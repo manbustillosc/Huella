@@ -1,0 +1,46 @@
+const sino = (id, texto, puntua) => ({ id, texto, tipo: 'sino', puntua });
+
+export default {
+  id: 'gds15',
+  nombre: 'Escala de Depresión Geriátrica (GDS-15)',
+  corto: 'GDS-15',
+  dominio: 'afectivo',
+  aliases: ['Yesavage', 'depresion', 'GDS', 'animo'],
+  descripcion: 'Cribado de depresión en personas mayores: 15 preguntas de sí o no, de 0 a 15 puntos.',
+  aplicacion: 'Pregunta al paciente cómo se ha sentido durante la última semana. Lee cada pregunta tal cual y registra la primera respuesta de sí o no.',
+  tiempo: '5 min',
+  min: 0,
+  max: 15,
+  items: [
+    sino('satisfecho', '¿Está básicamente satisfecho con su vida?', 'no'),
+    sino('renuncia', '¿Ha dejado muchas de sus actividades e intereses?', 'si'),
+    sino('vacia', '¿Siente que su vida está vacía?', 'si'),
+    sino('aburrido', '¿Se aburre con frecuencia?', 'si'),
+    sino('humor', '¿Está de buen humor la mayor parte del tiempo?', 'no'),
+    sino('temor', '¿Tiene miedo de que algo malo le vaya a pasar?', 'si'),
+    sino('feliz', '¿Se siente feliz la mayor parte del tiempo?', 'no'),
+    sino('desamparado', '¿Se siente a menudo desamparado?', 'si'),
+    sino('casa', '¿Prefiere quedarse en casa en lugar de salir y hacer cosas nuevas?', 'si'),
+    sino('memoria', '¿Siente que tiene más problemas de memoria que la mayoría de la gente?', 'si'),
+    sino('vivo', '¿Piensa que es maravilloso estar vivo?', 'no'),
+    sino('inutil', '¿Se siente inútil tal como está ahora?', 'si'),
+    sino('energia', '¿Se siente lleno de energía?', 'no'),
+    sino('desesperada', '¿Siente que su situación no tiene esperanza?', 'si'),
+    sino('mejor', '¿Cree que la mayoría de la gente está mejor que usted?', 'si'),
+  ],
+  bandas: [
+    { min: 0, max: 4, etiqueta: 'Sin datos de depresión', nivel: 'bien', texto: 'Puntaje normal: sin datos sugestivos de depresión.' },
+    { min: 5, max: 8, etiqueta: 'Depresión leve', nivel: 'leve', texto: 'Sugestivo de depresión leve. Confirmar con entrevista clínica.' },
+    { min: 9, max: 11, etiqueta: 'Depresión moderada', nivel: 'moderado', texto: 'Sugestivo de depresión moderada. Confirmar con entrevista clínica.' },
+    { min: 12, max: 15, etiqueta: 'Depresión grave', nivel: 'critico', texto: 'Sugestivo de depresión grave. Confirmar con entrevista clínica y explorar ideación suicida.' },
+  ],
+  notas: [
+    'Es una prueba de cribado, no diagnóstica: un puntaje de 5 o más amerita entrevista clínica.',
+    'Pierde fiabilidad en deterioro cognitivo moderado o grave; en ese caso considera la escala de Cornell.',
+    'El puntaje de cada pregunta depende de la respuesta: en 5 preguntas puntúa el «no».',
+  ],
+  referencias: [
+    { texto: 'Sheikh JI, Yesavage JA. Geriatric Depression Scale (GDS): recent evidence and development of a shorter version. Clin Gerontol. 1986;5(1-2):165-73.', doi: '10.1300/J018v05n01_09' },
+    { texto: 'Martínez de la Iglesia J, et al. Versión española del cuestionario de Yesavage abreviado (GDS) para el despistaje de depresión en mayores de 65 años: adaptación y validación. Medifam. 2002;12(10):620-30.' },
+  ],
+};
