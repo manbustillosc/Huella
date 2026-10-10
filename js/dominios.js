@@ -56,9 +56,9 @@ export const DOMINIOS = [
   },
   {
     id: 'prequirurgica', nombre: 'Prequirúrgica',
-    descripcion: 'Riesgo perioperatorio.',
+    descripcion: 'Riesgo cardiaco y pulmonar, capacidad funcional y vulnerabilidad geriátrica antes de la cirugía.',
     problemas: ['cirugía', 'preoperatorio'],
-    planeadas: ['ARISCAT', 'ASA', 'DASI', 'Caprini'],
+    planeadas: ['ASA', 'Caprini'],
   },
   {
     id: 'polifarmacia', nombre: 'Polifarmacia',
@@ -76,7 +76,7 @@ export const DOMINIOS = [
     id: 'paliativos', nombre: 'Paliativos y pronóstico',
     descripcion: 'Funcionalidad, síntomas y necesidades paliativas.',
     problemas: ['cuidados paliativos', 'pronóstico', 'fin de vida'],
-    planeadas: ['PPS', 'Karnofsky', 'Índice pronóstico paliativo (PPI)', 'NECPAL (registro)', 'Índice de Charlson', 'G8', 'VES-13'],
+    planeadas: ['Karnofsky', 'Índice pronóstico paliativo (PPI)', 'NECPAL (registro)', 'Índice de Charlson', 'G8', 'VES-13'],
   },
   {
     id: 'calculadoras', nombre: 'Calculadoras',

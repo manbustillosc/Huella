@@ -52,6 +52,9 @@ import camicu from './camicu.js';
 import fried from './fried.js';
 import tinetti from './tinetti.js';
 import gijon from './gijon.js';
+import ariscat from './ariscat.js';
+import dasi from './dasi.js';
+import pps from './pps.js';
 
 export const ESCALAS = [
   barthel, katz, lawton,
@@ -63,7 +66,8 @@ export const ESCALAS = [
   mnasf,
   braden,
   painad,
-  rcri,
+  rcri, ariscat, dasi,
+  pps,
   zarit, gijon,
   ckdepi, cockcroft,
 ];

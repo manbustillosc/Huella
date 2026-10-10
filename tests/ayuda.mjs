@@ -73,5 +73,8 @@ export const EJEMPLOS = {
     fuerza_estado: 'Medida con dinamómetro', fuerza: 16, peso_kg: 60, talla: 155, marcha_estado: 'Medida en 4.57 m', tiempo: 6.5, actividad: 'No bajo',
   }),
   tinetti: () => resp('tinetti', { equilibrio: 12, marcha: 9, ayuda: 'No' }),
+  ariscat: () => resp('ariscat', { edad: 82, spo2: 94, infeccion: 'No', anemia: 'No', incision: 'Abdominal alta', duracion: '2 a 3 h', urgencia: 'No' }),
+  dasi: () => resp('dasi', { cuidado: 'Sí', casa: 'Sí', cuadras: 'Sí', escaleras: 'Sí', correr: 'No', ligero: 'Sí', moderado: 'Sí', pesado: 'No', jardin: 'No', sexual: 'No', recreacion: 'No', deporte: 'No' }),
+  pps: () => resp('pps', { nivel: '50 %' }),
   gijon: () => resp('gijon', { familiar: 'Vive con cónyuge de similar edad', economica: '1 a 8 veces el salario mínimo mensual', vivienda: 'Adecuada a necesidades', relaciones: 'Relaciones sociales', apoyo: 'Con apoyo familiar y vecinal' }),
 };
