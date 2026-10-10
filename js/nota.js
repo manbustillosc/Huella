@@ -87,6 +87,7 @@ export function hallazgosYSugerencias(valoracion, escalasPorId, hoy = null) {
   const cambios = [];
   const avisos = [];
   const aplicados = [];
+  const alertas = [];
   const ids = [...new Set(valoracion.resultados.map((r) => r.escalaId))];
   for (const id of ids) {
     const escala = escalasPorId[id];
@@ -99,6 +100,7 @@ export function hallazgosYSugerencias(valoracion, escalasPorId, hoy = null) {
       noEvaluables.push(`${unir(escala.corto, etq)} (${minusculaInicial(vig.noEvaluable)})`);
     } else {
       aplicados.push(escala.corto);
+      for (const a of vig.alertas || []) alertas.push(`${unir(escala.corto, etq)}: ${a}`);
       if (vig.hallazgo) hallazgos.push(`${unir(escala.corto, etq)}: ${valorGuardado(vig)}.`);
       for (const s of vig.sugerencias || []) if (!sugerencias.includes(s)) sugerencias.push(s);
     }
@@ -118,7 +120,7 @@ export function hallazgosYSugerencias(valoracion, escalasPorId, hoy = null) {
   }
   const dias = amplitudDias(valoracion.resultados);
   if (dias > DIAS_EPISODIO) avisos.push(`Las aplicaciones abarcan ${dias} días: verifica que pertenezcan al mismo episodio clínico.`);
-  return { hallazgos, sugerencias, noEvaluables, cambios, avisos, aplicados };
+  return { hallazgos, sugerencias, noEvaluables, cambios, avisos, aplicados, alertas };
 }
 
 /* ---------- Nota ---------- */
@@ -156,7 +158,7 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
   }
 
   if (formato === 'completa') {
-    const { hallazgos, sugerencias, noEvaluables, cambios, avisos, aplicados } = hallazgosYSugerencias(valoracion, escalasPorId, hoy);
+    const { hallazgos, sugerencias, noEvaluables, cambios, avisos, aplicados, alertas } = hallazgosYSugerencias(valoracion, escalasPorId, hoy);
     const l = ['VALORACIÓN GERIÁTRICA INTEGRAL', `Fecha: ${f}`];
     if (datos.length) l.push(`Paciente: ${datos.join(', ')}.`);
     if (contexto) l.push(`Contexto clínico: ${contexto}.`);
@@ -197,8 +199,9 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
     }
 
     l.push('', '4. HALLAZGOS QUE REQUIEREN ATENCIÓN');
+    if (alertas.length) l.push(...alertas.map((a) => `- ALERTA: ${a}`));
     if (hallazgos.length) l.push(...hallazgos.map((h) => `- ${h}`));
-    else if (aplicados.length) l.push(`- Sin hallazgos que requieran atención en los instrumentos aplicados (${aplicados.join(', ')}); la conclusión se limita a ellos.`);
+    else if (aplicados.length && !alertas.length) l.push(`- Sin hallazgos que requieran atención en los instrumentos aplicados (${aplicados.join(', ')}); la conclusión se limita a ellos.`);
     else l.push('- No hay instrumentos interpretables en esta valoración.');
     if (noEvaluables.length) l.push(`- Instrumentos no evaluables: ${noEvaluables.join('; ')}.`);
     if (avisos.length) l.push(...avisos.map((a) => `- Verificar: ${a}`));

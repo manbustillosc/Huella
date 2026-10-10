@@ -24,6 +24,7 @@ function filaResultado(r, cambio = null, esRef = false, ref = null) {
         <span class="fr-texto">
           <span class="fr-nombre">${esc(e.corto)}${etq ? ` <span class="fr-momento">${esc(etq)}</span>` : ''}${esRef ? ' <span class="fr-ref">referencia</span>' : ''}</span>
           <span class="fr-res">${esc(valorGuardado(r))}</span>
+          ${r.alertas?.length ? `<span class="fr-alerta">${icono('alerta')} Alerta de seguridad: ${esc(r.alertas[0].split(':')[0])}</span>` : ''}
           ${cambio ? `<span class="fr-cambio cambio-${cambio.tipo}"><span aria-hidden="true">${ICONO_CAMBIO[cambio.tipo]}</span> ${esc(textoCambio(cambio, ref ? textoRespectoA(ref) : ''))}</span>` : ''}
           ${meta ? `<span class="fr-meta">${esc(meta)}</span>` : ''}
         </span>

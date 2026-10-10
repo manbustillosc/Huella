@@ -8,21 +8,21 @@ export const DOMINIOS = [
   },
   {
     id: 'cognitivo', nombre: 'Cognitivo',
-    descripcion: 'Tamizaje y evaluación del deterioro cognitivo.',
+    descripcion: 'Tamizaje, evaluación y estadificación del deterioro cognitivo.',
     problemas: ['memoria', 'demencia', 'olvidos'],
-    planeadas: ['MMSE (registro)', 'Fluencia verbal semántica', 'GPCOG', 'Prueba de Isaacs', 'CDR (registro)', 'GDS-FAST de Reisberg'],
+    planeadas: ['MMSE (registro)', 'Fluencia verbal semántica', 'GPCOG', 'Prueba de Isaacs', 'Escala de Deterioro Global (GDS) de Reisberg'],
   },
   {
     id: 'afectivo', nombre: 'Afectivo',
     descripcion: 'Síntomas depresivos, ansiedad y soledad.',
     problemas: ['depresión', 'ansiedad', 'tristeza', 'insomnio'],
-    planeadas: ['PHQ-9', 'CES-D 7', 'GAD-7', 'Escala de soledad de 3 ítems', 'Escala Atenas de insomnio'],
+    planeadas: ['CES-D 7', 'GAD-7', 'Escala de soledad de 3 ítems', 'Escala Atenas de insomnio'],
   },
   {
     id: 'delirium', nombre: 'Delirium y conducta',
-    descripcion: 'Detección de delirium y síntomas neuropsiquiátricos.',
-    problemas: ['confusión', 'agitación'],
-    planeadas: ['RASS', 'NPI-Q (registro)'],
+    descripcion: 'Detección de delirium, nivel de sedación y síntomas neuropsiquiátricos.',
+    problemas: ['confusión', 'agitación', 'sedación', 'conducta'],
+    planeadas: [],
   },
   {
     id: 'fragilidad', nombre: 'Fragilidad y sarcopenia',

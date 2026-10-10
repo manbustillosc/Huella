@@ -2,7 +2,9 @@
 import { icono } from './iconos.js';
 import { almacen } from './almacen.js';
 import { porId, dominioDe, escalasDe } from './datos.js';
-import { TIPOS } from './motor.js';
+import { TIPOS, CLASES, claseDe, TEXTO_REGISTRO } from './motor.js';
+import { valorGuardado } from './nota.js';
+import { vigenteDe, etiquetaAplicacion, fechaCorta } from './comparacion.js';
 
 export { icono };
 export const $ = (sel, raiz = document) => raiz.querySelector(sel);
@@ -43,21 +45,38 @@ export function botonEstrella(id) {
   return `<button class="btn-icono btn-estrella" type="button" data-fav="${id}" aria-pressed="${fav}" aria-label="${fav ? 'Quitar de' : 'Agregar a'} favoritas: ${esc(nombre)}">${icono('estrella')}</button>`;
 }
 
-export function chipTipo(e) {
-  return `<span class="chip-tipo tipo-${e.tipo}">${esc(TIPOS[e.tipo])}</span>`;
+export function chipTipo(e, { detallado = false } = {}) {
+  const clase = claseDe(e);
+  const nombre = detallado ? TIPOS[e.tipo] : CLASES[clase].nombre;
+  const registro = e.registro ? `<span class="chip-tipo chip-registro" title="Instrumento con titular de derechos: se captura el resultado sin reproducir los reactivos.">${esc(TEXTO_REGISTRO)}</span>` : '';
+  return `<span class="chip-tipo clase-${clase}" title="${esc(CLASES[clase].ayuda)}"><span class="chip-marca" aria-hidden="true"></span>${esc(nombre)}</span>${registro}`;
 }
 
-export function filaEscala(e, { conDominio = false } = {}) {
-  const meta = [conDominio ? dominioDe(e.dominio).nombre : null, TIPOS[e.tipo], e.tiempo].filter(Boolean).join(' · ');
+// Estado del instrumento en la valoración en curso: resultado vigente o sin aplicar.
+export function estadoEnValoracion(e) {
+  const rs = almacen.resultadosDe(e.id);
+  if (!rs.length) return { hecho: false, texto: 'Sin aplicar en esta valoración' };
+  const vig = vigenteDe(rs);
+  const cuando = etiquetaAplicacion(vig) || (vig.fecha ? fechaCorta(vig.fecha) : '');
+  const n = rs.length > 1 ? ` · ${rs.length} aplicaciones` : '';
+  return { hecho: true, texto: `En la valoración${cuando ? ` (${cuando})` : ''}: ${valorGuardado(vig)}${n}` };
+}
+
+export function filaEscala(e, { conDominio = false, detalle = false, estado = true } = {}) {
+  const meta = [conDominio ? dominioDe(e.dominio).nombre : null, e.tiempo].filter(Boolean).join(' · ');
+  const st = estado ? estadoEnValoracion(e) : null;
+  const indicado = detalle && e.problemas?.length ? `<span class="fila-indicado">Útil en: ${esc(e.problemas.slice(0, 4).join(', '))}</span>` : '';
   return `
     <div class="fila-escala">
       <a class="fila-enlace" href="#/e/${e.id}">
         <span class="fila-texto">
           <span class="fila-nombre">${esc(e.nombre)}</span>
           <span class="fila-desc">${esc(e.descripcion)}</span>
-          <span class="fila-meta">${esc(meta)}</span>
+          ${indicado}
+          <span class="fila-etiquetas">${chipTipo(e)}<span class="fila-meta">${esc(meta)}</span></span>
+          ${st ? `<span class="fila-estado${st.hecho ? ' hecho' : ''}">${icono(st.hecho ? 'completo' : 'pendiente')} ${esc(st.texto)}</span>` : ''}
         </span>
-        ${icono('adelante', 'chev')}
+        ${detalle ? `<span class="fila-aplicar" aria-hidden="true">${st?.hecho ? 'Repetir' : 'Aplicar'}</span>` : icono('adelante', 'chev')}
       </a>
       ${botonEstrella(e.id)}
     </div>`;

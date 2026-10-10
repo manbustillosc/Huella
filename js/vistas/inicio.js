@@ -1,7 +1,7 @@
 // Inicio orientado a tareas, búsqueda, dominios y favoritas.
 import { almacen } from '../almacen.js';
 import { escalas, porId, DOMINIOS, RUTAS, dominioDe, escalasDe } from '../datos.js';
-import { TIPOS } from '../motor.js';
+import { TIPOS, CLASES, claseDe, TEXTO_REGISTRO } from '../motor.js';
 import { $, esc, icono, plural, sinAcentos, filaEscala, tarjetaDominio } from '../ui.js';
 import { progresoRuta, tiempoRuta } from './rutas-estado.js';
 import { diasDesde } from './valoracion.js';
@@ -69,7 +69,7 @@ export function renderInicio() {
 
 function textoBusqueda(e) {
   const d = dominioDe(e.dominio);
-  return sinAcentos([e.nombre, e.corto, ...(e.aliases || []), ...(e.problemas || []), d.nombre, ...(d.problemas || []), TIPOS[e.tipo]].join(' '));
+  return sinAcentos([e.nombre, e.corto, ...(e.aliases || []), ...(e.problemas || []), d.nombre, ...(d.problemas || []), TIPOS[e.tipo], CLASES[claseDe(e)].nombre, e.registro ? `${TEXTO_REGISTRO} registro` : ''].join(' '));
 }
 
 export function resultadosBusqueda(q) {
@@ -102,9 +102,21 @@ export function montarInicio() {
   });
 }
 
+// Más usados del dominio en este dispositivo (solo con usos registrados).
+function masUsadosDe(dominioId) {
+  const usos = almacen.usos();
+  return escalasDe(dominioId)
+    .filter((e) => usos[e.id]?.n)
+    .sort((a, b) => usos[b.id].n - usos[a.id].n || usos[b.id].t - usos[a.id].t)
+    .slice(0, 3);
+}
+
 export function renderDominio({ id }) {
   const d = dominioDe(id);
   const lista = escalasDe(id);
+  const usados = lista.length > 3 ? masUsadosDe(id) : [];
+  const clases = [...new Set(lista.map(claseDe))];
+  const aplicados = lista.filter((e) => almacen.resultadosDe(e.id).length).length;
   return `
     <section class="vista dominio">
       <a class="migas" href="#/">${icono('atras')} Inicio</a>
@@ -116,8 +128,14 @@ export function renderDominio({ id }) {
           <p class="entradilla">${esc(d.descripcion)}</p>
         </div>
       </header>
-      ${lista.length
-        ? `<div class="lista-escalas">${lista.map((e) => filaEscala(e)).join('')}</div>`
+      ${lista.length ? `
+        <p class="dominio-resumen">${plural(lista.length, 'instrumento disponible', 'instrumentos disponibles')}${aplicados ? ` · ${aplicados} en la valoración en curso` : ''}</p>
+        ${clases.length > 1 ? `<ul class="leyenda-clases" aria-label="Tipos de instrumento">${clases.map((c) => `<li><span class="chip-tipo clase-${c}"><span class="chip-marca" aria-hidden="true"></span>${esc(CLASES[c].nombre)}</span><span>${esc(CLASES[c].ayuda)}</span></li>`).join('')}</ul>` : ''}
+        ${usados.length ? `
+          <h2 class="seccion">Más usados aquí</h2>
+          <div class="lista-escalas">${usados.map((e) => filaEscala(e, { detalle: true })).join('')}</div>
+          <h2 class="seccion">Todos</h2>` : ''}
+        <div class="lista-escalas">${lista.map((e) => filaEscala(e, { detalle: true })).join('')}</div>`
         : '<p class="vacio-texto">Aún no hay instrumentos en este dominio.</p>'}
       ${d.planeadas.length ? `
         <h2 class="seccion">Próximamente</h2>

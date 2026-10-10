@@ -14,7 +14,7 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `escalas/index.js` | Lista de escalas que muestra la app. |
 | `js/dominios.js` | Dominios de valoración, problemas clínicos que cubren y escalas planeadas. |
 | `js/rutas.js` | Rutas guiadas («¿Qué deseas valorar?»): núcleo, complementarias, finalidad de cada paso y momento. |
-| `js/motor.js` | Tipos de campo, cálculo, estados (sin responder, no aplica, no evaluable), listas con «Ninguno», validaciones cruzadas, interpretación y texto por escala. |
+| `js/motor.js` | Tipos y clases de instrumento, tipos de campo, cálculo, estados (sin responder, no aplica, no evaluable), listas con «Ninguno», validaciones cruzadas, interpretación y texto por escala. |
 | `js/comparacion.js` | Orden cronológico, referencia, resultado vigente y dirección clínica de cada cambio. |
 | `js/nota.js` | Nota de la valoración: párrafo, lista y completa (resultados, interpretación, cambios, hallazgos, sugerencias). |
 | `js/almacen.js` | Guardado local: valoración, aplicaciones repetidas, respuestas en curso y preferencias. |
@@ -41,6 +41,16 @@ En el resultado de cada escala y en **Valoración**, el texto se copia en varios
 - Cada instrumento declara su `direccionClinica` (`mayor_mejor`, `menor_mejor` o `sin_direccion`). La comparación distingue mejoría, empeoramiento, sin cambio, cambio no interpretable y variación sin significado clínico uniforme, con el valor sin redondear.
 - Huella avisa si las fechas no cuadran con los momentos o si una valoración abarca más de 90 días.
 
+## Clases de instrumento
+
+Cada instrumento pertenece a una de seis clases que se distinguen por color y forma en todas las listas: **tamizaje**, **evaluación clínica** (incluye algoritmos diagnósticos y pruebas de desempeño), **estadificación**, **índice pronóstico**, **calculadora** y **lista de verificación**. La marca **registro de resultado** (`registro: true`) indica que el instrumento tiene titular de derechos: Huella captura su resultado sin reproducir los reactivos.
+
+## Conexiones entre instrumentos
+
+- `vinculos`: datos de otra prueba de la misma valoración (por ejemplo, la RASS en el CAM-ICU). Se muestran con su fecha y solo se usan si el médico toca «Usar este dato»; algunos exigen que el dato sea de hoy.
+- `siguientes`: siguiente paso sugerido según el resultado (por ejemplo, Mini-Cog positivo → MoCA o RUDAS). Solo es un enlace.
+- `alertas`: avisos de seguridad que devuelve `calcular` (por ejemplo, reactivo 9 del PHQ-9). Se destacan en el resultado, se marcan en la valoración y abren los hallazgos de la nota completa.
+
 ## Agregar una escala
 
 1. Crear `escalas/<nombre>.js` con el mismo formato que las existentes.
@@ -51,7 +61,7 @@ En el resultado de cada escala y en **Valoración**, el texto se copia en varios
 
 ## Aviso
 
-Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algunas escalas tienen titular de derechos (por ejemplo MMSE, MoCA, MNA, Zarit, CFS, Braden); para esas se captura solo el puntaje y los puntos de corte, salvo permiso del titular.
+Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algunas escalas tienen titular de derechos (por ejemplo MoCA, MNA, Zarit, CFS, Braden, RUDAS, CDR, Cornell, NPI-Q); para esas se captura solo el resultado y los puntos de corte publicados, salvo permiso del titular.
 
 ## Créditos
 

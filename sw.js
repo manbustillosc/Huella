@@ -1,6 +1,6 @@
 // Service worker: guarda la app en el dispositivo para que funcione sin conexión.
 // Al cambiar cualquier archivo, sube VERSION para que los celulares descarguen la nueva versión.
-const VERSION = 'huella-1.1.0';
+const VERSION = 'huella-1.2.0';
 
 const ARCHIVOS = [
   './',
@@ -30,6 +30,14 @@ const ARCHIVOS = [
   './escalas/cfs.js',
   './escalas/ckdepi.js',
   './escalas/cockcroft.js',
+  './escalas/rudas.js',
+  './escalas/cdr.js',
+  './escalas/fast.js',
+  './escalas/phq9.js',
+  './escalas/cornell.js',
+  './escalas/npiq.js',
+  './escalas/rass.js',
+  './escalas/camicu.js',
   './escalas/cuatro-at.js',
   './escalas/frail.js',
   './escalas/gds15.js',

@@ -22,6 +22,9 @@ export default {
   textoEmpeoramiento: 'aumento de síntomas depresivos',
   min: 0,
   max: 15,
+  siguientes: [
+    { id: 'cornell', si: (res) => Boolean(res.noEvaluable), motivo: 'Si el deterioro cognitivo impide responder: síntomas depresivos con informante.' },
+  ],
   campos: [
     sino('satisfecho', '¿En general, está satisfecho(a) con su vida?', 'no'),
     sino('renuncia', '¿Ha abandonado muchas de sus tareas habituales y aficiones?', 'si'),

@@ -110,7 +110,7 @@ function fichaEscala(e) {
     <details class="ficha">
       <summary>${icono('info')} Objetivo, población e instrucciones <span>· ${esc(e.tiempo)}</span></summary>
       <dl class="ficha-datos">
-        <div><dt>Tipo</dt><dd>${esc(TIPOS[e.tipo])}</dd></div>
+        <div><dt>Tipo</dt><dd>${esc(TIPOS[e.tipo])}${e.registro ? ' · registro de resultado (no reproduce los reactivos)' : ''}</dd></div>
         <div><dt>Objetivo</dt><dd>${esc(e.objetivo)}</dd></div>
         <div><dt>Población</dt><dd>${esc(e.poblacion)}</dd></div>
         <div><dt>Tiempo</dt><dd>${esc(e.tiempo)}</dd></div>
@@ -582,6 +582,7 @@ export function aGuardado(e, res, r, momento) {
     resumen: resumenDe(e, res),
     breve: resumenBreveDe(e, res),
     noEvaluable: res.noEvaluable || null,
+    alertas: res.alertas?.length ? [...res.alertas] : null,
     extras: res.noEvaluable ? null : JSON.parse(JSON.stringify(res.extras || {})),
     respuestas,
     fecha: r._fecha || hoyISO(),
@@ -713,6 +714,21 @@ function botonesGuardado(ctx, plan) {
   return { principal, alterna, nota };
 }
 
+// Siguiente paso sugerido por el resultado: solo enlaza; nada se aplica ni se copia sin que el médico lo decida.
+function bloqueSiguientes(e, res) {
+  const xs = (e.siguientes || []).filter((x) => porId[x.id] && x.si(res));
+  if (!xs.length) return '';
+  return `
+    <section class="siguientes">
+      <h2 class="sub">${icono('ruta')} Siguiente paso sugerido</h2>
+      <ul>${xs.map((x) => {
+        const rs = almacen.resultadosDe(x.id);
+        const vig = rs.length ? vigenteDe(rs) : null;
+        return `<li><a href="#/e/${x.id}"><strong>${esc(porId[x.id].corto)}</strong>${icono('adelante', 'chev')}</a><span>${esc(x.motivo)}</span>${vig ? `<span class="sig-hecho">Ya en esta valoración (${esc(etiquetaAplicacion(vig) || fechaCorta(vig.fecha))}): ${esc(valorGuardado(vig))}</span>` : ''}</li>`;
+      }).join('')}</ul>
+    </section>`;
+}
+
 export function renderResultado(params) {
   const ctx = contexto(params);
   const { e } = ctx;
@@ -740,6 +756,14 @@ export function renderResultado(params) {
           ? '<p class="puntaje"><span class="puntaje-texto">No evaluable</span></p>'
           : `<p class="puntaje"><span class="puntaje-num${String(res.mostrar).length > 4 ? ' largo' : ''}">${esc(res.mostrar)}</span><span class="puntaje-de">${esc(res.sufijo)}</span></p>`}
         <p class="chip nivel-${b.nivel}"><span class="punto" aria-hidden="true"></span>${esc(b.etiqueta)}</p>
+        ${res.alertas?.length ? `
+          <div class="alerta-seguridad" role="alert">
+            ${icono('alerta')}
+            <div>
+              <p class="alerta-titulo">Requiere atención hoy</p>
+              ${res.alertas.map((a) => `<p>${esc(a)}</p>`).join('')}
+            </div>
+          </div>` : ''}
         ${barra ? `
           <div class="barra-bandas" role="img" aria-label="${esc(`${res.mostrar} ${res.unidad || ''}: ${b.etiqueta}`)}">
             ${e.bandas.map((x) => `<span class="seg nivel-${x.nivel}"></span>`).join('')}
@@ -762,6 +786,7 @@ export function renderResultado(params) {
             <p class="sugerencias-nota">Orientativas; no son resultados del instrumento ni sustituyen el juicio clínico.</p>
             <ul>${b.sugerencias.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
           </section>` : ''}
+        ${bloqueSiguientes(e, res)}
         <h2 class="sub">Limitaciones e interpretación</h2>
         <ul class="notas">${e.notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
         ${res.desglose.length && !res.noEvaluable ? `

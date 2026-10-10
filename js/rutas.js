@@ -18,6 +18,7 @@ export const RUTAS = [
       { id: 'sarcf', nota: 'Si FRAIL es positivo, o hay debilidad o caídas.' },
       { id: 'mnasf', nota: 'Si hay pérdida de peso o disminución del apetito.' },
       { id: 'tug', nota: 'Si hay caídas o alteración de la marcha.' },
+      { id: 'phq9', nota: 'Alternativa a la GDS-15 si necesitas graduar la intensidad o seguir el tratamiento; no apliques ambas.' },
     ],
   },
   {
@@ -43,7 +44,7 @@ export const RUTAS = [
   },
   {
     id: 'hospital', nombre: 'Valoración hospitalaria', icono: 'hospital',
-    descripcion: 'Funcionalidad basal y actual, delirium, fragilidad basal, riesgo de lesiones por presión, dolor y nutrición.',
+    descripcion: 'Funcionalidad basal y actual, delirium, fragilidad basal, riesgo de lesiones por presión, dolor y nutrición; RASS y CAM-ICU en UCI.',
     momento: 'ingreso',
     momentos: ['ingreso', 'actual', 'egreso'],
     pasos: [
@@ -61,8 +62,9 @@ export const RUTAS = [
       { id: 'katz', nota: 'Alternativa al Barthel en el momento elegido.' },
       { id: 'ckdepi', nota: 'Función renal: categoría KDIGO de la TFG estimada.' },
       { id: 'cockcroft', nota: 'Depuración de creatinina para dosificar fármacos.' },
+      { id: 'rass', nota: 'Nivel de agitación o sedación; en UCI es el paso previo del CAM-ICU.' },
+      { id: 'camicu', nota: 'Solo en UCI o con ventilación mecánica; no es intercambiable con el CAM.' },
     ],
-    planes: ['RASS'],
   },
   {
     id: 'cognitiva', nombre: 'Evaluación cognitiva', icono: 'cognitivo',
@@ -76,9 +78,14 @@ export const RUTAS = [
     ],
     complementarios: [
       { id: 'barthel', nota: 'Actividades básicas si se sospecha un deterioro avanzado.' },
+      { id: 'rudas', nota: 'Tamizaje alternativo si la escolaridad o el idioma limitan el Mini-Cog o el MoCA.' },
+      { id: 'cdr', nota: 'Estadificación si se confirma un trastorno neurocognitivo (entrevista y algoritmo oficiales).' },
+      { id: 'fast', nota: 'Estadio funcional en enfermedad de Alzheimer; distinto del CDR y de la GDS de Reisberg.' },
+      { id: 'npiq', nota: 'Síntomas neuropsiquiátricos y angustia del cuidador, con un informante.' },
+      { id: 'cornell', nota: 'Síntomas depresivos con informante cuando la GDS-15 no es fiable por el deterioro cognitivo.' },
       { id: 'zarit', nota: 'Si hay un cuidador principal.' },
     ],
-    planes: ['MMSE (registro)', 'FAQ de Pfeffer', 'CDR (registro)'],
+    planes: ['MMSE (registro)', 'FAQ de Pfeffer'],
   },
   {
     id: 'fragilidad', nombre: 'Fragilidad y movilidad', icono: 'fragilidad',

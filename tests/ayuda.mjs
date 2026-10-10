@@ -36,6 +36,7 @@ export function guardado(id, respuestas, extra = {}) {
     escalaId: id, puntaje: res.puntaje, max: res.max, valor: res.valor, unidad: res.unidad, mostrar: res.mostrar,
     nivel: res.banda.nivel, etiqueta: res.banda.etiqueta, hallazgo: Boolean(res.banda.hallazgo), sugerencias: res.banda.sugerencias || [],
     resumen: resumenDe(e, res), breve: resumenBreveDe(e, res), noEvaluable: res.noEvaluable || null,
+    alertas: res.alertas?.length ? [...res.alertas] : null,
     extras: res.noEvaluable ? null : JSON.parse(JSON.stringify(res.extras || {})),
     respuestas, guardado: contador, ...extra,
   };
@@ -56,4 +57,15 @@ export const EJEMPLOS = {
   painad: () => todos('painad', () => 1), rcri: () => todos('rcri', () => 1), zarit: () => resp('zarit', { puntaje: 50 }),
   ckdepi: () => resp('ckdepi', { creatinina: 1.2, edad: 78, sexo: 'Hombre' }),
   cockcroft: () => resp('cockcroft', { edad: 78, sexo: 'Hombre', creatinina: 1.2, peso: 70, peso_uso: 'Peso real' }),
+  rudas: () => resp('rudas', { memoria: 6, orientacion: 5, praxis: 2, dibujo: 2, juicio: 3, lenguaje: 6 }),
+  cdr: () => resp('cdr', { global: '1 · Demencia leve', casillas: 'Sí', m: '1', o: '1', j: '1', c: '1', h: '1', p: '0' }),
+  fast: () => resp('fast', { estadio: '4 · actividades instrumentales complejas', ordinal: 'Sí' }),
+  phq9: () => resp('phq9', { ...todos('phq9', () => 1), dificultad: 'Un poco difícil' }),
+  cornell: () => resp('cornell', { entrevista: 'Informante y paciente', sA: 3, sB: 1, sC: 1, sD: 2, sE: 1, na: 0, delirium: 'Sí' }),
+  npiq: () => resp('npiq', {
+    ...Object.fromEntries(['delirios', 'alucinaciones', 'agitacion', 'depresion', 'ansiedad', 'euforia', 'apatia', 'desinhibicion', 'irritabilidad', 'motora', 'sueno', 'apetito'].map((id) => [id, 'No'])),
+    apatia: 'Sí', apatia_g: '2 · Moderada', apatia_a: '1 · Mínima',
+  }),
+  rass: () => resp('rass', { nivel: '0 · Alerta y tranquilo' }),
+  camicu: () => resp('camicu', { rass: '0 · Alerta y tranquilo', agudo: 'Ausente' }),
 };

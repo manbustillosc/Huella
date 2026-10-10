@@ -22,6 +22,10 @@ export default {
   permiteNoEvaluable: false,
   min: 0,
   max: 12,
+  siguientes: [
+    { id: 'cam', si: (res) => !res.noEvaluable && res.puntaje >= 4, motivo: 'Algoritmo para identificar delirium; fuera de UCI.' },
+    { id: 'camicu', si: (res) => !res.noEvaluable && res.puntaje >= 4, motivo: 'Solo si está en UCI (no es intercambiable con el CAM).' },
+  ],
   campos: [
     {
       id: 'alerta', texto: 'Alerta', textoCorto: 'alerta',

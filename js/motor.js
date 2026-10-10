@@ -13,14 +13,32 @@ export const TEXTO_NINGUNO = 'Ninguno de los anteriores';
 
 export const TIPOS = {
   tamizaje: 'Tamizaje',
-  evaluacion: 'Escala de evaluación',
+  evaluacion: 'Evaluación clínica',
   diagnostico: 'Algoritmo diagnóstico',
   desempeno: 'Prueba de desempeño físico',
+  estadificacion: 'Estadificación',
+  pronostico: 'Índice pronóstico',
   calculadora: 'Calculadora clínica',
-  registro: 'Registro de puntaje oficial',
-  pronostico: 'Índice de riesgo',
+  lista: 'Lista de verificación',
   prescripcion: 'Algoritmo de prescripción',
 };
+
+// Seis clases que se distinguen visualmente; cada tipo pertenece a una.
+// «registro» no es un tipo sino una marca: el instrumento tiene titular de derechos y solo se captura su resultado.
+export const CLASES = {
+  tamizaje: { nombre: 'Tamizaje', ayuda: 'Identifica a quién evaluar más a fondo; no diagnostica.' },
+  evaluacion: { nombre: 'Evaluación clínica', ayuda: 'Mide o describe un dominio, o aplica un algoritmo clínico.' },
+  estadificacion: { nombre: 'Estadificación', ayuda: 'Asigna un estadio de gravedad o de progresión.' },
+  pronostico: { nombre: 'Índice pronóstico', ayuda: 'Estima un riesgo para un desenlace, población y horizonte definidos.' },
+  calculadora: { nombre: 'Calculadora', ayuda: 'Calcula un valor o una indicación a partir de datos.' },
+  lista: { nombre: 'Lista de verificación', ayuda: 'Revisión estructurada criterio por criterio, sin puntaje.' },
+};
+const CLASE_DE_TIPO = {
+  tamizaje: 'tamizaje', evaluacion: 'evaluacion', diagnostico: 'evaluacion', desempeno: 'evaluacion',
+  estadificacion: 'estadificacion', pronostico: 'pronostico', calculadora: 'calculadora', prescripcion: 'calculadora', lista: 'lista',
+};
+export const claseDe = (escala) => CLASE_DE_TIPO[escala.tipo] || 'evaluacion';
+export const TEXTO_REGISTRO = 'Registro de resultado';
 
 export const MOMENTOS = [
   { id: 'basal', nombre: 'Basal', ayuda: 'Previo a la enfermedad aguda', enNota: 'basal' },
@@ -98,7 +116,7 @@ export function normalizarEscala(escala) {
     ...escala,
     campos,
     items: campos,
-    permiteNoEvaluable: escala.permiteNoEvaluable ?? !['calculadora', 'prescripcion', 'pronostico'].includes(escala.tipo),
+    permiteNoEvaluable: escala.permiteNoEvaluable ?? !['calculadora', 'prescripcion', 'pronostico', 'lista'].includes(escala.tipo),
   };
 }
 

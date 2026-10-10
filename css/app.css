@@ -1007,7 +1007,6 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
   color: var(--ink-muted);
   background: var(--surface-100);
 }
-.chip-tipo.tipo-registro, .chip-tipo.tipo-calculadora { border-style: dashed; }
 
 /* Ficha del instrumento */
 .ficha {
@@ -1305,6 +1304,56 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .avisos-cronologia ul { margin: var(--space-2) 0 0; padding-left: var(--space-6); }
 .aviso-episodio .ico, .avisos-cronologia .ico { width: 18px; height: 18px; flex: none; color: var(--orange-deep); }
 .en-curso-aviso { display: block; margin-top: 2px; font-size: 12px; color: var(--orange-deep) !important; }
+
+/* ---------- Fase 2 ---------- */
+/* Clases de instrumento: color de marca y forma distinta (el nombre siempre se lee). */
+.chip-tipo { gap: 6px; }
+.chip-tipo + .chip-tipo { margin-left: var(--space-1); }
+.chip-marca { width: 8px; height: 8px; flex: none; background: var(--clase, var(--ink-muted)); }
+.clase-tamizaje { --clase: var(--green); }
+.clase-tamizaje .chip-marca { border-radius: 50%; }
+.clase-evaluacion { --clase: var(--terracotta); }
+.clase-evaluacion .chip-marca { border-radius: 2px; }
+.clase-estadificacion { --clase: var(--orange); }
+.clase-estadificacion .chip-marca { clip-path: polygon(0 100%, 0 66%, 33% 66%, 33% 33%, 66% 33%, 66% 0, 100% 0, 100% 100%); }
+.clase-pronostico { --clase: var(--terracotta-deep); }
+.clase-pronostico .chip-marca { transform: rotate(45deg) scale(0.85); }
+.clase-calculadora { --clase: var(--orange-deep); border-style: dashed; }
+.clase-calculadora .chip-marca { background: transparent; border: 2px solid var(--clase); border-radius: 50%; }
+.clase-lista { --clase: var(--green-deep); }
+.clase-lista .chip-marca { width: 5px; height: 9px; background: transparent; border: solid var(--clase); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
+.chip-tipo.clase-tamizaje, .chip-tipo.clase-evaluacion, .chip-tipo.clase-estadificacion, .chip-tipo.clase-pronostico, .chip-tipo.clase-calculadora, .chip-tipo.clase-lista { border-color: color-mix(in srgb, var(--clase) 55%, var(--line)); color: var(--ink); }
+.chip-registro { border-style: dashed; font-weight: 500; }
+
+.fila-etiquetas { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); margin-top: var(--space-1); }
+.fila-etiquetas .fila-meta { margin-top: 0; }
+.fila-indicado { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.fila-estado { display: flex; align-items: flex-start; gap: 6px; margin-top: var(--space-1); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.fila-estado .ico { width: 16px; height: 16px; flex: none; margin-top: 1px; }
+.fila-estado.hecho { color: var(--green-deep); font-weight: 500; }
+.fila-aplicar { flex: none; align-self: center; padding: 6px var(--space-3); border-radius: var(--radius-pill); background: var(--acento); color: var(--on-acento); font-size: 13px; font-weight: 600; }
+.dominio-resumen { margin: 0 0 var(--space-3); font-size: 14px; color: var(--ink-muted); }
+.leyenda-clases { list-style: none; margin: 0 0 var(--space-4); padding: 0; display: grid; gap: var(--space-2); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.leyenda-clases li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
+/* Alerta de seguridad (p. ej., reactivo 9 del PHQ-9): destacada y separada de la interpretación. */
+.alerta-seguridad { display: flex; gap: var(--space-3); align-items: flex-start; margin: var(--space-4) 0; padding: var(--space-4); border: 2px solid var(--terracotta-deep); border-radius: var(--radius-md); background: var(--surface-100); color: var(--ink); font-size: 15px; line-height: 22px; }
+.alerta-seguridad > .ico { width: 22px; height: 22px; flex: none; color: var(--terracotta-deep); }
+.alerta-seguridad p { margin: 0; }
+.alerta-seguridad p + p { margin-top: var(--space-2); }
+.alerta-titulo { font-weight: 700; color: var(--terracotta-deep); }
+.fr-alerta { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--terracotta-deep); }
+.fr-alerta .ico { width: 14px; height: 14px; }
+
+/* Siguiente paso sugerido */
+.siguientes { margin-top: var(--space-4); padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-200); }
+.siguientes .sub { display: flex; align-items: center; gap: var(--space-2); margin: 0; font-size: 18px; }
+.siguientes .sub .ico { color: var(--acento); }
+.siguientes ul { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; gap: var(--space-3); }
+.siguientes li { display: grid; gap: 2px; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.siguientes li a { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; color: var(--acento); font-size: 16px; }
+.siguientes li a .chev { width: 16px; height: 16px; }
+.sig-hecho { color: var(--green-deep); font-size: 13px; }
 
 @media print {
   .tira-ruta, .segmentado, .ficha, .aplicacion, .no-evaluable, .vinculos { display: none !important; }
