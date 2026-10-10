@@ -59,6 +59,12 @@ export function resumenDe(escala, resultado) {
   return `${escala.corto}: ${resultado.puntaje}/${resultado.max} (${minusculaInicial(resultado.banda.etiqueta)}).`;
 }
 
+// Versión compacta, sin punto final, para la nota en párrafo: «Barthel 90/100 (dependencia moderada)».
+export function resumenBreveDe(escala, resultado) {
+  if (escala.resumenBreve) return escala.resumenBreve(resultado);
+  return `${escala.corto} ${resultado.puntaje}/${resultado.max} (${minusculaInicial(resultado.banda.etiqueta)})`;
+}
+
 // Posición del marcador en una barra de bandas de igual ancho (0–1).
 export function posicionMarcador(escala, puntaje) {
   const n = escala.bandas.length;
@@ -98,22 +104,40 @@ export function validarEscala(escala) {
 }
 
 const SEXO = { mujer: 'mujer', hombre: 'hombre' };
+export const FORMATOS_NOTA = ['parrafo', 'lista'];
 
-export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new Date()) {
-  const lineas = [];
+// Texto breve de un resultado guardado; reconstruye uno si se guardó con una versión anterior.
+function breveGuardado(r, escalasPorId) {
+  if (r.breve) return r.breve;
+  const nombre = escalasPorId[r.escalaId]?.corto ?? r.escalaId;
+  return `${nombre} ${r.puntaje}/${r.max} (${minusculaInicial(r.etiqueta)})`;
+}
+
+// formato 'lista': encabezado por dominio y un renglón por escala.
+// formato 'parrafo': todo seguido, dominios separados por punto y escalas por punto y coma.
+export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new Date(), formato = 'lista') {
   const f = fecha.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  lineas.push(`VALORACIÓN GERIÁTRICA · ${f}`);
   const p = valoracion.paciente || {};
   const datos = [];
   if (p.sexo && SEXO[p.sexo]) datos.push(SEXO[p.sexo]);
   if (p.edad) datos.push(`${p.edad} años`);
   if (p.escolaridad !== undefined && p.escolaridad !== '') datos.push(`escolaridad ${p.escolaridad} años`);
+  const grupos = dominios
+    .map((d) => ({ d, rs: valoracion.resultados.filter((r) => escalasPorId[r.escalaId]?.dominio === d.id) }))
+    .filter((g) => g.rs.length);
+
+  if (formato === 'parrafo') {
+    const partes = [`Valoración geriátrica ${f}.`];
+    if (datos.length) partes.push(`Paciente: ${datos.join(', ')}.`);
+    for (const { d, rs } of grupos) partes.push(`${d.nombre}: ${rs.map((r) => breveGuardado(r, escalasPorId)).join('; ')}.`);
+    return partes.join(' ');
+  }
+
+  const lineas = [`VALORACIÓN GERIÁTRICA · ${f}`];
   if (datos.length) lineas.push(`Paciente: ${datos.join(', ')}.`);
-  for (const d of dominios) {
-    const delDominio = valoracion.resultados.filter((r) => escalasPorId[r.escalaId]?.dominio === d.id);
-    if (!delDominio.length) continue;
+  for (const { d, rs } of grupos) {
     lineas.push('', d.nombre.toUpperCase());
-    for (const r of delDominio) lineas.push(`- ${r.resumen}`);
+    for (const r of rs) lineas.push(`- ${r.resumen}`);
   }
   return lineas.join('\n');
 }

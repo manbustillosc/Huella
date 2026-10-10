@@ -1,10 +1,11 @@
 import { ESCALAS } from '../escalas/index.js';
 import { DOMINIOS } from './dominios.js';
 import { icono } from './iconos.js';
-import { normalizarEscala, calcular, resumenDe, posicionMarcador, rangoTexto, notaValoracion } from './motor.js';
+import { normalizarEscala, calcular, resumenDe, resumenBreveDe, posicionMarcador, rangoTexto, notaValoracion } from './motor.js';
 import { almacen } from './almacen.js';
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
+const ETIQUETA_COPIAR = { parrafo: 'Copiar en párrafo', lista: 'Copiar en lista' };
 
 const escalas = ESCALAS.map(normalizarEscala);
 const porId = Object.fromEntries(escalas.map((e) => [e.id, e]));
@@ -385,6 +386,7 @@ function filaResultado(r) {
 
 function vistaValoracion() {
   const v = almacen.valoracion();
+  const formato = almacen.formatoNota();
   const p = v.paciente || {};
   const grupos = DOMINIOS.map((d) => {
     const rs = v.resultados.filter((r) => porId[r.escalaId]?.dominio === d.id);
@@ -414,10 +416,16 @@ function vistaValoracion() {
       </div>
       ${v.resultados.length ? `
         <div class="resultados-val">${grupos}</div>
-        <h2 class="seccion">Nota para el expediente</h2>
-        <pre class="nota" id="nota">${esc(notaValoracion(v, porId, DOMINIOS))}</pre>
+        <div class="cabecera-nota">
+          <h2 class="seccion">Nota para el expediente</h2>
+          <div class="segmentado" role="radiogroup" aria-label="Formato de la nota">
+            ${[['parrafo', 'parrafo', 'Párrafo'], ['lista', 'lista', 'Lista']].map(([valor, ico, texto]) => `
+              <label><input type="radio" name="formato-nota" id="formato-${valor}" value="${valor}"${formato === valor ? ' checked' : ''}>${icono(ico)}${texto}</label>`).join('')}
+          </div>
+        </div>
+        <pre class="nota" id="nota" data-formato="${formato}">${esc(notaValoracion(v, porId, DOMINIOS, new Date(), formato))}</pre>
         <div class="acciones dos">
-          <button class="btn btn-primario" type="button" id="copiar-nota">${icono('copiar')} Copiar nota</button>
+          <button class="btn btn-primario" type="button" id="copiar-nota">${icono('copiar')} ${ETIQUETA_COPIAR[formato]}</button>
           <button class="btn" type="button" id="nueva-val">${icono('borrar')} Nueva valoración</button>
         </div>` : `
         <div class="vacio-estado">
@@ -543,6 +551,7 @@ const MONTAJES = {
         nivel: res.banda.nivel,
         etiqueta: res.banda.etiqueta,
         resumen,
+        breve: resumenBreveDe(e, res),
         respuestas: { ...almacen.respuestas(id) },
         fecha: Date.now(),
       });
@@ -562,8 +571,17 @@ const MONTAJES = {
   valoracion() {
     const actualizarNota = () => {
       const nota = $('#nota');
-      if (nota) nota.textContent = notaValoracion(almacen.valoracion(), porId, DOMINIOS);
+      if (!nota) return;
+      const formato = almacen.formatoNota();
+      nota.dataset.formato = formato;
+      nota.textContent = notaValoracion(almacen.valoracion(), porId, DOMINIOS, new Date(), formato);
+      $('#copiar-nota').innerHTML = `${icono('copiar')} ${ETIQUETA_COPIAR[formato]}`;
     };
+    vista.querySelectorAll('input[name="formato-nota"]').forEach((input) =>
+      input.addEventListener('change', () => {
+        almacen.guardarFormatoNota(input.value);
+        actualizarNota();
+      }));
     const guardarPaciente = () => {
       const v = almacen.valoracion();
       v.paciente = {
@@ -575,7 +593,8 @@ const MONTAJES = {
       actualizarNota();
     };
     ['#p-edad', '#p-sexo', '#p-escolaridad'].forEach((s) => $(s).addEventListener('input', guardarPaciente));
-    $('#copiar-nota')?.addEventListener('click', () => copiar($('#nota').textContent));
+    $('#copiar-nota')?.addEventListener('click', () =>
+      copiar($('#nota').textContent, almacen.formatoNota() === 'parrafo' ? 'Nota copiada en párrafo' : 'Nota copiada en lista'));
     // Confirmación en dos toques, sin cuadros de diálogo del navegador.
     let armado = null;
     $('#nueva-val')?.addEventListener('click', (ev) => {
@@ -659,7 +678,7 @@ function aviso(mensaje) {
   temporizadorAviso = setTimeout(() => el.classList.remove('visible'), 2200);
 }
 
-async function copiar(texto) {
+async function copiar(texto, mensaje = 'Copiado al portapapeles') {
   try {
     await navigator.clipboard.writeText(texto);
   } catch {
@@ -673,7 +692,7 @@ async function copiar(texto) {
     document.execCommand('copy');
     ta.remove();
   }
-  aviso('Copiado al portapapeles');
+  aviso(mensaje);
 }
 
 function temaOscuro() {

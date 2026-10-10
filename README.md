@@ -19,6 +19,13 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `sw.js` | Copia sin conexión. |
 | `tests/` | Pruebas de cada escala (`node --test tests/motor.test.mjs`). |
 
+## Nota para el expediente
+
+En **Valoración**, la nota se puede copiar en dos formatos (la app recuerda el último que usaste):
+
+- **Párrafo**: todo seguido, para ahorrar espacio. Cada escala trae su versión breve (`resumenBreve`).
+- **Lista**: un encabezado por dominio y un renglón por escala (`resumen`).
+
 ## Agregar una escala
 
 1. Crear `escalas/<nombre>.js` con el mismo formato que las existentes.

@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ESCALAS } from '../escalas/index.js';
 import { DOMINIOS } from '../js/dominios.js';
-import { normalizarEscala, calcular, validarEscala, resumenDe, posicionMarcador, notaValoracion } from '../js/motor.js';
+import { normalizarEscala, calcular, validarEscala, resumenDe, resumenBreveDe, posicionMarcador, notaValoracion } from '../js/motor.js';
 
 const escalas = ESCALAS.map(normalizarEscala);
 const porId = Object.fromEntries(escalas.map((e) => [e.id, e]));
@@ -126,4 +126,27 @@ test('sw.js guarda todos los archivos de la app y existen', async () => {
       if (f.endsWith('.js')) assert.ok(lista.includes(`${dir}/${f}`), `sw.js no incluye ${dir}/${f}`);
     }
   }
+});
+
+test('nota en párrafo: compacta, sin viñetas ni saltos de línea', () => {
+  const rcri = porId.rcri;
+  const r = Object.fromEntries(rcri.items.map((i) => [i.id, 1]));
+  r.creatinina = 0;
+  const resRcri = calcular(rcri, r);
+  const v = {
+    paciente: { edad: 82, sexo: 'mujer' },
+    resultados: [
+      { escalaId: 'barthel', puntaje: 90, max: 100, etiqueta: 'Dependencia moderada', resumen: 'Barthel: 90/100 (dependencia moderada).' },
+      { escalaId: 'lawton', puntaje: 6, max: 8, etiqueta: 'Dependencia leve', resumen: 'Lawton-Brody: 6/8 (dependencia leve).', breve: resumenBreveDe(porId.lawton, { puntaje: 6, max: 8, banda: { etiqueta: 'Dependencia leve' } }) },
+      { escalaId: 'rcri', puntaje: 1, max: 6, etiqueta: resRcri.banda.etiqueta, resumen: resumenDe(rcri, resRcri), breve: resumenBreveDe(rcri, resRcri) },
+    ],
+  };
+  const nota = notaValoracion(v, porId, DOMINIOS, new Date(2026, 9, 10), 'parrafo');
+  assert.ok(!nota.includes('\n') && !nota.includes('- '), nota);
+  assert.equal(nota,
+    'Valoración geriátrica 10/10/2026. Paciente: mujer, 82 años. '
+    + 'Funcional: Barthel 90/100 (dependencia moderada); Lawton-Brody 6/8 (dependencia leve). '
+    + 'Prequirúrgica: RCRI 1/6 (clase II, riesgo bajo; muerte, infarto o paro cardiaco a 30 días: 6.0 %; factor: creatinina preoperatoria mayor de 2.0 mg/dL).');
+  // La lista conserva el formato por renglones
+  assert.match(notaValoracion(v, porId, DOMINIOS, new Date(2026, 9, 10), 'lista'), /\nFUNCIONAL\n- Barthel/);
 });

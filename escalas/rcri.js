@@ -1,4 +1,5 @@
 const factor = (id, texto, ayuda) => ({ id, texto, ayuda, tipo: 'sino', puntua: 'si' });
+const inicialMinuscula = (t) => t.charAt(0).toLowerCase() + t.slice(1);
 
 export default {
   id: 'rcri',
@@ -35,10 +36,18 @@ export default {
     'No aplica a cirugía cardiaca ni a TAVI.',
   ],
   resumen({ puntaje, max, banda, presentes }) {
-    const inicialMinuscula = (t) => t.charAt(0).toLowerCase() + t.slice(1);
     const clase = inicialMinuscula(banda.etiqueta.replace(' · ', ', '));
-    const factores = presentes.length ? ` Factores: ${presentes.map(inicialMinuscula).join('; ')}.` : ' Sin factores de riesgo.';
+    const factores = presentes.length
+      ? ` ${presentes.length === 1 ? 'Factor' : 'Factores'}: ${presentes.map(inicialMinuscula).join('; ')}.`
+      : ' Sin factores de riesgo.';
     return `RCRI (Lee): ${puntaje}/${max}, ${clase}. Muerte, infarto o paro cardiaco a 30 días: ${banda.recalibrado} % (recalibración CCS 2017).${factores}`;
+  },
+  resumenBreve({ puntaje, max, banda, presentes }) {
+    const clase = inicialMinuscula(banda.etiqueta.replace(' · ', ', '));
+    const factores = presentes.length
+      ? `; ${presentes.length === 1 ? 'factor' : 'factores'}: ${presentes.map(inicialMinuscula).join(', ')}`
+      : '; sin factores de riesgo';
+    return `RCRI ${puntaje}/${max} (${clase}; muerte, infarto o paro cardiaco a 30 días: ${banda.recalibrado} %${factores})`;
   },
   referencias: [
     { texto: 'Lee TH, Marcantonio ER, Mangione CM, et al. Derivation and prospective validation of a simple index for prediction of cardiac risk of major noncardiac surgery. Circulation. 1999;100(10):1043-9.', doi: '10.1161/01.cir.100.10.1043' },

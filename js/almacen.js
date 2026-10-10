@@ -34,6 +34,9 @@ export const almacen = {
     return nuevas.includes(id);
   },
 
+  formatoNota: () => (leer(area(local), 'formatoNota', 'parrafo') === 'lista' ? 'lista' : 'parrafo'),
+  guardarFormatoNota: (f) => escribir(area(local), 'formatoNota', f),
+
   tema: () => leer(area(local), 'tema', 'auto'),
   guardarTema: (t) => escribir(area(local), 'tema', t),
 
