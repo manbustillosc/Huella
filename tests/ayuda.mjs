@@ -68,4 +68,10 @@ export const EJEMPLOS = {
   }),
   rass: () => resp('rass', { nivel: '0 · Alerta y tranquilo' }),
   camicu: () => resp('camicu', { rass: '0 · Alerta y tranquilo', agudo: 'Ausente' }),
+  fried: () => resp('fried', {
+    sexo: 'Mujer', peso: 'No', esfuerzo: 'Algunas veces (1 a 2 días)', arrancar: 'Rara vez o nunca (menos de 1 día)',
+    fuerza_estado: 'Medida con dinamómetro', fuerza: 16, peso_kg: 60, talla: 155, marcha_estado: 'Medida en 4.57 m', tiempo: 6.5, actividad: 'No bajo',
+  }),
+  tinetti: () => resp('tinetti', { equilibrio: 12, marcha: 9, ayuda: 'No' }),
+  gijon: () => resp('gijon', { familiar: 'Vive con cónyuge de similar edad', economica: '1 a 8 veces el salario mínimo mensual', vivienda: 'Adecuada a necesidades', relaciones: 'Relaciones sociales', apoyo: 'Con apoyo familiar y vecinal' }),
 };

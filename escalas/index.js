@@ -49,18 +49,21 @@ import cornell from './cornell.js';
 import npiq from './npiq.js';
 import rass from './rass.js';
 import camicu from './camicu.js';
+import fried from './fried.js';
+import tinetti from './tinetti.js';
+import gijon from './gijon.js';
 
 export const ESCALAS = [
   barthel, katz, lawton,
   minicog, moca, rudas, cdr, fast,
   gds15, phq9, cornell,
   cuatroAt, cam, rass, camicu, npiq,
-  frail, cfs, sarcf, sppb, vivifrail,
-  tug, velocidad,
+  frail, cfs, fried, sarcf, sppb, vivifrail,
+  tug, velocidad, tinetti,
   mnasf,
   braden,
   painad,
   rcri,
-  zarit,
+  zarit, gijon,
   ckdepi, cockcroft,
 ];

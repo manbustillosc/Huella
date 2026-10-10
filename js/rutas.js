@@ -38,9 +38,12 @@ export const RUTAS = [
     complementarios: [
       { id: 'tug', nota: 'Si hay caídas o alteración de la marcha; el SPPB ya mide la marcha.' },
       { id: 'zarit', nota: 'Si hay un cuidador principal.' },
+      { id: 'gijon', nota: 'Riesgo social: familia, economía, vivienda, relaciones y apoyo; orienta la referencia a Trabajo Social.' },
+      { id: 'fried', nota: 'Fenotipo de fragilidad si se dispone de dinamómetro y del recorrido de 4.57 m; complementa al CFS, no lo sustituye.' },
+      { id: 'tinetti', nota: 'Equilibrio y marcha por separado si hay caídas o inestabilidad.' },
       { id: 'vivifrail', nota: 'Prescripción de ejercicio a partir del SPPB.' },
     ],
-    planes: ['Fenotipo de Fried', 'STOPP/START', 'Gijón'],
+    planes: ['STOPP/START'],
   },
   {
     id: 'hospital', nombre: 'Valoración hospitalaria', icono: 'hospital',
@@ -100,8 +103,10 @@ export const RUTAS = [
     ],
     complementarios: [
       { id: 'velocidad', nota: 'Si necesitas el recorrido de 6 m (criterio de Vivifrail) o no hiciste el SPPB; puede reutilizar la marcha del SPPB.' },
+      { id: 'fried', nota: 'Fenotipo de Fried con dinamómetro, marcha de 4.57 m y actividad física; los componentes sin medir no se simulan.' },
+      { id: 'tinetti', nota: 'Subescalas de equilibrio y marcha si hay caídas o inestabilidad.' },
     ],
-    planes: ['Fenotipo de Fried', 'Downton'],
+    planes: ['Downton'],
   },
   {
     id: 'preqx', nombre: 'Valoración prequirúrgica', icono: 'prequirurgica',

@@ -28,13 +28,13 @@ export const DOMINIOS = [
     id: 'fragilidad', nombre: 'Fragilidad y sarcopenia',
     descripcion: 'Fragilidad, fuerza, desempeño físico y prescripción de ejercicio.',
     problemas: ['debilidad', 'pérdida de peso', 'ejercicio'],
-    planeadas: ['Fenotipo de Fried'],
+    planeadas: [],
   },
   {
     id: 'caidas', nombre: 'Caídas y movilidad',
     descripcion: 'Marcha, equilibrio y riesgo de caídas.',
     problemas: ['caídas', 'marcha', 'equilibrio'],
-    planeadas: ['Downton', 'Tinetti', 'Short FES-I'],
+    planeadas: ['Downton', 'Short FES-I'],
   },
   {
     id: 'nutricion', nombre: 'Nutrición',
@@ -68,9 +68,9 @@ export const DOMINIOS = [
   },
   {
     id: 'social', nombre: 'Social y cuidador',
-    descripcion: 'Red de apoyo, sobrecarga del cuidador y maltrato.',
+    descripcion: 'Riesgo social, red de apoyo, sobrecarga del cuidador y maltrato.',
     problemas: ['cuidador', 'aislamiento', 'red de apoyo', 'maltrato'],
-    planeadas: ['Gijón', 'Lubben LSNS-6', 'Escala geriátrica de maltrato', 'Cuestionario MOS de apoyo social'],
+    planeadas: ['Lubben LSNS-6', 'Escala geriátrica de maltrato', 'Cuestionario MOS de apoyo social'],
   },
   {
     id: 'paliativos', nombre: 'Paliativos y pronóstico',
