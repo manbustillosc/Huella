@@ -41,6 +41,7 @@ export default {
   ],
   tiempo: '5 min (después de la evaluación cognitiva)',
   permiteNoEvaluable: false,
+  direccionClinica: 'sin_direccion',
   barra: false,
   campos: [
     rasgo('agudo', '1. Inicio agudo y curso fluctuante', 'Cambio agudo del estado mental respecto al basal, o conducta que fluctúa durante el día (aparece y desaparece, o aumenta y disminuye de intensidad).', 'inicio agudo y curso fluctuante'),

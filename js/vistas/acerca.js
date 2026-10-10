@@ -19,7 +19,7 @@ export function renderAcerca() {
         <h2 id="privacidad">${icono('escudo')} Qué se guarda y dónde</h2>
         <p>Todo se calcula en este navegador. Huella no tiene servidor y no envía datos a ningún lugar.</p>
         <ul>
-          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados y respuestas): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio.</li>
+          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, y respuestas): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio: inicia una nueva para no mezclar resultados de episodios distintos.</li>
           <li><strong>Respuestas en edición</strong>: en el almacenamiento de la pestaña; se borran al cerrarla y nunca se mezclan con otra valoración.</li>
           <li><strong>Preferencias</strong> (favoritas, tema, formato de la nota, instrumentos más usados): en el almacenamiento local.</li>
         </ul>
@@ -32,7 +32,8 @@ export function renderAcerca() {
         <button class="btn" type="button" id="borrar-todo">${icono('borrar')} Borrar todos los datos de Huella en este navegador</button>
 
         <h2>Uso clínico</h2>
-        <p>Es un apoyo para aplicar e interpretar instrumentos; no sustituye el juicio clínico. Un tamizaje positivo no establece un diagnóstico. Las sugerencias son orientativas y se muestran separadas de los resultados. Los puntos de corte corresponden a las referencias citadas en cada instrumento.</p>
+        <p>Es un apoyo para aplicar e interpretar instrumentos; no sustituye el juicio clínico. Un tamizaje positivo no establece un diagnóstico. Las sugerencias son orientativas y se muestran separadas de los resultados. Los puntos de corte corresponden a las referencias citadas en cada instrumento; los valores continuos se clasifican sin redondear.</p>
+        <p>Al comparar aplicaciones, cada instrumento declara si un valor mayor es mejor, si un valor menor es mejor o si el cambio no tiene una dirección clínica uniforme. La comparación describe la diferencia y su dirección; su relevancia clínica, su causa y su reversibilidad requieren valoración.</p>
         <p>Los instrumentos con titular de derechos (${conLicencia}) se incluyen sin reproducir sus reactivos: se registra el puntaje obtenido con la versión oficial o se usan solo sus reglas de puntuación.</p>
 
         <h2>Tema</h2>

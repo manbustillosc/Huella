@@ -2,10 +2,13 @@
 import { almacen } from '../almacen.js';
 import { porId, dominioDe, momentoPorDefecto } from '../datos.js';
 import {
-  calcular, resumenDe, resumenBreveDe, textoEscala, posicionMarcador, rangoTexto, campoVisible, leerNumero,
-  TIPOS, MOMENTOS, momentoDe, FUENTES, MOTIVOS_NO_EVALUABLE, minusculaInicial,
+  calcular, resumenDe, resumenBreveDe, textoEscala, posicionMarcador, rangoTexto, campoVisible,
+  limpiarOcultas, TIPOS, MOMENTOS, momentoDe, FUENTES, MOTIVOS_NO_EVALUABLE, minusculaInicial, NINGUNO, TEXTO_NINGUNO,
 } from '../motor.js';
-import { compararMomentos, valorGuardado, fechaCorta } from '../nota.js';
+import {
+  compararResultados, esUnico, etiquetaAplicacion, fechaCorta, textoRespectoA, textoCambio, vigenteDe, diasEntre,
+} from '../comparacion.js';
+import { valorGuardado } from '../nota.js';
 import {
   $, $$, esc, icono, plural, aviso, copiar, botonEstrella, selectorFormato, alCambiarFormato,
   ETIQUETA_COPIAR, movimientoReducido, hoyISO, chipTipo,
@@ -16,7 +19,7 @@ import { pasosConEstado, siguientePendiente, urlPaso } from './rutas-estado.js';
 
 export function contexto({ id, momento, ruta }) {
   const e = porId[id];
-  const m = momentoPorDefecto(e, ruta, momento);
+  const m = momentoPorDefecto(e, ruta, momento, ruta ? almacen.momentoRuta(ruta.id) : null);
   const base = ruta ? `#/r/${ruta.id}/${id}` : `#/e/${id}`;
   const url = (mm = m) => `${base}${e.momentos ? `@${mm}` : ''}`;
   return { e, momento: m, ruta, url: url(), urlResultado: `${url()}/resultado`, urlMomento: url };
@@ -24,12 +27,7 @@ export function contexto({ id, momento, ruta }) {
 
 const paciente = () => almacen.valoracion().paciente || {};
 
-function ultimoSppb() {
-  const rs = almacen.valoracion().resultados.filter((r) => r.escalaId === 'sppb' && r.puntaje != null);
-  return rs.length ? rs.sort((a, b) => (b.guardado || 0) - (a.guardado || 0))[0].puntaje : null;
-}
-
-// Completa con los datos del paciente los campos marcados con prefill (sin sobrescribir respuestas).
+// Completa con los datos clínicos de la valoración los campos marcados con prefill (sin sobrescribir respuestas).
 function precargar(e, r) {
   const p = paciente();
   let cambio = false;
@@ -39,7 +37,6 @@ function precargar(e, r) {
     if (c.prefill === 'edad' && p.edad) v = String(p.edad);
     if (c.prefill === 'sexo' && p.sexo) { const i = c.opciones.findIndex((o) => o.clave === p.sexo); if (i >= 0) v = i; }
     if (c.prefill === 'escolaridad12' && p.escolaridad !== '' && p.escolaridad != null) v = Number(p.escolaridad) <= 12 ? 0 : 1;
-    if (c.prefill === 'sppb') { const s = ultimoSppb(); if (s != null) v = String(s); }
     if (v !== undefined) { r[c.id] = v; cambio = true; }
   }
   return cambio;
@@ -52,6 +49,59 @@ export function respuestasDe(ctx) {
 }
 
 export const calcularCtx = (e, r) => calcular(e, r, { paciente: paciente() });
+
+/* ---------- Datos vinculados de otras pruebas ---------- */
+
+// Aplicación más reciente del instrumento fuente en la valoración en curso.
+function candidatoVinculo(vin) {
+  const rs = almacen.resultadosDe(vin.escala).filter((x) => !x.noEvaluable);
+  return rs.length ? vigenteDe(rs) : null;
+}
+
+const antiguedad = (fecha) => {
+  if (!fecha) return '';
+  const d = diasEntre(fecha, hoyISO());
+  return d <= 0 ? 'hoy' : d === 1 ? 'hace 1 día' : `hace ${d} días`;
+};
+
+function panelVinculos(e, r) {
+  if (!e.vinculos?.length) return '';
+  const usados = r._vinculos || {};
+  const filas = e.vinculos.map((vin) => {
+    const fuente = porId[vin.escala];
+    const res = candidatoVinculo(vin);
+    if (!res) return `<li class="vinculo sin-dato">${icono('pendiente')}<div><strong>${esc(vin.titulo)}</strong><span>Sin registro de ${esc(fuente.corto)} en esta valoración.</span></div></li>`;
+    const etq = etiquetaAplicacion(res) || fechaCorta(res.fecha);
+    const disp = vin.disponible(res);
+    if (disp !== true) return `<li class="vinculo no-aplica">${icono('alerta')}<div><strong>${esc(vin.titulo)}</strong> <span class="vin-fecha">${esc(etq)}</span><span>${esc(disp)}</span></div></li>`;
+    const adv = vin.advertencia?.(res);
+    const dias = res.fecha ? diasEntre(res.fecha, hoyISO()) : 0;
+    const usado = usados[vin.id]?.resultadoId === res.id;
+    return `
+      <li class="vinculo${usado ? ' usado' : ''}">
+        ${icono(usado ? 'completo' : 'ruta')}
+        <div>
+          <strong>${esc(vin.titulo)}</strong> <span class="vin-fecha">${esc(etq)} · ${esc(antiguedad(res.fecha))}</span>
+          <span>${esc(vin.describir(res))}</span>
+          ${adv ? `<span class="vin-adv">${esc(adv)}</span>` : ''}
+          ${dias > 30 ? '<span class="vin-adv">Tiene más de 30 días: confirma que siga vigente.</span>' : ''}
+        </div>
+        ${usado ? '<span class="vin-usado">En uso</span>' : `<button class="btn btn-chico" type="button" data-vincular="${esc(vin.id)}">Usar este dato</button>`}
+      </li>`;
+  }).join('');
+  return `
+    <section class="vinculos" id="vinculos" aria-labelledby="vinculos-t">
+      <h2 class="sub" id="vinculos-t">Datos de otras pruebas en esta valoración</h2>
+      <p class="vin-nota">Huella no los usa sin tu confirmación. Revisa la fecha y que sigan siendo válidos.</p>
+      <ul>${filas}</ul>
+    </section>`;
+}
+
+function notaVinculo(c, r) {
+  const v = Object.values(r._vinculos || {}).find((x) => x.campos?.includes(c.id));
+  if (!v) return '';
+  return `<p class="dato-vinculado">${icono('completo')} Tomado de ${esc(v.titulo)}${v.etiqueta ? ` ${esc(v.etiqueta)}` : ''}${v.fecha ? `, ${esc(fechaCorta(v.fecha))}` : ''}. Si lo cambias, deja de vincularse.</p>`;
+}
 
 /* ---------- Piezas ---------- */
 
@@ -72,25 +122,28 @@ function fichaEscala(e) {
 }
 
 function selectorMomento(ctx) {
-  const guardados = almacen.valoracion().resultados.filter((r) => r.escalaId === ctx.e.id).map((r) => r.momento);
+  const guardados = almacen.resultadosDe(ctx.e.id).map((r) => r.momento);
   const m = momentoDe(ctx.momento);
   return `
     <div class="momentos">
-      <p class="momentos-etq">Momento de la evaluación</p>
-      <nav class="segmentado ancho" aria-label="Momento de la evaluación">
+      <p class="momentos-etq">Momento clínico</p>
+      <nav class="segmentado ancho" aria-label="Momento clínico de la evaluación">
         ${MOMENTOS.map((x) => `
           <a href="${ctx.urlMomento(x.id)}" class="${x.id === ctx.momento ? 'activo' : ''}"${x.id === ctx.momento ? ' aria-current="true"' : ''}>
-            ${esc(x.nombre)}${guardados.includes(x.id) ? '<span class="punto-guardado" aria-label="guardado"></span>' : ''}
+            ${esc(x.nombre)}${guardados.includes(x.id) ? '<span class="punto-guardado" aria-label="con resultado guardado"></span>' : ''}
           </a>`).join('')}
       </nav>
-      <p class="momentos-ayuda">${esc(m.ayuda)}. Cada momento se guarda por separado; uno nuevo no sustituye al basal.</p>
+      <p class="momentos-ayuda">${esc(m.ayuda)}. El momento clínico es distinto de la fecha de aplicación. Basal, ingreso y egreso admiten un resultado; «actual» admite varias aplicaciones con distinta fecha.</p>
     </div>`;
 }
 
-function datosAplicacion(e, r) {
+function datosAplicacion(e, r, momento) {
+  const hoy = hoyISO();
   return `
     <div class="aplicacion">
-      <label class="campo-mini"><span>${icono('calendario')} Fecha de aplicación</span><input type="date" id="a-fecha" value="${esc(r._fecha || hoyISO())}" max="${hoyISO()}"></label>
+      <label class="campo-mini"><span>${icono('calendario')} Fecha de aplicación</span><input type="date" id="a-fecha" value="${esc(r._fecha || hoy)}" max="${hoy}"></label>
+      ${momento === 'basal' ? `
+        <label class="campo-mini"><span>Fecha del estado basal (si se conoce)</span><input type="date" id="a-fecha-basal" value="${esc(r._fechaBasal || '')}" max="${esc(r._fecha || hoy)}" aria-describedby="ayuda-basal"></label>` : ''}
       ${e.fuente ? `
         <label class="campo-mini"><span>Fuente de información</span>
           <select id="a-fuente">
@@ -98,7 +151,9 @@ function datosAplicacion(e, r) {
             ${FUENTES.map((f) => `<option value="${f.id}"${r._fuente === f.id ? ' selected' : ''}>${esc(f.nombre)}</option>`).join('')}
           </select>
         </label>` : ''}
-    </div>`;
+    </div>
+    ${momento === 'basal' ? '<p class="ayuda-aplicacion" id="ayuda-basal">El estado basal describe a la persona antes del episodio agudo (por ejemplo, 2 semanas antes del ingreso); la fecha de aplicación es cuando lo registras.</p>' : ''}
+    <p class="error-campo" id="e-fechas" role="alert" hidden></p>`;
 }
 
 function bloqueNoEvaluable(r) {
@@ -115,9 +170,24 @@ function bloqueNoEvaluable(r) {
     </details>`;
 }
 
-function avisoGuardado(ctx, g) {
-  const m = ctx.e.momentos ? ` ${momentoDe(ctx.momento).enNota}` : '';
-  return `<p class="nota-guardado">${icono('completo')} Ya hay un resultado${m} en la valoración: ${esc(valorGuardado(g))}${g.fecha ? `, ${fechaCorta(g.fecha)}` : ''}. Si cambias las respuestas, se pedirá confirmación antes de reemplazarlo.</p>`;
+// Aplicaciones ya guardadas de este instrumento, con opción de abrir una para corregirla.
+function avisoGuardados(ctx, r) {
+  const todos = almacen.resultadosDe(ctx.e.id);
+  if (!todos.length) return '';
+  const origen = r._origen ? almacen.resultadoPorId(r._origen) : null;
+  const filas = [...todos].sort((a, b) => ((b.fecha || '') > (a.fecha || '') ? 1 : -1)).map((g) => {
+    const etq = etiquetaAplicacion(g) || fechaCorta(g.fecha) || 'sin fecha';
+    const editando = origen?.id === g.id;
+    return `<li><span><strong>${esc(etq)}</strong> · ${esc(valorGuardado(g))}</span>${editando ? '<span class="vin-usado">Corrigiendo</span>' : `<button class="btn btn-chico" type="button" data-corregir="${esc(g.id)}">Corregir</button>`}</li>`;
+  }).join('');
+  return `
+    <div class="nota-guardado">
+      ${icono('completo')}
+      <div>
+        <p>${todos.length === 1 ? 'Este instrumento ya tiene una aplicación' : `Este instrumento ya tiene ${todos.length} aplicaciones`} en la valoración. Al guardar se pedirá confirmación antes de reemplazar un resultado.</p>
+        <ul class="lista-guardados">${filas}</ul>
+      </div>
+    </div>`;
 }
 
 function encabezadoCampo(c, n, etiquetaPara = '') {
@@ -127,13 +197,16 @@ function encabezadoCampo(c, n, etiquetaPara = '') {
     : `<p class="reactivo-titulo" id="t-${c.id}">${titulo}</p>`;
 }
 
+const notaPrefill = (c) => (c.prefill ? '<p class="ayuda prefill">Se completa con los datos clínicos de la valoración; verifícalo.</p>' : '');
+
 function campoOpciones(c, n, r) {
   const sel = r[c.id];
-  const clases = ['reactivo', c.compacto && 'compacto', c.compactoNumerico && 'numerico', c.secundario && 'secundario', sel != null && 'contestado'].filter(Boolean).join(' ');
+  const clases = ['reactivo', c.compacto && 'compacto', c.compactoNumerico && 'numerico', c.secundario && 'secundario', sel != null && sel !== '' && 'contestado'].filter(Boolean).join(' ');
   return `
     <div class="${clases}" id="r-${c.id}" data-campo="${c.id}" role="radiogroup" aria-labelledby="t-${c.id}">
       ${c.secundario ? `<p class="reactivo-titulo sub" id="t-${c.id}">${esc(c.texto)} <span>(opcional)</span></p>` : encabezadoCampo(c, n)}
       ${c.ayuda ? `<p class="ayuda">${esc(c.ayuda)}</p>` : ''}
+      ${notaPrefill(c)}
       <div class="opciones">
         ${c.opciones.map((o, j) => {
           const pts = c.puntua !== false && !c.anotaA && !o.especial && !c.compactoNumerico;
@@ -148,6 +221,7 @@ function campoOpciones(c, n, r) {
           </label>`;
         }).join('')}
       </div>
+      ${notaVinculo(c, r)}
     </div>`;
 }
 
@@ -157,6 +231,7 @@ function campoNumero(c, n, r) {
     <div class="reactivo campo-numero${r[c.id] != null && r[c.id] !== '' ? ' contestado' : ''}" id="r-${c.id}" data-campo="${c.id}">
       ${encabezadoCampo(c, n, `n-${c.id}`)}
       ${c.ayuda ? `<p class="ayuda">${esc(c.ayuda)}</p>` : ''}
+      ${notaPrefill(c)}
       <div class="entrada-numero">
         <input id="n-${c.id}" name="${c.id}" type="text" inputmode="decimal" autocomplete="off" value="${esc(r[c.id] ?? '')}" aria-describedby="e-${c.id}"${c.opcional ? '' : ' aria-required="true"'}>
         ${c.unidades
@@ -164,20 +239,30 @@ function campoNumero(c, n, r) {
           : `<span class="unidad">${esc(c.unidad || '')}</span>`}
       </div>
       <p class="error-campo" id="e-${c.id}" role="alert" hidden></p>
+      ${notaVinculo(c, r)}
     </div>`;
 }
 
+const estadoLista = (marcadas) => {
+  if (marcadas.includes(NINGUNO)) return 'Confirmado: ninguno';
+  const n = marcadas.length;
+  return n ? plural(n, 'marcada', 'marcadas') : 'Sin responder: marca las presentes o «Ninguno de los anteriores»';
+};
+
 function campoChecklist(c, n, r) {
   const marcadas = Array.isArray(r[c.id]) ? r[c.id] : [];
+  const contestado = marcadas.length > 0;
   return `
-    <fieldset class="reactivo campo-lista contestado" id="r-${c.id}" data-campo="${c.id}">
+    <fieldset class="reactivo campo-lista${contestado ? ' contestado' : ''}" id="r-${c.id}" data-campo="${c.id}">
       <legend class="reactivo-titulo" id="t-${c.id}"><span class="num" aria-hidden="true">${n}</span><span>${esc(c.texto)}</span></legend>
       ${c.ayuda ? `<p class="ayuda">${esc(c.ayuda)}</p>` : ''}
       <div class="casillas">
         ${c.opciones.map((o) => `
           <label class="casilla"><input type="checkbox" name="${c.id}" value="${o.id}"${marcadas.includes(o.id) ? ' checked' : ''}><span>${esc(o.texto)}</span></label>`).join('')}
+        <label class="casilla ninguno"><input type="checkbox" name="${c.id}" value="${NINGUNO}"${marcadas.includes(NINGUNO) ? ' checked' : ''}><span>${esc(TEXTO_NINGUNO)}</span></label>
       </div>
-      <p class="cuenta-lista" id="cuenta-${c.id}">${plural(marcadas.length, 'marcada', 'marcadas')}</p>
+      <p class="cuenta-lista" id="cuenta-${c.id}" aria-live="polite">${esc(estadoLista(marcadas))}</p>
+      <p class="error-campo" id="e-${c.id}" role="alert" hidden></p>
     </fieldset>`;
 }
 
@@ -216,17 +301,19 @@ function tiraRuta(ctx) {
   const pa = pasoActual(ctx);
   if (!pa?.actual) return `<a class="migas" href="#/r/${ctx.ruta.id}">${icono('atras')} ${esc(ctx.ruta.nombre)}</a>`;
   const disponibles = pa.pasos.filter((p) => p.estado !== 'plan');
+  const nucleo = disponibles.filter((p) => !p.complementario);
   const k = disponibles.indexOf(pa.actual) + 1;
-  const completos = disponibles.filter((p) => p.estado === 'completo').length;
+  const completos = nucleo.filter((p) => p.estado === 'completo').length;
   const anterior = disponibles[k - 2];
   const siguiente = disponibles[k];
   return `
     <nav class="tira-ruta" aria-label="Ruta: ${esc(ctx.ruta.nombre)}">
       <div class="tira-cab">
         <a class="tira-nombre" href="#/r/${ctx.ruta.id}">${icono('ruta')} ${esc(ctx.ruta.nombre)}</a>
-        <span class="tira-paso">Paso ${k} de ${disponibles.length} · ${completos} completos</span>
+        <span class="tira-paso">${pa.actual.complementario ? 'Complementaria' : `Paso ${nucleo.indexOf(pa.actual) + 1} de ${nucleo.length}`} · ${completos} completos</span>
       </div>
-      <div class="tira-barra" aria-hidden="true"><span style="width:${(completos / disponibles.length) * 100}%"></span></div>
+      <div class="tira-barra" aria-hidden="true"><span style="width:${nucleo.length ? (completos / nucleo.length) * 100 : 0}%"></span></div>
+      ${pa.actual.nota ? `<p class="tira-nota">${icono('info')} ${esc(pa.actual.nota)}</p>` : ''}
       <div class="tira-acciones">
         ${anterior ? `<a class="btn btn-chico" href="${urlPaso(ctx.ruta, anterior)}">${icono('atras')} Anterior</a>` : '<span></span>'}
         <button class="btn btn-chico" type="button" id="omitir-paso">${icono('omitir')} Omitir</button>
@@ -255,7 +342,6 @@ export function renderEscala(params) {
   const d = dominioDe(e.dominio);
   const r = respuestasDe(ctx);
   const res = calcularCtx(e, r);
-  const guardado = almacen.resultado(e.id, ctx.momento);
   let n = 0;
   const campos = e.campos.map((c) => {
     const visible = campoVisible(c, r);
@@ -277,15 +363,22 @@ export function renderEscala(params) {
       </header>
       ${fichaEscala(e)}
       ${e.momentos ? selectorMomento(ctx) : ''}
-      ${datosAplicacion(e, r)}
-      ${guardado ? avisoGuardado(ctx, guardado) : ''}
+      ${datosAplicacion(e, r, ctx.momento)}
+      ${avisoGuardados(ctx, r)}
+      ${panelVinculos(e, r)}
       ${e.permiteNoEvaluable ? bloqueNoEvaluable(r) : ''}
       <form id="form-escala" class="reactivos${r._noEvaluable ? ' inactivo' : ''}" novalidate>${campos}</form>
       <div class="pie-escala" id="pie-escala" style="--avance:${res.total ? (res.contestadas / res.total) * 100 : 0}%">${pieEscala(e, res, r)}</div>
     </section>`;
 }
 
-export function montarEscala(params) {
+function errorFechas(r) {
+  if (r._fechaBasal && r._fecha && r._fechaBasal > r._fecha) return 'La fecha del estado basal no puede ser posterior a la fecha de aplicación.';
+  if (r._fecha && r._fecha > hoyISO()) return 'La fecha de aplicación no puede ser futura.';
+  return '';
+}
+
+export function montarEscala(params, rerender) {
   const ctx = contexto(params);
   const { e } = ctx;
   almacen.registrarUso(e.id);
@@ -295,8 +388,22 @@ export function montarEscala(params) {
 
   const guardar = () => almacen.guardarRespuestas(e.id, ctx.momento, r);
 
+  // Un dato vinculado que se edita a mano deja de considerarse tomado de otra prueba.
+  const desvincular = (campoId) => {
+    if (!r._vinculos) return;
+    let cambio = false;
+    for (const [id, v] of Object.entries(r._vinculos)) {
+      if (v.campos?.includes(campoId)) { delete r._vinculos[id]; cambio = true; }
+    }
+    if (!cambio) return;
+    if (!Object.keys(r._vinculos).length) delete r._vinculos;
+    const panel = $('#vinculos');
+    if (panel) panel.outerHTML = panelVinculos(e, r);
+    $$(`#r-${CSS.escape(campoId)} .dato-vinculado`).forEach((x) => x.remove());
+    montarVinculos();
+  };
+
   const actualizar = () => {
-    // Visibilidad y numeración
     let n = 0;
     for (const c of e.campos) {
       const tarjeta = $(`#r-${CSS.escape(c.id)}`);
@@ -310,15 +417,15 @@ export function montarEscala(params) {
       }
     }
     const res = calcularCtx(e, r);
-    // Errores de números
-    for (const c of e.campos.filter((x) => x.tipo === 'numero')) {
+    for (const c of e.campos.filter((x) => x.tipo === 'numero' || x.tipo === 'checklist' || res.errores[x.id])) {
       const err = $(`#e-${CSS.escape(c.id)}`);
-      if (!err) continue;
-      const leido = leerNumero(c, r);
-      err.hidden = !leido.error;
-      err.textContent = leido.error || '';
-      $(`#r-${CSS.escape(c.id)}`).classList.toggle('con-error', Boolean(leido.error));
-      $(`#r-${CSS.escape(c.id)}`).classList.toggle('contestado', leido.valor != null);
+      const tarjeta = $(`#r-${CSS.escape(c.id)}`);
+      if (!tarjeta) continue;
+      const msg = campoVisible(c, r) ? res.errores[c.id] : '';
+      if (err) { err.hidden = !msg; err.textContent = msg || ''; }
+      tarjeta.classList.toggle('con-error', Boolean(msg));
+      if (c.tipo === 'numero') tarjeta.classList.toggle('contestado', r[c.id] != null && r[c.id] !== '' && !msg);
+      if (c.tipo === 'checklist') tarjeta.classList.toggle('contestado', Array.isArray(r[c.id]) && r[c.id].length > 0 && !msg);
     }
     pie.innerHTML = pieEscala(e, res, r);
     pie.style.setProperty('--avance', `${res.total ? (res.contestadas / res.total) * 100 : 0}%`);
@@ -329,6 +436,7 @@ export function montarEscala(params) {
     const el = ev.target;
     if (el.type === 'radio') {
       r[el.name] = Number(el.value);
+      desvincular(el.name);
       const tarjeta = el.closest('.reactivo');
       tarjeta.classList.remove('falta');
       tarjeta.classList.add('contestado');
@@ -336,12 +444,18 @@ export function montarEscala(params) {
       actualizar();
       avanzar(tarjeta);
     } else if (el.type === 'checkbox') {
-      r[el.name] = $$(`input[name="${CSS.escape(el.name)}"]:checked`, form).map((x) => x.value);
-      $(`#cuenta-${CSS.escape(el.name)}`).textContent = plural(r[el.name].length, 'marcada', 'marcadas');
+      const casillas = $$(`input[name="${CSS.escape(el.name)}"]`, form);
+      // «Ninguno de los anteriores» excluye a los demás elementos y viceversa.
+      if (el.checked && el.value === NINGUNO) casillas.forEach((x) => { if (x !== el) x.checked = false; });
+      if (el.checked && el.value !== NINGUNO) casillas.forEach((x) => { if (x.value === NINGUNO) x.checked = false; });
+      r[el.name] = casillas.filter((x) => x.checked).map((x) => x.value);
+      $(`#cuenta-${CSS.escape(el.name)}`).textContent = estadoLista(r[el.name]);
+      el.closest('.reactivo').classList.remove('falta');
       guardar();
       actualizar();
     } else if (el.tagName === 'SELECT') {
       r[el.name] = el.value;
+      desvincular(el.name.replace(/_u$/, ''));
       guardar();
       actualizar();
     }
@@ -350,13 +464,28 @@ export function montarEscala(params) {
     const el = ev.target;
     if (el.type !== 'text') return;
     r[el.name] = el.value;
+    desvincular(el.name);
     el.closest('.reactivo').classList.remove('falta');
     guardar();
     actualizar();
   });
   form.addEventListener('submit', (ev) => ev.preventDefault());
 
-  $('#a-fecha')?.addEventListener('change', (ev) => { r._fecha = ev.target.value; guardar(); });
+  const mostrarErrorFechas = () => {
+    const msg = errorFechas(r);
+    const p = $('#e-fechas');
+    p.hidden = !msg;
+    p.textContent = msg;
+    return msg;
+  };
+  $('#a-fecha')?.addEventListener('change', (ev) => {
+    r._fecha = ev.target.value || undefined;
+    const basal = $('#a-fecha-basal');
+    if (basal) basal.max = r._fecha || hoyISO();
+    guardar();
+    mostrarErrorFechas();
+  });
+  $('#a-fecha-basal')?.addEventListener('change', (ev) => { r._fechaBasal = ev.target.value || undefined; guardar(); mostrarErrorFechas(); });
   $('#a-fuente')?.addEventListener('change', (ev) => { r._fuente = ev.target.value || undefined; guardar(); });
   $('#ne-motivo')?.addEventListener('change', (ev) => {
     r._noEvaluable = ev.target.value || undefined;
@@ -365,9 +494,46 @@ export function montarEscala(params) {
     actualizar();
   });
 
+  // Corregir una aplicación guardada: carga sus respuestas y recuerda cuál es.
+  $$('[data-corregir]').forEach((b) => b.addEventListener('click', () => {
+    const g = almacen.resultadoPorId(b.dataset.corregir);
+    if (!g) return;
+    almacen.guardarRespuestas(e.id, g.momento, { ...(g.respuestas || {}), _origen: g.id });
+    const destino = ctx.urlMomento(g.momento);
+    if (location.hash === destino) rerender();
+    else location.hash = destino;
+    aviso('Respuestas cargadas para corregir');
+  }));
+
+  function montarVinculos() {
+    $$('[data-vincular]').forEach((b) => b.addEventListener('click', () => {
+      const vin = e.vinculos.find((x) => x.id === b.dataset.vincular);
+      const res = vin && candidatoVinculo(vin);
+      if (!res) return;
+      const otros = Object.entries(r._vinculos || {}).filter(([, v]) => v.campos?.some((c) => vin.campos.includes(c)));
+      r = { ...r, ...vin.aplicar(res), _vinculos: { ...(r._vinculos || {}) } };
+      for (const [id] of otros) delete r._vinculos[id];
+      r._vinculos[vin.id] = {
+        resultadoId: res.id, escalaId: vin.escala, titulo: vin.titulo, texto: vin.describir(res),
+        etiqueta: etiquetaAplicacion(res, { conFecha: false }), fecha: res.fecha || null, campos: vin.campos,
+      };
+      guardar();
+      const y = window.scrollY;
+      rerender();
+      window.scrollTo(0, y);
+      aviso(`${vin.titulo}: dato aplicado`);
+    }));
+  }
+  montarVinculos();
+
   pie.addEventListener('click', (ev) => {
     if (!ev.target.closest('#ver-resultado')) return;
     const res = actualizar();
+    if (mostrarErrorFechas()) {
+      $('#e-fechas').scrollIntoView({ block: 'center' });
+      aviso('Revisa las fechas');
+      return;
+    }
     if (res.completo) {
       location.hash = ctx.urlResultado;
       return;
@@ -385,6 +551,7 @@ export function montarEscala(params) {
 
   montarTiraRuta(ctx);
   actualizar();
+  mostrarErrorFechas();
 }
 
 function avanzar() {
@@ -396,8 +563,10 @@ function avanzar() {
 
 /* ---------- Resultado ---------- */
 
-// Objeto que se guarda en la valoración.
+// Objeto que se guarda en la valoración. Las respuestas ocultas no se guardan.
 export function aGuardado(e, res, r, momento) {
+  const respuestas = limpiarOcultas(e, r);
+  delete respuestas._origen;
   return {
     escalaId: e.id,
     momento,
@@ -413,69 +582,103 @@ export function aGuardado(e, res, r, momento) {
     resumen: resumenDe(e, res),
     breve: resumenBreveDe(e, res),
     noEvaluable: res.noEvaluable || null,
-    respuestas: { ...r },
+    extras: res.noEvaluable ? null : JSON.parse(JSON.stringify(res.extras || {})),
+    respuestas,
     fecha: r._fecha || hoyISO(),
+    fechaReferencia: momento === 'basal' ? r._fechaBasal || null : null,
     fuente: r._fuente || null,
+    vinculos: r._vinculos ? Object.values(r._vinculos).map(({ titulo, etiqueta, fecha, texto }) => ({ titulo, etiqueta, fecha, texto })) : null,
   };
 }
 
-// Texto de la escala con el momento, la fuente y la fecha cuando aplican.
-export function textoConContexto(e, res, r, momento, formato) {
+const mismoContenido = (a, b) => a.resumen === b.resumen && a.fecha === b.fecha && (a.fuente || null) === (b.fuente || null)
+  && (a.fechaReferencia || null) === (b.fechaReferencia || null);
+
+// Qué hará el botón de guardar: agregar, reemplazar (con confirmación) o elegir entre nueva aplicación y reemplazo.
+function planGuardado(ctx, guardable, r) {
+  const slot = almacen.resultadosSlot(ctx.e.id, ctx.momento);
+  const igual = slot.find((x) => mismoContenido(x, guardable)) || null;
+  const unico = esUnico(ctx.momento);
+  const origen = r._origen ? slot.find((x) => x.id === r._origen) || null : null;
+  const mismaFecha = slot.find((x) => x.fecha === guardable.fecha) || null;
+  const nombre = (x) => etiquetaAplicacion(x) || `del ${fechaCorta(x.fecha)}`;
+  if (igual) return { igual, slot };
+  if (!slot.length) return { accion: 'nuevo', slot };
+  if (unico) return { accion: 'reemplazar', objetivo: slot[0], confirmar: `Reemplazar el resultado ${momentoDe(ctx.momento).enNota}`, slot, unico };
+  const objetivo = origen || mismaFecha;
+  if (objetivo) return { accion: 'reemplazar', objetivo, confirmar: `Actualizar la aplicación ${nombre(objetivo)}`, alterna: 'nuevo', slot };
+  return { accion: 'nuevo', alterna: 'reemplazar', objetivo: slot[0], confirmar: `Reemplazar la aplicación ${nombre(slot[0])}`, slot };
+}
+
+// Resultados con los que se compara esta aplicación (sin el que reemplazaría por defecto).
+function contextoComparacion(ctx, guardable, plan) {
+  const quitar = plan.igual?.id || (plan.accion === 'reemplazar' ? plan.objetivo?.id : null);
+  const otros = almacen.resultadosDe(ctx.e.id).filter((x) => x.id !== quitar);
+  const yo = { ...guardable, id: '__esta', guardado: Date.now() };
+  return { lista: [...otros, yo], yo };
+}
+
+// Texto de la escala con el momento, la fuente, la fecha y el cambio respecto a la referencia.
+export function textoConContexto(e, res, r, momento, formato, cmpCtx = null) {
   let t = textoEscala(e, res, formato);
-  if (momento && momento !== 'actual') t = t.replace(e.corto, `${e.corto} ${momentoDe(momento).enNota}`);
+  const yo = cmpCtx?.yo;
+  const etq = yo ? etiquetaAplicacion(yo, { conFecha: false }) : '';
+  if (etq && momento !== 'actual') t = t.replace(e.corto, `${e.corto} ${etq}`);
   const extra = [];
-  const cambio = textoCambioEscala(e, res, r, momento);
+  const cambio = cmpCtx ? textoCambioEscala(e, cmpCtx) : '';
   if (cambio) extra.push(cambio);
   if (r._fuente) extra.push(`Fuente: ${FUENTES.find((f) => f.id === r._fuente).nombre.toLowerCase()}.`);
-  if (r._fecha && r._fecha !== hoyISO()) extra.push(`Fecha: ${fechaCorta(r._fecha)}.`);
+  if (r._fecha && r._fecha !== hoyISO()) extra.push(`Fecha de aplicación: ${fechaCorta(r._fecha)}.`);
   if (!extra.length) return t;
   return formato === 'lista' ? `${t}\n${extra.join(' ')}` : `${t} ${extra.join(' ')}`;
 }
 
-// «Basal: 95/100 (dependencia escasa); disminución de 50 puntos respecto al basal.»
-function textoCambioEscala(e, res, r, momento) {
-  if (!e.momentos || !momento || res.noEvaluable) return '';
-  const otros = almacen.valoracion().resultados.filter((x) => x.escalaId === e.id && x.momento && x.momento !== momento);
-  if (!otros.length) return '';
-  const yo = aGuardado(e, res, r, momento);
-  const cmp = compararMomentos([...otros, yo], e);
+function textoCambioEscala(e, { lista, yo }) {
+  if (res0(yo) || lista.length < 2) return '';
+  const cmp = compararResultados(lista, e);
   if (!cmp) return '';
-  const previos = cmp.lista.filter((x) => x !== yo).map((x) => `${mayus(momentoDe(x.momento).enNota)}: ${valorGuardado(x)}`).join('; ');
-  const c = cmp.comparaciones.find((x) => x.r === yo);
-  if (!c || c.dif == null) return `${previos}.`;
-  const base = c.dif < 0 ? `disminución de ${Math.abs(c.dif)} ${e.unidadCambio || 'puntos'}` : c.dif > 0 ? `aumento de ${c.dif} ${e.unidadCambio || 'puntos'}` : 'sin cambio en el puntaje';
-  return `${previos}; ${base} respecto al ${cmp.ref.momento === 'basal' ? 'basal' : momentoDe(cmp.ref.momento).enNota}.`;
+  const previos = cmp.lista.filter((x) => x !== yo).map((x) => `${mayus(etiquetaAplicacion(x) || 'aplicación previa')}: ${valorGuardado(x)}`).join('; ');
+  const f = cmp.filas.find((x) => x.r === yo);
+  if (!f || f.esRef) return `${previos}.`;
+  return `${previos}; ${textoCambio(f.vsRef, textoRespectoA(cmp.ref))}.`;
+}
+const res0 = (yo) => Boolean(yo.noEvaluable);
+const mayus = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+
+const ICONO_CAMBIO = { mejoria: ['↑', 'Mejoría'], empeoramiento: ['↓', 'Empeoramiento'], sin_cambio: ['=', 'Sin cambio'], sin_direccion: ['~', 'Sin dirección clínica'], no_interpretable: ['?', 'No interpretable'] };
+
+function celdaCambio(c) {
+  if (!c) return '—';
+  const [simbolo, nombre] = ICONO_CAMBIO[c.tipo];
+  const cifra = c.dif == null ? '' : c.tipo === 'sin_cambio' ? '' : ` ${c.dif > 0 ? '+' : '−'}${c.magnitud}`;
+  return `<span class="cambio cambio-${c.tipo}" title="${esc(c.texto)}"><span aria-hidden="true">${simbolo}</span>${esc(cifra)} <span class="cambio-nombre">${esc(nombre)}</span></span>`;
 }
 
-const esActual = (x, b) => x === b || (x.id && b.id && x.id === b.id) || (x.min != null && x.min === b.min && x.max === b.max && !b.id);
-
-function bloqueComparacion(ctx, actualGuardable) {
-  const otros = almacen.valoracion().resultados.filter((r) => r.escalaId === ctx.e.id && r.momento && r.momento !== ctx.momento);
-  if (!otros.length) return '';
-  const cmp = compararMomentos([...otros, actualGuardable], ctx.e);
+function bloqueComparacion(ctx, cmpCtx) {
+  if (cmpCtx.lista.length < 2) return '';
+  const cmp = compararResultados(cmpCtx.lista, ctx.e);
   if (!cmp) return '';
-  const fila = (r) => {
-    const c = cmp.comparaciones.find((x) => x.r === r);
-    const dif = c?.dif == null ? '—' : c.dif === 0 ? 'Sin cambio' : `${c.dif > 0 ? '+' : '−'}${Math.abs(c.dif)}`;
-    return `<tr${r === actualGuardable ? ' class="actual"' : ''}>
-      <th scope="row">${esc(momentoDe(r.momento).nombre)}${r === actualGuardable ? ' <span>(esta aplicación)</span>' : ''}</th>
-      <td>${esc(valorGuardado(r))}</td>
-      <td class="num-col">${r === cmp.ref ? 'Referencia' : dif}</td>
+  const fila = (f) => `
+    <tr${f.r === cmpCtx.yo ? ' class="actual"' : ''}>
+      <th scope="row">${esc(mayus(etiquetaAplicacion(f.r) || 'Aplicación'))}${f.r === cmpCtx.yo ? ' <span>(esta aplicación)</span>' : ''}</th>
+      <td>${esc(valorGuardado(f.r))}</td>
+      <td class="num-col">${f.esRef ? 'Referencia' : celdaCambio(f.vsRef)}</td>
     </tr>`;
-  };
-  const yo = cmp.comparaciones.find((x) => x.r === actualGuardable);
+  const yo = cmp.filas.find((x) => x.r === cmpCtx.yo);
+  const avisos = [...new Set(cmp.filas.flatMap((f) => (f.esRef ? [] : f.vsRef.advertencias)))];
   return `
     <section class="comparacion">
-      <h2 class="sub">Comparación entre momentos</h2>
+      <h2 class="sub">Comparación entre aplicaciones</h2>
       <div class="tabla-envoltura"><table class="tabla">
-        <thead><tr><th>Momento</th><th>Resultado</th><th class="num-col">Cambio vs ${esc(momentoDe(cmp.ref.momento).nombre.toLowerCase())}</th></tr></thead>
-        <tbody>${cmp.lista.map(fila).join('')}</tbody>
+        <thead><tr><th>Aplicación</th><th>Resultado</th><th class="num-col">Cambio vs ${esc(cmp.ref.momento === 'basal' ? 'basal' : 'referencia')}</th></tr></thead>
+        <tbody>${cmp.filas.map(fila).join('')}</tbody>
       </table></div>
-      ${yo?.empeoradas.length ? `<p class="comparacion-nota">${esc(mayus(ctx.e.textoEmpeoradas || 'reactivos con menor puntaje'))}: ${esc(yo.empeoradas.map(minusculaInicial).join(', '))}.</p>` : ''}
-      <p class="comparacion-nota discreta">El cambio describe la diferencia de puntaje; no establece su causa ni si es reversible.</p>
+      ${yo && !yo.esRef ? `<p class="comparacion-nota">${esc(mayus(textoCambio(yo.vsRef, textoRespectoA(cmp.ref))))}.</p>` : ''}
+      ${yo?.empeoradas?.length ? `<p class="comparacion-nota">${esc(mayus(ctx.e.textoEmpeoradas || 'reactivos que empeoraron'))}: ${esc(yo.empeoradas.map(minusculaInicial).join(', '))}.</p>` : ''}
+      ${avisos.map((a) => `<p class="comparacion-nota aviso-cambio">${icono('alerta')} ${esc(a)}</p>`).join('')}
+      <p class="comparacion-nota discreta">Orden cronológico por fecha de aplicación; el basal es la referencia si existe. El cambio describe la diferencia numérica y su dirección clínica; no establece su causa, su reversibilidad ni su relevancia.</p>
     </section>`;
 }
-const mayus = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
 function tablaDetalle(d) {
   return `
@@ -488,24 +691,45 @@ function tablaDetalle(d) {
     </section>`;
 }
 
+const esActual = (x, b) => x === b || (x.id && b.id && x.id === b.id) || (x.min != null && x.min === b.min && x.max === b.max && !b.id);
+
+function botonesGuardado(ctx, plan) {
+  const enRuta = Boolean(ctx.ruta);
+  if (plan.igual) {
+    return { principal: enRuta ? [icono('flecha'), 'Continuar'] : [icono('check'), 'En la valoración'], alterna: null, nota: '' };
+  }
+  const nombreAccion = (accion) => (accion === 'nuevo'
+    ? (plan.slot.length ? 'Guardar como nueva aplicación' : 'Añadir a la valoración')
+    : plan.confirmar);
+  const principal = [icono(plan.accion === 'nuevo' ? 'mas' : 'reiniciar'), `${nombreAccion(plan.accion)}${enRuta ? ' y continuar' : ''}`];
+  const alterna = plan.alterna ? [icono(plan.alterna === 'nuevo' ? 'mas' : 'reiniciar'), nombreAccion(plan.alterna)] : null;
+  let nota = '';
+  if (plan.slot.length && !plan.unico) {
+    const previa = plan.slot[0];
+    nota = `Ya hay ${plan.slot.length === 1 ? 'una aplicación' : `${plan.slot.length} aplicaciones`} de este momento (la más reciente: ${etiquetaAplicacion(previa) || fechaCorta(previa.fecha)}, ${valorGuardado(previa)}). Una nueva aplicación conserva las anteriores; reemplazar pide confirmación.`;
+  } else if (plan.unico) {
+    nota = `Solo puede haber un resultado ${momentoDe(ctx.momento).enNota}: guardar reemplaza el actual (${valorGuardado(plan.slot[0])}) y pide confirmación.`;
+  }
+  return { principal, alterna, nota };
+}
+
 export function renderResultado(params) {
   const ctx = contexto(params);
   const { e } = ctx;
   const r = respuestasDe(ctx);
   const res = calcularCtx(e, r);
-  if (!res.completo) return null;
+  if (!res.completo || errorFechas(r)) return null;
   const b = res.banda;
   const formato = almacen.formatoEscala();
   const guardable = aGuardado(e, res, r, ctx.momento);
-  const existente = almacen.resultado(e.id, ctx.momento);
-  const igual = existente && existente.resumen === guardable.resumen && existente.fecha === guardable.fecha && (existente.fuente || null) === guardable.fuente;
+  const plan = planGuardado(ctx, guardable, r);
+  const cmpCtx = contextoComparacion(ctx, guardable, plan);
   const barra = e.barra !== false && !res.noEvaluable && (res.puntaje != null || res.valor != null) && e.bandas.every((x) => x.min != null);
   const valorBarra = res.puntaje ?? res.valor;
   const pos = barra ? posicionMarcador(e, valorBarra, b) : 0;
   const m = e.momentos ? momentoDe(ctx.momento) : null;
   const pa = pasoActual(ctx);
-  const etiquetaPrincipal = ctx.ruta ? (igual ? 'Continuar' : 'Guardar y continuar') : igual ? 'En la valoración' : existente ? 'Actualizar en la valoración' : 'Añadir a la valoración';
-  const icoPrincipal = ctx.ruta ? 'flecha' : igual ? 'check' : existente ? 'reiniciar' : 'mas';
+  const botones = botonesGuardado(ctx, plan);
 
   return `
     <section class="vista resultado">
@@ -513,7 +737,7 @@ export function renderResultado(params) {
       <article class="tarjeta-resultado nivel-${b.nivel}">
         <h1 class="ceja">${esc(e.corto)} · Resultado${m ? ` · ${esc(m.nombre)}` : ''}</h1>
         ${res.noEvaluable
-          ? `<p class="puntaje"><span class="puntaje-texto">No evaluable</span></p>`
+          ? '<p class="puntaje"><span class="puntaje-texto">No evaluable</span></p>'
           : `<p class="puntaje"><span class="puntaje-num${String(res.mostrar).length > 4 ? ' largo' : ''}">${esc(res.mostrar)}</span><span class="puntaje-de">${esc(res.sufijo)}</span></p>`}
         <p class="chip nivel-${b.nivel}"><span class="punto" aria-hidden="true"></span>${esc(b.etiqueta)}</p>
         ${barra ? `
@@ -531,7 +755,7 @@ export function renderResultado(params) {
         <p class="interpretacion">${esc(b.texto)}</p>
         ${res.lineas?.length ? `<ul class="lineas">${res.lineas.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
         ${(res.detalles || []).map(tablaDetalle).join('')}
-        ${e.momentos && !res.noEvaluable ? bloqueComparacion(ctx, guardable) : ''}
+        ${!res.noEvaluable ? bloqueComparacion(ctx, cmpCtx) : ''}
         ${b.sugerencias?.length ? `
           <section class="sugerencias">
             <h2 class="sub">${icono('bombilla')} Sugerencias de evaluación complementaria</h2>
@@ -556,9 +780,11 @@ export function renderResultado(params) {
         <h2 class="seccion">Texto para el expediente</h2>
         ${selectorFormato(formato)}
       </div>
-      <pre class="nota" id="texto-escala" data-formato="${formato}">${esc(textoConContexto(e, res, r, ctx.momento, formato))}</pre>
+      <pre class="nota" id="texto-escala" data-formato="${formato}">${esc(textoConContexto(e, res, r, ctx.momento, formato, cmpCtx))}</pre>
+      ${botones.nota ? `<p class="nota-guardar" id="nota-guardar">${icono('info')} ${esc(botones.nota)}</p>` : ''}
       <div class="acciones">
-        <button class="btn btn-primario" type="button" id="agregar"${igual && !ctx.ruta ? ' data-agregado' : ''}>${icono(icoPrincipal)} ${etiquetaPrincipal}</button>
+        <button class="btn btn-primario" type="button" id="agregar"${plan.igual && !ctx.ruta ? ' data-agregado' : ''}>${botones.principal.join(' ')}</button>
+        ${botones.alterna ? `<button class="btn ancho" type="button" id="guardar-alterna">${botones.alterna.join(' ')}</button>` : ''}
         <button class="btn ancho" type="button" id="copiar">${icono('copiar')} ${ETIQUETA_COPIAR[formato]}</button>
         <a class="btn" href="${ctx.url}">${icono('editar')} Revisar<span class="amplio">&nbsp;respuestas</span></a>
         ${ctx.ruta
@@ -574,10 +800,8 @@ export function montarResultado(params, alGuardar) {
   const r = respuestasDe(ctx);
   const res = calcularCtx(e, r);
   const guardable = aGuardado(e, res, r, ctx.momento);
-  const existente = almacen.resultado(e.id, ctx.momento);
-  const igual = existente && existente.resumen === guardable.resumen && existente.fecha === guardable.fecha && (existente.fuente || null) === guardable.fuente;
-  const btn = $('#agregar');
-  let armado = null;
+  const plan = planGuardado(ctx, guardable, r);
+  const cmpCtx = contextoComparacion(ctx, guardable, plan);
 
   const continuarRuta = () => {
     const pa = pasoActual(ctx);
@@ -585,46 +809,64 @@ export function montarResultado(params, alGuardar) {
     location.hash = sig ? urlPaso(ctx.ruta, sig) : `#/r/${ctx.ruta.id}`;
   };
 
-  btn.addEventListener('click', () => {
-    if (igual) {
-      if (ctx.ruta) continuarRuta();
-      return;
-    }
-    if (existente && !armado) {
-      const m = e.momentos ? ` ${momentoDe(ctx.momento).enNota}` : '';
-      btn.innerHTML = `${icono('alerta')} Toca otra vez para reemplazar el resultado${m} guardado (${esc(valorGuardado(existente))})`;
-      btn.classList.add('armado');
-      armado = setTimeout(() => {
-        armado = null;
-        btn.classList.remove('armado');
-        btn.innerHTML = `${icono(ctx.ruta ? 'flecha' : 'reiniciar')} ${ctx.ruta ? 'Guardar y continuar' : 'Actualizar en la valoración'}`;
-      }, 5000);
-      return;
-    }
-    clearTimeout(armado);
-    almacen.agregarResultado(guardable);
+  const ejecutar = (accion) => {
+    const guardado = accion === 'reemplazar'
+      ? almacen.guardarResultado(guardable, { reemplazar: plan.objetivo.id, unico: Boolean(plan.unico) })
+      : almacen.guardarResultado(guardable, { unico: esUnico(ctx.momento) });
+    // Las respuestas en edición quedan ligadas a la aplicación guardada para futuras correcciones.
+    almacen.guardarRespuestas(e.id, ctx.momento, { ...r, _origen: guardado.id });
     alGuardar();
     if (ctx.ruta) {
       aviso(`${e.corto} guardado`);
       continuarRuta();
       return;
     }
+    aviso(accion === 'reemplazar' ? 'Resultado reemplazado en la valoración' : 'Añadido a la valoración');
+    const btn = $('#agregar');
     btn.classList.remove('armado');
     btn.dataset.agregado = '';
     btn.innerHTML = `${icono('check')} En la valoración`;
-    aviso(existente ? 'Resultado actualizado en la valoración' : 'Añadido a la valoración');
-  });
+    $('#guardar-alterna')?.remove();
+    $('#nota-guardar')?.remove();
+  };
+
+  // Reemplazar siempre pide un segundo toque; agregar una aplicación nueva no.
+  const conConfirmacion = (boton, accion) => {
+    let armado = null;
+    const original = boton.innerHTML;
+    boton.addEventListener('click', () => {
+      if (boton.dataset.agregado !== undefined) return;
+      if (accion !== 'reemplazar') { ejecutar(accion); return; }
+      if (!armado) {
+        boton.innerHTML = `${icono('alerta')} Toca otra vez para reemplazar ${esc(valorGuardado(plan.objetivo))}`;
+        boton.classList.add('armado');
+        armado = setTimeout(() => { armado = null; boton.classList.remove('armado'); boton.innerHTML = original; }, 5000);
+        return;
+      }
+      clearTimeout(armado);
+      ejecutar(accion);
+    });
+  };
+
+  const btn = $('#agregar');
+  if (plan.igual) {
+    btn.addEventListener('click', () => { if (ctx.ruta) continuarRuta(); });
+  } else {
+    conConfirmacion(btn, plan.accion);
+    const alt = $('#guardar-alterna');
+    if (alt) conConfirmacion(alt, plan.alterna);
+  }
 
   alCambiarFormato(document, (formato) => {
     const f = formato === 'lista' ? 'lista' : 'parrafo';
     const pre = $('#texto-escala');
     pre.dataset.formato = f;
-    pre.textContent = textoConContexto(e, res, r, ctx.momento, f);
+    pre.textContent = textoConContexto(e, res, r, ctx.momento, f, cmpCtx);
     $('#copiar').innerHTML = `${icono('copiar')} ${ETIQUETA_COPIAR[f]}`;
   });
   $('#copiar').addEventListener('click', () => {
     const f = almacen.formatoEscala();
-    copiar(textoConContexto(e, res, r, ctx.momento, f), f === 'parrafo' ? 'Copiado en párrafo' : 'Copiado en lista');
+    copiar(textoConContexto(e, res, r, ctx.momento, f, cmpCtx), f === 'parrafo' ? 'Copiado en párrafo' : 'Copiado en lista');
   });
   $('#nueva')?.addEventListener('click', () => {
     almacen.guardarRespuestas(e.id, ctx.momento, {});

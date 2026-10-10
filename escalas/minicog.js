@@ -18,6 +18,9 @@ export default {
     'Las series de palabras no se reproducen aquí: usa las de la hoja oficial (mini-cog.com o la guía del INGER).',
   ],
   tiempo: '3 a 5 min',
+  direccionClinica: 'mayor_mejor',
+  textoMejoria: 'mejor desempeño en el tamizaje',
+  textoEmpeoramiento: 'peor desempeño en el tamizaje',
   min: 0,
   max: 5,
   campos: [

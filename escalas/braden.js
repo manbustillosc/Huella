@@ -16,7 +16,11 @@ const B = {
   alto: { id: 'alto', rango: '≤12', etiqueta: 'Riesgo alto', nivel: 'grave', hallazgo: true, texto: 'Riesgo alto de lesiones por presión.', sugerencias: SUG_RIESGO },
   medio: { id: 'medio', rango: '13 a 14', etiqueta: 'Riesgo medio', nivel: 'moderado', hallazgo: true, texto: 'Riesgo medio de lesiones por presión.', sugerencias: SUG_RIESGO },
   bajo: { id: 'bajo', rango: '15 a 16 (<75 años) · 15 a 18 (≥75 años)', etiqueta: 'Riesgo bajo', nivel: 'leve', hallazgo: true, texto: 'Riesgo bajo de lesiones por presión.', sugerencias: [SUG_RIESGO[0], SUG_RIESGO[2]] },
-  sin: { id: 'sin', rango: '≥17 (<75 años) · ≥19 (≥75 años)', etiqueta: 'Sin riesgo', nivel: 'bien', texto: 'Sin riesgo según el punto de corte para su edad.', sugerencias: [] },
+  sin: {
+    id: 'sin', rango: '≥17 (<75 años) · ≥19 (≥75 años)', etiqueta: 'Sin riesgo elevado identificado por la escala', nivel: 'bien',
+    texto: 'Puntaje por encima del punto de corte para su edad: la escala no identifica riesgo elevado de lesiones por presión. No sustituye la inspección de la piel; revalorar ante cambios clínicos.',
+    sugerencias: ['Mantener la inspección de la piel y revalorar el riesgo ante cambios en la movilidad, la nutrición, la continencia o el estado de alerta.'],
+  },
 };
 
 export default {
@@ -37,6 +41,9 @@ export default {
   ],
   tiempo: '5 min',
   momentos: true,
+  direccionClinica: 'mayor_mejor',
+  textoMejoria: 'menor riesgo según la escala',
+  textoEmpeoramiento: 'mayor riesgo según la escala',
   min: 6,
   max: 23,
   barra: false,
@@ -54,7 +61,10 @@ export default {
     const total = base.desglose.filter((d) => d.valor != null).reduce((s, d) => s + d.valor, 0);
     const limiteBajo = v.edad >= 75 ? 18 : 16;
     const banda = total <= 12 ? B.alto : total <= 14 ? B.medio : total <= limiteBajo ? B.bajo : B.sin;
-    return { puntaje: total, banda, lineas: [`Punto de corte para ${v.edad >= 75 ? '75 años o más' : 'menores de 75 años'}: riesgo hasta ${limiteBajo} puntos.`] };
+    const lineas = [`Punto de corte para ${v.edad >= 75 ? '75 años o más' : 'menores de 75 años'}: riesgo hasta ${limiteBajo} puntos (guía del INGER).`];
+    if (total <= 9) lineas.push('En la clasificación de Braden y Bergstrom, 9 puntos o menos corresponde a riesgo muy alto.');
+    lineas.push('La escala estima el riesgo; no sustituye la inspección diaria de la piel.');
+    return { puntaje: total, banda, lineas };
   },
   resumen(res) {
     const sub = res.desglose.filter((d) => d.valor != null).map((d) => `${d.campo.textoCorto} ${d.valor}`).join(', ');
@@ -62,8 +72,9 @@ export default {
   },
   detalleEnResumen: true,
   notas: [
-    'Interpretación de la guía del INGER (2022): alto <12, medio 13–14, bajo 15–16 en menores de 75 años o 15–18 en 75 años o más; aquí 12 se agrupa con el riesgo alto, como en la clasificación original de Braden (10–12 alto, ≤9 muy alto).',
-    'No sustituye la inspección diaria de la piel ni el juicio clínico.',
+    'Interpretación de la guía del INGER (2022): riesgo alto ≤12, medio 13–14, bajo 15–16 en menores de 75 años o 15–18 en 75 años o más. Por encima de esos valores la escala no identifica riesgo elevado, lo que no equivale a ausencia de riesgo.',
+    'Clasificación de Braden y Bergstrom: 15–18 riesgo leve, 13–14 moderado, 10–12 alto y ≤9 muy alto.',
+    'Estimar el riesgo no sustituye la inspección diaria de la piel ni el juicio clínico; revalora ante cambios en la movilidad, la nutrición, la continencia o el estado de alerta.',
     'El titular exige licencia para reproducir los descriptores: Huella registra solo los puntajes por subescala.',
   ],
   licencia: { texto: 'Braden Scale © Barbara Braden y Nancy Bergstrom; licencias a través de Health Sense Ai.', enlace: 'https://bradenscale.com' },

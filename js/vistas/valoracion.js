@@ -1,59 +1,66 @@
-// Valoración en curso: datos clínicos no identificables, resultados por dominio y nota para el expediente.
+// Valoración en curso: datos clínicos no identificables, resultados por dominio en orden cronológico y nota.
 import { almacen } from '../almacen.js';
 import { porId, DOMINIOS, RUTAS } from '../datos.js';
-import { momentoDe, FUENTES } from '../motor.js';
-import { notaValoracion, compararMomentos, valorGuardado, fechaCorta } from '../nota.js';
+import { FUENTES } from '../motor.js';
+import { notaValoracion, valorGuardado, hallazgosYSugerencias } from '../nota.js';
+import { ordenarCronologico, compararResultados, etiquetaAplicacion, fechaCorta, isoDe, textoCambio, textoRespectoA } from '../comparacion.js';
 import { $, $$, esc, icono, plural, aviso, copiar, selectorFormato, alCambiarFormato, ETIQUETA_COPIAR, confirmarEnDosToques } from '../ui.js';
 import { progresoRuta } from './rutas-estado.js';
 
-const urlResultado = (r) => `#/e/${r.escalaId}${r.momento ? `@${r.momento}` : ''}/resultado`;
+export const diasDesde = (ts) => (ts ? Math.max(0, Math.floor((Date.now() - ts) / 86400000)) : 0);
 
-function filaResultado(r, cambio = '') {
+const urlResultado = (r) => `#/e/${r.escalaId}${r.momento ? `@${r.momento}` : ''}/resultado`;
+const ICONO_CAMBIO = { mejoria: '↑', empeoramiento: '↓', sin_cambio: '=', sin_direccion: '~', no_interpretable: '?' };
+
+function filaResultado(r, cambio = null, esRef = false, ref = null) {
   const e = porId[r.escalaId];
-  const m = r.momento ? momentoDe(r.momento)?.nombre : '';
+  const etq = etiquetaAplicacion(r) || (r.fecha ? fechaCorta(r.fecha) : '');
+  const fuente = r.fuente ? `fuente: ${(FUENTES.find((f) => f.id === r.fuente)?.nombre || r.fuente).toLowerCase()}` : '';
+  const meta = [r.momento && r.fecha && r.momento !== 'basal' ? '' : r.momento === 'basal' && r.fecha ? `registrado ${fechaCorta(r.fecha)}` : '', fuente].filter(Boolean).join(' · ');
   return `
     <div class="fila-resultado nivel-${r.nivel}">
-      <a class="fr-enlace" href="${urlResultado(r)}" data-cargar="${esc(r.escalaId)}" data-momento="${esc(r.momento || '')}">
+      <a class="fr-enlace" href="${urlResultado(r)}" data-cargar="${esc(r.id)}">
         <span class="punto" aria-hidden="true"></span>
         <span class="fr-texto">
-          <span class="fr-nombre">${esc(e.nombre)}${m ? ` <span class="fr-momento">${esc(m)}</span>` : ''}</span>
+          <span class="fr-nombre">${esc(e.corto)}${etq ? ` <span class="fr-momento">${esc(etq)}</span>` : ''}${esRef ? ' <span class="fr-ref">referencia</span>' : ''}</span>
           <span class="fr-res">${esc(valorGuardado(r))}</span>
-          ${cambio ? `<span class="fr-cambio">${esc(cambio)}</span>` : ''}
-          ${r.fecha || r.fuente ? `<span class="fr-meta">${[r.fecha ? fechaCorta(r.fecha) : '', r.fuente ? `fuente: ${(FUENTES.find((f) => f.id === r.fuente)?.nombre || r.fuente).toLowerCase()}` : ''].filter(Boolean).join(' · ')}</span>` : ''}
+          ${cambio ? `<span class="fr-cambio cambio-${cambio.tipo}"><span aria-hidden="true">${ICONO_CAMBIO[cambio.tipo]}</span> ${esc(textoCambio(cambio, ref ? textoRespectoA(ref) : ''))}</span>` : ''}
+          ${meta ? `<span class="fr-meta">${esc(meta)}</span>` : ''}
         </span>
       </a>
-      <button class="btn-icono" type="button" data-quitar="${esc(r.escalaId)}" data-momento="${esc(r.momento || '')}" aria-label="Quitar ${esc(e.corto)}${m ? ` ${esc(m)}` : ''} de la valoración">${icono('cerrar')}</button>
+      <button class="btn-icono" type="button" data-quitar="${esc(r.id)}" aria-label="Quitar ${esc(e.corto)}${etq ? ` ${esc(etq)}` : ''} de la valoración">${icono('cerrar')}</button>
     </div>`;
 }
 
 function grupoEscala(rs) {
   const e = porId[rs[0].escalaId];
-  const cmp = rs.length > 1 ? compararMomentos(rs, e) : null;
-  return (cmp ? cmp.lista : rs).map((r) => {
-    const c = cmp?.comparaciones.find((x) => x.r === r);
-    const cambio = c?.dif != null ? `${c.dif === 0 ? 'Sin cambio' : `${c.dif > 0 ? '+' : '−'}${Math.abs(c.dif)} ${e.unidadCambio || 'puntos'}`} respecto al ${cmp.ref.momento === 'basal' ? 'basal' : momentoDe(cmp.ref.momento).nombre.toLowerCase()}` : '';
-    return filaResultado(r, cambio);
-  }).join('');
+  const cmp = rs.length > 1 ? compararResultados(rs, e) : null;
+  if (!cmp) return filaResultado(rs[0]);
+  return cmp.filas.map((f) => filaResultado(f.r, f.esRef ? null : f.vsRef, f.esRef, cmp.ref)).join('');
 }
 
 export function renderValoracion() {
   const v = almacen.valoracion();
   const p = v.paciente || {};
   const formato = almacen.formatoNota();
+  const dias = diasDesde(v.creada);
   const grupos = DOMINIOS.map((d) => {
     const rs = v.resultados.filter((r) => porId[r.escalaId]?.dominio === d.id);
     if (!rs.length) return '';
-    const ids = [...new Set(rs.map((r) => r.escalaId))];
+    const ids = [...new Set(ordenarCronologico(rs).map((r) => r.escalaId))];
     return `<p class="ceja grupo-val">${esc(d.nombre)}</p>${ids.map((id) => grupoEscala(rs.filter((r) => r.escalaId === id))).join('')}`;
   }).join('');
   const enCurso = RUTAS.map((r) => ({ r, p: progresoRuta(r) })).filter((x) => x.p.completos + x.p.omitidos > 0 && x.p.pendientes.length);
+  const { avisos } = v.resultados.length ? hallazgosYSugerencias(v, porId) : { avisos: [] };
   return `
     <section class="vista valoracion">
       <header class="cabecera">
         <p class="ceja">Valoración en curso</p>
         <h1>Valoración</h1>
         <p class="entradilla">Se guarda solo en este navegador, sin nombre ni datos de identificación. <a href="#/acerca">Qué se guarda y sus límites</a>.</p>
+        ${v.creada ? `<p class="inicio-valoracion">${icono('calendario')} Iniciada el ${esc(fechaCorta(isoDe(new Date(v.creada))))}${dias > 0 ? ` (hace ${plural(dias, 'día', 'días')})` : ' (hoy)'}.</p>` : ''}
       </header>
+      ${dias > 7 && v.resultados.length ? `<p class="aviso-episodio">${icono('alerta')} Esta valoración tiene más de una semana. Si los nuevos resultados son de otro episodio clínico, copia la nota e inicia una nueva valoración para no mezclarlos.</p>` : ''}
       <div class="tarjeta">
         <p class="titulo-tarjeta">Datos clínicos <span>(opcionales, no identificables)</span></p>
         <div class="campos">
@@ -74,8 +81,14 @@ export function renderValoracion() {
         <div class="rutas-en-curso">
           ${enCurso.map(({ r, p: pr }) => `<a class="en-curso" href="#/r/${r.id}">${icono(r.icono)}<span><strong>${esc(r.nombre)}</strong><span>${pr.completos} de ${pr.total} completos · ${plural(pr.pendientes.length, 'pendiente', 'pendientes')}</span></span>${icono('adelante', 'chev')}</a>`).join('')}
         </div>` : ''}
+      ${avisos.length ? `
+        <div class="avisos-cronologia" role="note">
+          <p class="titulo-tarjeta">${icono('alerta')} Revisa la cronología</p>
+          <ul>${avisos.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>
+        </div>` : ''}
       ${v.resultados.length ? `
         <div class="resultados-val">${grupos}</div>
+        <p class="discreto">Cada instrumento se muestra en orden cronológico; el cambio se compara con el basal o, si no hay, con la primera aplicación. Toca un resultado para revisarlo o corregirlo.</p>
         <div class="cabecera-nota">
           <h2 class="seccion">Nota para el expediente</h2>
           ${selectorFormato(formato, ['parrafo', 'lista', 'completa'])}
@@ -98,8 +111,8 @@ export function renderValoracion() {
 function descripcionFormato(f) {
   return {
     parrafo: 'Todo seguido, para ahorrar espacio en la nota.',
-    lista: 'Un renglón por instrumento, agrupado por dominio.',
-    completa: 'Resultados por dominio, cambios respecto a evaluaciones previas, hallazgos y sugerencias separadas de los resultados.',
+    lista: 'Un renglón por aplicación, agrupado por dominio, con el cambio respecto a la referencia.',
+    completa: 'Separa resultados objetivos, interpretación, cambios longitudinales, hallazgos y sugerencias orientativas.',
   }[f];
 }
 
@@ -142,14 +155,22 @@ export function montarValoracion(rerender, alCambiar) {
       },
     });
   }
-  $$('[data-quitar]').forEach((b) => b.addEventListener('click', () => {
-    almacen.quitarResultado(b.dataset.quitar, b.dataset.momento || undefined);
-    alCambiar();
-    rerender();
-    aviso('Quitado de la valoración');
+  // Quitar un resultado también pide un segundo toque.
+  $$('[data-quitar]').forEach((b) => confirmarEnDosToques(b, {
+    texto: icono('alerta'),
+    accion: () => {
+      almacen.quitarResultado(b.dataset.quitar);
+      alCambiar();
+      rerender();
+      aviso('Quitado de la valoración');
+    },
   }));
+  $$('[data-quitar]').forEach((b) => b.addEventListener('click', () => {
+    if (b.classList.contains('armado')) b.setAttribute('aria-label', 'Toca otra vez para quitar este resultado');
+  }));
+  // Al abrir un resultado, sus respuestas quedan listas para revisarlo o corregirlo.
   $$('[data-cargar]').forEach((a) => a.addEventListener('click', () => {
-    const r = almacen.resultado(a.dataset.cargar, a.dataset.momento || undefined);
-    if (r?.respuestas) almacen.guardarRespuestas(r.escalaId, r.momento, r.respuestas);
+    const r = almacen.resultadoPorId(a.dataset.cargar);
+    if (r?.respuestas) almacen.guardarRespuestas(r.escalaId, r.momento, { ...r.respuestas, _origen: r.id });
   }));
 }

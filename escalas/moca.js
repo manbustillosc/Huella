@@ -17,6 +17,9 @@ export default {
     'Si no fue posible aplicarla, márcala como no evaluable e indica el motivo.',
   ],
   tiempo: '10 a 15 min',
+  direccionClinica: 'mayor_mejor',
+  textoMejoria: 'mejor desempeño en la prueba',
+  textoEmpeoramiento: 'peor desempeño en la prueba',
   min: 0,
   max: 30,
   campos: [

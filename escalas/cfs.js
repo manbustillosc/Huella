@@ -37,8 +37,10 @@ export default {
   tiempo: '1 a 2 min',
   momentos: true,
   fuente: true,
-  mayorEsMejor: false,
-  unidadCambio: 'niveles',
+  direccionClinica: 'menor_mejor',
+  unidadCambio: ['nivel', 'niveles'],
+  textoMejoria: 'menor grado de fragilidad registrado, sujeto a interpretación clínica',
+  textoEmpeoramiento: 'mayor grado de fragilidad registrado',
   min: 1,
   max: 9,
   campos: [
@@ -52,7 +54,7 @@ export default {
     return {
       min: k,
       max: k,
-      etiqueta: `Nivel ${n} · ${nombre}`,
+      etiqueta: `Nivel ${n}: ${nombre.toLowerCase()}`,
       nivel,
       hallazgo: k >= 4,
       texto: k <= 3 ? 'Sin fragilidad.' : k === 9 ? 'Esperanza de vida menor de 6 meses; puede no tener otros datos de fragilidad.' : `Fragilidad (${nombre.toLowerCase()}). A partir del nivel 5 se considera fragilidad.`,
@@ -66,7 +68,7 @@ export default {
     return `CFS: ${res.banda.etiqueta.toLowerCase()}.`;
   },
   resumenBreve(res) {
-    return `CFS ${res.puntaje} (${res.banda.etiqueta.replace(/^Nivel \d · /, '').toLowerCase()})`;
+    return `CFS ${res.puntaje}/9 (${res.banda.etiqueta.replace(/^Nivel \d: /, '')})`;
   },
   detalleEnResumen: true,
   notas: [

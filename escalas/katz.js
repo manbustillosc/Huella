@@ -48,14 +48,14 @@ const ACTIVIDADES = [
 ];
 
 const LETRAS = [
-  { id: 'A', etiqueta: 'Katz A', nivel: 'bien', texto: 'Independiente en las seis actividades básicas.' },
-  { id: 'B', etiqueta: 'Katz B', nivel: 'leve', texto: 'Independiente en todas las actividades salvo una.' },
-  { id: 'C', etiqueta: 'Katz C', nivel: 'moderado', texto: 'Independiente en todas salvo baño y otra actividad.' },
-  { id: 'D', etiqueta: 'Katz D', nivel: 'moderado', texto: 'Independiente en todas salvo baño, vestido y otra actividad.' },
-  { id: 'E', etiqueta: 'Katz E', nivel: 'grave', texto: 'Independiente en todas salvo baño, vestido, uso del sanitario y otra actividad.' },
-  { id: 'F', etiqueta: 'Katz F', nivel: 'grave', texto: 'Independiente en todas salvo baño, vestido, uso del sanitario, transferencias y otra actividad.' },
-  { id: 'G', etiqueta: 'Katz G', nivel: 'critico', texto: 'Dependiente en las seis actividades básicas.' },
-  { id: 'H', etiqueta: 'Katz H (otro)', nivel: 'moderado', texto: 'Dependiente en al menos dos actividades, sin clasificar como C, D, E ni F.' },
+  { id: 'A', etiqueta: 'Clase A', nivel: 'bien', texto: 'Independiente en las seis actividades básicas.' },
+  { id: 'B', etiqueta: 'Clase B', nivel: 'leve', texto: 'Independiente en todas las actividades salvo una.' },
+  { id: 'C', etiqueta: 'Clase C', nivel: 'moderado', texto: 'Independiente en todas salvo baño y otra actividad.' },
+  { id: 'D', etiqueta: 'Clase D', nivel: 'moderado', texto: 'Independiente en todas salvo baño, vestido y otra actividad.' },
+  { id: 'E', etiqueta: 'Clase E', nivel: 'grave', texto: 'Independiente en todas salvo baño, vestido, uso del sanitario y otra actividad.' },
+  { id: 'F', etiqueta: 'Clase F', nivel: 'grave', texto: 'Independiente en todas salvo baño, vestido, uso del sanitario, transferencias y otra actividad.' },
+  { id: 'G', etiqueta: 'Clase G', nivel: 'critico', texto: 'Dependiente en las seis actividades básicas.' },
+  { id: 'H', etiqueta: 'Clase H (otro)', nivel: 'moderado', texto: 'Dependiente en al menos dos actividades, sin clasificar como C, D, E ni F.' },
 ].map((l) => ({ ...l, rango: l.id }));
 
 // Clasificación jerárquica de Katz (1963).
@@ -92,11 +92,13 @@ export default {
   tiempo: '5 min',
   momentos: true,
   fuente: true,
+  direccionClinica: 'mayor_mejor',
+  textoMejoria: 'recuperación de actividades básicas',
+  textoEmpeoramiento: 'pérdida de actividades básicas',
   min: 0,
   max: 6,
   barra: false,
-  unidadCambio: 'puntos',
-  textoEmpeoradas: 'actividades básicas perdidas respecto al basal',
+  textoEmpeoradas: 'actividades básicas perdidas respecto a la referencia',
   campos: ACTIVIDADES,
   bandas: LETRAS,
   calcular({ v }) {

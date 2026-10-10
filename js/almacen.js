@@ -39,10 +39,11 @@ const seguro = (nombre) => {
 const local = seguro('localStorage');
 const sesion = seguro('sessionStorage');
 
-const nuevoId = () => `v${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+const nuevoId = (p = 'v') => `${p}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 const vacia = () => ({ id: nuevoId(), creada: Date.now(), paciente: {}, resultados: [], rutas: {} });
 export const claveResultado = (escalaId, momento) => (momento ? `${escalaId}@${momento}` : escalaId);
 const claveDe = (r) => claveResultado(r.escalaId, r.momento);
+const recientePrimero = (a, b) => ((b.fecha || '') > (a.fecha || '') ? 1 : (b.fecha || '') < (a.fecha || '') ? -1 : (b.guardado || 0) - (a.guardado || 0));
 
 export const almacen = {
   /* Preferencias */
@@ -85,34 +86,75 @@ export const almacen = {
       escribir(local, 'valoracion', n);
       return n;
     }
+    let migrada = false;
     if (!v.id) {
       // Migración desde versiones anteriores
       Object.assign(v, { id: nuevoId(), creada: Date.now(), rutas: v.rutas || {} });
-      escribir(local, 'valoracion', v);
+      migrada = true;
     }
     v.rutas = v.rutas || {};
     v.paciente = v.paciente || {};
     v.resultados = v.resultados || [];
+    for (const r of v.resultados) {
+      if (!r.id) { r.id = nuevoId('r'); migrada = true; }
+    }
+    if (migrada) escribir(local, 'valoracion', v);
     return v;
   },
   guardarValoracion: (v) => escribir(local, 'valoracion', v),
+  // Todas las aplicaciones de un instrumento, o solo las de un momento (sin momento = undefined).
+  resultadosDe(escalaId) {
+    return this.valoracion().resultados.filter((r) => r.escalaId === escalaId);
+  },
+  resultadosSlot(escalaId, momento) {
+    return this.valoracion().resultados.filter((r) => claveDe(r) === claveResultado(escalaId, momento)).sort(recientePrimero);
+  },
+  // La aplicación más reciente de ese momento.
   resultado(escalaId, momento) {
-    return this.valoracion().resultados.find((r) => claveDe(r) === claveResultado(escalaId, momento)) || null;
+    return this.resultadosSlot(escalaId, momento)[0] || null;
   },
-  agregarResultado(resultado) {
+  resultadoPorId(id) {
+    return this.valoracion().resultados.find((r) => r.id === id) || null;
+  },
+  // Guarda una aplicación. Con { reemplazar: id } sustituye esa aplicación (conserva su identificador);
+  // sin él agrega una nueva. Los momentos únicos (basal, ingreso, egreso) siempre reemplazan al anterior.
+  guardarResultado(resultado, { reemplazar = null, unico = false } = {}) {
     const v = this.valoracion();
-    const clave = claveDe(resultado);
-    v.resultados = v.resultados.filter((r) => claveDe(r) !== clave);
-    v.resultados.push({ ...resultado, guardado: Date.now() });
+    const datos = { ...resultado };
+    delete datos.id;
+    let id = reemplazar && v.resultados.some((r) => r.id === reemplazar) ? reemplazar : null;
+    if (unico) {
+      const previo = v.resultados.find((r) => claveDe(r) === claveDe(resultado));
+      if (previo) id = previo.id;
+      v.resultados = v.resultados.filter((r) => claveDe(r) !== claveDe(resultado) || r.id === id);
+    }
+    const nuevo = { ...datos, id: id || nuevoId('r'), guardado: Date.now() };
+    const i = id ? v.resultados.findIndex((r) => r.id === id) : -1;
+    if (i >= 0) v.resultados[i] = nuevo;
+    else v.resultados.push(nuevo);
     this.guardarValoracion(v);
+    return nuevo;
   },
-  quitarResultado(escalaId, momento) {
+  // Compatibilidad: agrega reemplazando el mismo momento.
+  agregarResultado(resultado) {
+    return this.guardarResultado(resultado, { unico: true });
+  },
+  quitarResultado(id) {
     const v = this.valoracion();
-    v.resultados = v.resultados.filter((r) => claveDe(r) !== claveResultado(escalaId, momento));
+    v.resultados = v.resultados.filter((r) => r.id !== id);
     this.guardarValoracion(v);
   },
   omitidas(rutaId) {
     return this.valoracion().rutas[rutaId]?.omitidas || [];
+  },
+  momentoRuta(rutaId) {
+    return this.valoracion().rutas[rutaId]?.momento || null;
+  },
+  guardarMomentoRuta(rutaId, momento) {
+    const v = this.valoracion();
+    const r = (v.rutas[rutaId] = v.rutas[rutaId] || { omitidas: [] });
+    r.momento = momento;
+    this.guardarValoracion(v);
   },
   alternarOmitida(rutaId, clave, omitir = true) {
     const v = this.valoracion();

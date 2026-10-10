@@ -21,9 +21,12 @@ export default {
   tiempo: '5 a 10 min',
   momentos: true,
   fuente: true,
+  direccionClinica: 'mayor_mejor',
+  textoMejoria: 'mejoría funcional en las ABVD',
+  textoEmpeoramiento: 'deterioro funcional en las ABVD',
   min: 0,
   max: 100,
-  textoEmpeoradas: 'actividades con menor puntaje que el basal',
+  textoEmpeoradas: 'actividades con menor puntaje que en la referencia',
   campos: [
     {
       id: 'comer', texto: 'Comer', textoCorto: 'comer',

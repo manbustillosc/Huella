@@ -15,6 +15,9 @@ export default {
     'Son datos del cuidador, no del paciente: no anotes su nombre.',
   ],
   tiempo: '10 min',
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'menor sobrecarga percibida',
+  textoEmpeoramiento: 'mayor sobrecarga percibida',
   min: 22,
   max: 110,
   campos: [

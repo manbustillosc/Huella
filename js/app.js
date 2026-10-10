@@ -75,7 +75,7 @@ function render() {
 function montar(r) {
   const navegacion = () => renderNavegacion(ruta());
   if (r.vista === 'inicio') montarInicio();
-  if (r.vista === 'escala') montarEscala(r);
+  if (r.vista === 'escala') montarEscala(r, render);
   if (r.vista === 'resultado') montarResultado(r, navegacion);
   if (r.vista === 'ruta') montarRuta(r, render);
   if (r.vista === 'valoracion') montarValoracion(render, navegacion);

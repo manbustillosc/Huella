@@ -17,6 +17,8 @@ export default {
     'El reactivo 4 puede completarse con información del cuidador, enfermería o el expediente.',
   ],
   tiempo: '2 min',
+  // No mide gravedad: se informa el cambio de categoría y la diferencia sin calificarla.
+  direccionClinica: 'sin_direccion',
   permiteNoEvaluable: false,
   min: 0,
   max: 12,

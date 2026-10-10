@@ -1,26 +1,37 @@
-// Texto de la valoración para el expediente y comparación entre momentos (basal, ingreso, actual, egreso).
-import { MOMENTOS, momentoDe, FUENTES, calcular, minusculaInicial } from './motor.js';
+// Texto de la valoración para el expediente.
+// Formatos: 'parrafo' (compacto), 'lista' (un renglón por aplicación) y 'completa', que separa
+// 1) resultados objetivos, 2) interpretación, 3) cambios longitudinales, 4) hallazgos y 5) sugerencias.
+import { FUENTES, minusculaInicial } from './motor.js';
+import {
+  ordenarCronologico, vigenteDe, compararResultados, etiquetaAplicacion, fechaCorta, isoDe,
+  textoRespectoA, textoCambio, inconsistenciasCronologicas, amplitudDias,
+} from './comparacion.js';
 
+export { fechaCorta };
 export const FORMATOS_NOTA = ['parrafo', 'lista', 'completa'];
-const ORDEN = Object.fromEntries(MOMENTOS.map((m, i) => [m.id, i]));
+// Dominios que una valoración geriátrica integral suele cubrir; la nota completa avisa si faltan.
+export const DOMINIOS_NUCLEO = ['funcional', 'cognitivo', 'afectivo', 'fragilidad', 'nutricion'];
+export const DIAS_EPISODIO = 90;
 const SEXO = { mujer: 'mujer', hombre: 'hombre' };
 
-export const fechaCorta = (d) => {
-  const x = d instanceof Date ? d : new Date(`${d}T12:00:00`);
-  return Number.isNaN(x.getTime()) ? '' : x.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
-
-const hoyISO = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
 const fuenteTexto = (id) => FUENTES.find((f) => f.id === id)?.nombre.toLowerCase() || '';
 
-// «90/100 (dependencia moderada)» o «62 mL/min/1.73 m² (G2…)» a partir de un resultado guardado.
+// Cifra del resultado sin interpretación: «45/100», «0.75 m/s», «52 mL/min/1.73 m²». Null si no es numérico.
+export function cifraGuardada(r) {
+  if (r.noEvaluable) return null;
+  if (Number.isFinite(r.puntaje) && r.max != null) return `${r.puntaje}/${r.max}`;
+  if (Number.isFinite(r.puntaje)) return String(r.puntaje);
+  if (Number.isFinite(r.valor)) return `${r.mostrar ?? r.valor} ${r.unidad || ''}`.trim();
+  return null;
+}
+
+// «45/100 (dependencia grave)», o solo la categoría si el resultado no es numérico.
 export function valorGuardado(r) {
   if (r.noEvaluable) return `no evaluable (${minusculaInicial(r.noEvaluable)})`;
-  const cifra = r.puntaje != null && r.max != null ? `${r.puntaje}/${r.max}` : `${r.mostrar ?? r.valor} ${r.unidad || ''}`.trim();
-  return `${cifra} (${minusculaInicial(r.etiqueta)})`;
+  const cifra = cifraGuardada(r);
+  const etiqueta = r.etiqueta ? minusculaInicial(r.etiqueta) : '';
+  if (!cifra) return etiqueta || r.resumen || '';
+  return etiqueta ? `${cifra} (${etiqueta})` : cifra;
 }
 
 export function breveGuardado(r, escalasPorId) {
@@ -28,69 +39,19 @@ export function breveGuardado(r, escalasPorId) {
   return `${escalasPorId[r.escalaId]?.corto ?? r.escalaId} ${valorGuardado(r)}`;
 }
 
-/* ---------- Comparación entre momentos ---------- */
-
-// Ordena los resultados de una misma escala por momento y compara cada uno con el basal (o el primero).
-export function compararMomentos(resultados, escala) {
-  const lista = [...resultados].filter((r) => r.momento).sort((a, b) => ORDEN[a.momento] - ORDEN[b.momento]);
-  if (lista.length < 2) return null;
-  const ref = lista.find((r) => r.momento === 'basal') || lista[0];
-  const comparaciones = lista.filter((r) => r !== ref).map((r) => {
-    const dif = r.puntaje != null && ref.puntaje != null && !r.noEvaluable && !ref.noEvaluable ? r.puntaje - ref.puntaje : null;
-    const cambioCategoria = dif != null && r.etiqueta !== ref.etiqueta;
-    const empeoradas = escala ? reactivosEmpeorados(escala, ref, r) : [];
-    return { r, dif, cambioCategoria, empeoradas };
-  });
-  return { ref, lista, comparaciones };
+// Etiqueta de la aplicación con fuente: «basal (estado al 20/09/2026; fuente: cuidador)».
+function etiquetaConFuente(r, hoy, conFuente) {
+  const base = etiquetaAplicacion(r, { omitirFecha: hoy });
+  const fuente = conFuente && r.fuente ? `fuente: ${fuenteTexto(r.fuente)}` : '';
+  if (!fuente) return base;
+  if (base.endsWith(')')) return `${base.slice(0, -1)}; ${fuente})`;
+  return base ? `${base} (${fuente})` : `(${fuente})`;
 }
 
-// Reactivos con menor puntaje que en el momento de referencia (solo escalas donde más puntaje es mejor).
-export function reactivosEmpeorados(escala, ref, actual) {
-  if (escala.mayorEsMejor === false || !ref.respuestas || !actual.respuestas) return [];
-  const a = calcular(escala, ref.respuestas);
-  const b = calcular(escala, actual.respuestas);
-  const antes = Object.fromEntries(a.desglose.filter((d) => d.valor != null && !d.opcion?.especial).map((d) => [d.campo.id, d.valor]));
-  return b.desglose
-    .filter((d) => d.valor != null && !d.opcion?.especial && antes[d.campo.id] != null && d.valor < antes[d.campo.id])
-    .map((d) => d.campo.textoCorto || d.campo.texto);
-}
+const unir = (...xs) => xs.filter(Boolean).join(' ');
 
-function textoCambio(c, ref, unidad = 'puntos') {
-  if (c.dif == null) return '';
-  const quien = momentoDe(ref.momento)?.enNota || ref.momento;
-  const base = c.dif < 0 ? `disminución de ${Math.abs(c.dif)} ${unidad}` : c.dif > 0 ? `aumento de ${c.dif} ${unidad}` : 'sin cambio en el puntaje';
-  return `${base} respecto al ${quien === 'basal' ? 'basal' : `valor ${quien}`}${c.cambioCategoria ? ', con cambio de categoría' : ''}`;
-}
+/* ---------- Agrupación ---------- */
 
-// «Barthel basal 95/100 (dependencia escasa), al ingreso 45/100 (dependencia grave), con disminución de 50 puntos respecto al basal»
-export function textoComparado(escala, cmp, { detalle = false, fuentes = false } = {}) {
-  const partes = cmp.lista.map((r) => {
-    const m = momentoDe(r.momento)?.enNota || r.momento;
-    const extra = [];
-    if (fuentes && r.fuente) extra.push(`fuente: ${fuenteTexto(r.fuente)}`);
-    if (fuentes && r.fecha && r.fecha !== hoyISO()) extra.push(fechaCorta(r.fecha));
-    const v = valorGuardado(r);
-    return `${m} ${extra.length ? v.replace(/\)$/, `; ${extra.join(', ')})`) : v}`;
-  });
-  let t = `${escala.corto} ${partes.join(', ')}`;
-  const cambios = cmp.comparaciones.filter((c) => c.dif != null).map((c) => textoCambio(c, cmp.ref, escala.unidadCambio));
-  const ultimo = cmp.comparaciones.at(-1);
-  if (cambios.length) t += `, con ${cambios.at(-1)}`;
-  if (detalle && ultimo?.empeoradas.length) t += `; ${escala.textoEmpeoradas || 'reactivos con menor puntaje que el basal'}: ${ultimo.empeoradas.map(minusculaInicial).join(', ')}`;
-  return t;
-}
-
-/* ---------- Nota de la valoración ---------- */
-
-function datosPaciente(p = {}) {
-  const datos = [];
-  if (p.sexo && SEXO[p.sexo]) datos.push(SEXO[p.sexo]);
-  if (p.edad) datos.push(`${p.edad} años`);
-  if (p.escolaridad !== undefined && p.escolaridad !== '' && p.escolaridad != null) datos.push(`escolaridad ${p.escolaridad} años`);
-  return datos;
-}
-
-// Agrupa por dominio y, dentro, por escala (con todos sus momentos).
 function agrupar(valoracion, escalasPorId, dominios) {
   return dominios.map((d) => {
     const rs = valoracion.resultados.filter((r) => escalasPorId[r.escalaId]?.dominio === d.id);
@@ -100,57 +61,87 @@ function agrupar(valoracion, escalasPorId, dominios) {
       if (!g) porEscala.push((g = { escalaId: r.escalaId, escala: escalasPorId[r.escalaId], rs: [] }));
       g.rs.push(r);
     }
-    for (const g of porEscala) g.rs.sort((a, b) => (ORDEN[a.momento] ?? 2) - (ORDEN[b.momento] ?? 2));
+    for (const g of porEscala) {
+      g.rs = ordenarCronologico(g.rs);
+      g.cmp = g.rs.length > 1 ? compararResultados(g.rs, g.escala) : null;
+    }
     return { d, porEscala };
   }).filter((x) => x.porEscala.length);
 }
 
-// El resultado más reciente de cada escala (egreso > actual > ingreso > basal).
-export function resultadoVigente(rs) {
-  return [...rs].sort((a, b) => (ORDEN[b.momento] ?? 2) - (ORDEN[a.momento] ?? 2))[0];
+// Cambio de la aplicación vigente respecto a la referencia (y a la previa, si hay más de dos).
+function textoCambioVigente(g) {
+  const f = g.cmp?.ultima;
+  if (!f) return '';
+  let t = textoCambio(f.vsRef, textoRespectoA(g.cmp.ref));
+  if (f.vsPrevio && f.previo) t += `; ${textoCambio(f.vsPrevio, textoRespectoA(f.previo))}`;
+  return t;
 }
 
-function lineaEscala(g, escalasPorId, formato) {
-  const cmp = g.rs.length > 1 ? compararMomentos(g.rs, g.escala) : null;
-  if (cmp) return textoComparado(g.escala, cmp, { detalle: formato === 'completa', fuentes: formato !== 'parrafo' });
-  const r = g.rs[0];
-  const m = r.momento && r.momento !== 'actual' ? ` ${momentoDe(r.momento)?.enNota}` : '';
-  if (formato === 'parrafo') return breveGuardado(r, escalasPorId).replace(g.escala?.corto ?? '', `${g.escala?.corto ?? ''}${m}`);
-  const fuente = r.fuente && formato !== 'parrafo' ? ` Fuente: ${fuenteTexto(r.fuente)}.` : '';
-  if (formato === 'completa') return `${breveGuardado(r, escalasPorId).replace(g.escala?.corto ?? '', `${g.escala?.corto ?? ''}${m}`)}${r.fuente ? ` (fuente: ${fuenteTexto(r.fuente)})` : ''}`;
-  return `${r.resumen.replace(`${g.escala?.corto}:`, `${g.escala?.corto}${m}:`)}${fuente}`;
-}
+/* ---------- Hallazgos, cambios y avisos ---------- */
 
-export function hallazgosYSugerencias(valoracion, escalasPorId) {
+export function hallazgosYSugerencias(valoracion, escalasPorId, hoy = null) {
   const hallazgos = [];
   const sugerencias = [];
   const noEvaluables = [];
+  const cambios = [];
+  const avisos = [];
+  const aplicados = [];
   const ids = [...new Set(valoracion.resultados.map((r) => r.escalaId))];
   for (const id of ids) {
     const escala = escalasPorId[id];
     if (!escala) continue;
     const rs = valoracion.resultados.filter((r) => r.escalaId === id);
-    const vig = resultadoVigente(rs);
+    const vig = vigenteDe(rs);
+    const etq = etiquetaAplicacion(vig, { omitirFecha: hoy });
+    avisos.push(...inconsistenciasCronologicas(rs, escala));
     if (vig.noEvaluable) {
-      noEvaluables.push(`${escala.corto} (${minusculaInicial(vig.noEvaluable)})`);
-      continue;
+      noEvaluables.push(`${unir(escala.corto, etq)} (${minusculaInicial(vig.noEvaluable)})`);
+    } else {
+      aplicados.push(escala.corto);
+      if (vig.hallazgo) hallazgos.push(`${unir(escala.corto, etq)}: ${valorGuardado(vig)}.`);
+      for (const s of vig.sugerencias || []) if (!sugerencias.includes(s)) sugerencias.push(s);
     }
-    if (vig.hallazgo) hallazgos.push(`${breveGuardado(vig, escalasPorId)}.`);
-    const cmp = rs.length > 1 ? compararMomentos(rs, escala) : null;
-    const ultimo = cmp?.comparaciones.at(-1);
-    if (ultimo?.dif != null && ultimo.dif < 0) {
-      hallazgos.push(`Disminución de ${Math.abs(ultimo.dif)} ${escala.unidadCambio || 'puntos'} en ${escala.corto} respecto al ${cmp.ref.momento === 'basal' ? 'basal' : momentoDe(cmp.ref.momento)?.enNota}${ultimo.empeoradas.length ? ` (${ultimo.empeoradas.map(minusculaInicial).join(', ')})` : ''}; la causa y la reversibilidad requieren valoración clínica.`);
+    const cmp = rs.length > 1 ? compararResultados(rs, escala) : null;
+    if (!cmp) continue;
+    for (const f of cmp.filas.filter((x) => !x.esRef)) {
+      let linea = `${unir(escala.corto, etiquetaAplicacion(f.r, { omitirFecha: hoy }))}: ${textoCambio(f.vsRef, textoRespectoA(cmp.ref))}`;
+      if (f.vsPrevio && f.previo) linea += `; ${textoCambio(f.vsPrevio, textoRespectoA(f.previo))}`;
+      if (f.empeoradas.length) linea += `; ${escala.textoEmpeoradas || 'reactivos que empeoraron'}: ${f.empeoradas.map(minusculaInicial).join(', ')}`;
+      cambios.push(`${linea}.`);
+      for (const a of [...f.vsRef.advertencias]) if (!cambios.includes(`  ${a}`)) cambios.push(`  ${a}`);
     }
-    for (const s of vig.sugerencias || []) if (!sugerencias.includes(s)) sugerencias.push(s);
+    const u = cmp.ultima;
+    if (u?.vsRef.tipo === 'empeoramiento') {
+      hallazgos.push(`${escala.corto}: ${textoCambio(u.vsRef, textoRespectoA(cmp.ref))}${u.empeoradas.length ? `; ${escala.textoEmpeoradas || 'reactivos que empeoraron'}: ${u.empeoradas.map(minusculaInicial).join(', ')}` : ''}. La causa y la reversibilidad requieren valoración clínica.`);
+    }
   }
-  return { hallazgos, sugerencias, noEvaluables };
+  const dias = amplitudDias(valoracion.resultados);
+  if (dias > DIAS_EPISODIO) avisos.push(`Las aplicaciones abarcan ${dias} días: verifica que pertenezcan al mismo episodio clínico.`);
+  return { hallazgos, sugerencias, noEvaluables, cambios, avisos, aplicados };
 }
 
-// formato 'lista': encabezado por dominio y un renglón por escala.
-// formato 'parrafo': todo seguido; dominios separados por punto y escalas por punto y coma.
-// formato 'completa': resultados por dominio, cambios, hallazgos y sugerencias separadas de los resultados.
+/* ---------- Nota ---------- */
+
+function datosPaciente(p = {}) {
+  const datos = [];
+  if (p.sexo && SEXO[p.sexo]) datos.push(SEXO[p.sexo]);
+  if (p.edad) datos.push(`${p.edad} años`);
+  if (p.escolaridad !== undefined && p.escolaridad !== '' && p.escolaridad != null) datos.push(`escolaridad ${p.escolaridad} años`);
+  return datos;
+}
+
+function lineaParrafo(g, hoy) {
+  const partes = g.rs.map((r) => unir(etiquetaConFuente(r, hoy, false), valorGuardado(r)));
+  let t = `${g.escala.corto} ${partes.join(', ')}`;
+  const cambio = textoCambioVigente(g);
+  if (cambio) t += `: ${cambio}`;
+  return t;
+}
+
 export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new Date(), formato = 'lista') {
   const f = fechaCorta(fecha);
+  const hoy = isoDe(fecha instanceof Date ? fecha : new Date(fecha));
   const p = valoracion.paciente || {};
   const datos = datosPaciente(p);
   const contexto = (p.contexto || '').trim().replace(/\.$/, '');
@@ -160,22 +151,60 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
     const partes = [`Valoración geriátrica ${f}.`];
     if (datos.length) partes.push(`Paciente: ${datos.join(', ')}.`);
     if (contexto) partes.push(`Contexto: ${contexto}.`);
-    for (const { d, porEscala } of grupos) partes.push(`${d.nombre}: ${porEscala.map((g) => lineaEscala(g, escalasPorId, 'parrafo')).join('; ')}.`);
+    for (const { d, porEscala } of grupos) partes.push(`${d.nombre}: ${porEscala.map((g) => lineaParrafo(g, hoy)).join('; ')}.`);
     return partes.join(' ');
   }
 
   if (formato === 'completa') {
+    const { hallazgos, sugerencias, noEvaluables, cambios, avisos, aplicados } = hallazgosYSugerencias(valoracion, escalasPorId, hoy);
     const l = ['VALORACIÓN GERIÁTRICA INTEGRAL', `Fecha: ${f}`];
     if (datos.length) l.push(`Paciente: ${datos.join(', ')}.`);
     if (contexto) l.push(`Contexto clínico: ${contexto}.`);
-    l.push('', 'RESULTADOS POR DOMINIO');
-    for (const { d, porEscala } of grupos) l.push(`${d.nombre}: ${porEscala.map((g) => lineaEscala(g, escalasPorId, 'completa')).join('; ')}.`);
-    const { hallazgos, sugerencias, noEvaluables } = hallazgosYSugerencias(valoracion, escalasPorId);
-    l.push('', 'HALLAZGOS QUE REQUIEREN ATENCIÓN');
-    l.push(...(hallazgos.length ? hallazgos.map((h) => `- ${h}`) : ['- Sin hallazgos anormales en los instrumentos aplicados.']));
-    if (noEvaluables.length) l.push('', `Instrumentos no evaluables: ${noEvaluables.join('; ')}.`);
+
+    l.push('', '1. RESULTADOS OBJETIVOS');
+    for (const { d, porEscala } of grupos) {
+      l.push(`${d.nombre}:`);
+      for (const g of porEscala) {
+        for (const r of g.rs) {
+          const etq = etiquetaConFuente(r, hoy, true);
+          const valor = r.noEvaluable ? `no evaluable (${minusculaInicial(r.noEvaluable)})` : cifraGuardada(r) || (r.resumen || '').replace(/^[^:]*:\s*/, '').replace(/\.$/, '');
+          l.push(`- ${unir(g.escala.corto, etq)}: ${valor}.`);
+        }
+      }
+    }
+    const presentes = new Set(grupos.map((x) => x.d.id));
+    const faltantes = dominios.filter((d) => DOMINIOS_NUCLEO.includes(d.id) && !presentes.has(d.id)).map((d) => d.nombre.toLowerCase());
+    if (faltantes.length) l.push(`Dominios de la valoración integral sin instrumentos aplicados: ${faltantes.join(', ')}.`);
+
+    l.push('', '2. INTERPRETACIÓN DE LOS INSTRUMENTOS');
+    for (const { porEscala } of grupos) {
+      for (const g of porEscala) {
+        const partes = g.rs.map((r) => {
+          const etq = etiquetaAplicacion(r, { omitirFecha: hoy });
+          const cat = r.noEvaluable ? 'no evaluable' : minusculaInicial(r.etiqueta || '');
+          return g.rs.length > 1 || etq ? unir(etq ? `${etq},` : '', cat) : cat;
+        });
+        l.push(`- ${g.escala.corto}: ${partes.join('; ')}.`);
+      }
+    }
+
+    if (cambios.length) {
+      l.push('', '3. CAMBIOS LONGITUDINALES');
+      l.push(...cambios.map((c) => (c.startsWith('  ') ? c : `- ${c}`)));
+      l.push('Los cambios describen la diferencia numérica y su dirección clínica; su relevancia requiere valoración.');
+    } else {
+      l.push('', '3. CAMBIOS LONGITUDINALES', '- Sin aplicaciones repetidas para comparar.');
+    }
+
+    l.push('', '4. HALLAZGOS QUE REQUIEREN ATENCIÓN');
+    if (hallazgos.length) l.push(...hallazgos.map((h) => `- ${h}`));
+    else if (aplicados.length) l.push(`- Sin hallazgos que requieran atención en los instrumentos aplicados (${aplicados.join(', ')}); la conclusión se limita a ellos.`);
+    else l.push('- No hay instrumentos interpretables en esta valoración.');
+    if (noEvaluables.length) l.push(`- Instrumentos no evaluables: ${noEvaluables.join('; ')}.`);
+    if (avisos.length) l.push(...avisos.map((a) => `- Verificar: ${a}`));
+
     if (sugerencias.length) {
-      l.push('', 'SUGERENCIAS DE EVALUACIÓN COMPLEMENTARIA (orientativas; no son resultados)');
+      l.push('', '5. SUGERENCIAS ORIENTATIVAS (no son resultados)');
       l.push(...sugerencias.map((s) => `- ${s}`));
     }
     return l.join('\n');
@@ -188,12 +217,16 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
     lineas.push('', d.nombre.toUpperCase());
     for (const g of porEscala) {
       if (g.rs.length > 1) {
-        for (const r of g.rs) lineas.push(`- ${g.escala.corto} ${momentoDe(r.momento)?.enNota}: ${valorGuardado(r)}.${r.fuente ? ` Fuente: ${fuenteTexto(r.fuente)}.` : ''}`);
-        const cmp = compararMomentos(g.rs, g.escala);
-        const c = cmp?.comparaciones.at(-1);
-        if (c?.dif != null) lineas.push(`  Cambio: ${textoCambio(c, cmp.ref, g.escala.unidadCambio)}.`);
+        for (const r of g.rs) lineas.push(`- ${unir(g.escala.corto, etiquetaConFuente(r, hoy, true))}: ${valorGuardado(r)}.`);
+        const cambio = textoCambioVigente(g);
+        if (cambio) lineas.push(`  Cambio: ${cambio}.`);
       } else {
-        lineas.push(`- ${lineaEscala(g, escalasPorId, 'lista')}`);
+        const r = g.rs[0];
+        const etq = etiquetaConFuente(r, hoy, true);
+        const prefijo = `${g.escala.corto}:`;
+        lineas.push(!r.noEvaluable && r.resumen?.startsWith(prefijo)
+          ? `- ${unir(g.escala.corto, etq)}:${r.resumen.slice(prefijo.length)}`
+          : `- ${unir(g.escala.corto, etq)}: ${valorGuardado(r)}.`);
       }
     }
   }

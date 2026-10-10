@@ -1,6 +1,6 @@
 // Service worker: guarda la app en el dispositivo para que funcione sin conexión.
 // Al cambiar cualquier archivo, sube VERSION para que los celulares descarguen la nueva versión.
-const VERSION = 'huella-1.0.0';
+const VERSION = 'huella-1.1.0';
 
 const ARCHIVOS = [
   './',
@@ -9,6 +9,7 @@ const ARCHIVOS = [
   './css/app.css',
   './js/almacen.js',
   './js/app.js',
+  './js/comparacion.js',
   './js/datos.js',
   './js/dominios.js',
   './js/iconos.js',
@@ -57,8 +58,13 @@ const ARCHIVOS = [
   './assets/fonts/inter-tight-latin-ext-wght-normal.woff2',
 ];
 
+// Se descargan sin pasar por la caché HTTP del navegador, para no guardar versiones viejas.
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(ARCHIVOS)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(VERSION)
+      .then((cache) => cache.addAll(ARCHIVOS.map((url) => new Request(url, { cache: 'reload' }))))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -69,12 +75,12 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Primero la red (para ver cambios recientes); si no hay conexión, la copia guardada.
+// Primero la red, revalidando con el servidor (para ver cambios recientes); sin conexión, la copia guardada.
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
   event.respondWith(
-    fetch(request)
+    fetch(request, { cache: 'no-cache' })
       .then((respuesta) => {
         if (respuesta.ok) {
           const copia = respuesta.clone();

@@ -4,6 +4,13 @@
 
 export const NIVELES = ['bien', 'leve', 'moderado', 'grave', 'critico', 'neutro'];
 
+// Dirección clínica de un cambio en el valor principal. Cada instrumento la declara de forma explícita.
+export const DIRECCIONES = ['mayor_mejor', 'menor_mejor', 'sin_direccion'];
+
+// Opción exclusiva de las listas de verificación: confirma que no hay ningún elemento presente.
+export const NINGUNO = '__ninguno';
+export const TEXTO_NINGUNO = 'Ninguno de los anteriores';
+
 export const TIPOS = {
   tamizaje: 'Tamizaje',
   evaluacion: 'Escala de evaluación',
@@ -40,7 +47,7 @@ export const MOTIVOS_NO_EVALUABLE = [
 ];
 
 // Cambia solo la primera letra (respetando «¿» inicial) y deja intactas las siglas: «AMT4», «GDS».
-export const minusculaInicial = (t) => String(t).replace(/^(¿?)(\p{Lu})(?!\p{Lu})/u, (_, a, b) => a + b.toLowerCase());
+export const minusculaInicial = (t) => String(t).replace(/^(¿?)(\p{Lu})(?![\p{Lu}\d])/u, (_, a, b) => a + b.toLowerCase());
 export const mayusculaInicial = (t) => String(t).replace(/^(¿?)(\p{Ll})/u, (_, a, b) => a + b.toUpperCase());
 
 // Número con punto decimal y sin ceros sobrantes: 6.0 → «6», 6.25 → «6.25».
@@ -49,6 +56,23 @@ export const fmt = (n, decimales = 1) => {
   const f = Number(n.toFixed(decimales));
   return String(f);
 };
+
+// Cifra para mostrar: redondea a los decimales pedidos, pero agrega decimales si el redondeo
+// cambiaría la categoría (p. ej., TFG 59.6 no se muestra como «60» si se clasifica como G3a).
+export function mostrarSinCruzar(valor, decimales, clasificar) {
+  const real = clasificar(valor);
+  for (let d = decimales; d <= decimales + 4; d += 1) {
+    if (clasificar(Number(valor.toFixed(d))) === real) return valor.toFixed(d);
+  }
+  return String(valor);
+}
+
+// Minutos estimados a partir del texto de tiempo: «5 a 10 min» → [5, 10]; «2 min» → [2, 2].
+export function minutosDe(escala) {
+  const m = String(escala.tiempo || '').match(/(\d+)(?:\s*a\s*(\d+))?\s*min/);
+  if (!m) return null;
+  return [Number(m[1]), Number(m[2] || m[1])];
+}
 
 /* ---------- Definición de campos ---------- */
 
@@ -141,14 +165,49 @@ export function evaluarCampos(escala, r = {}) {
       if (requerido) contestadas += 1;
       desglose.push({ campo: c, respuesta: `${fmt(leido.crudo, c.decimales ?? 2)} ${leido.etiqueta}`.trim(), valor: null });
     } else if (c.tipo === 'checklist') {
-      const marcadas = Array.isArray(r[c.id]) ? r[c.id] : [];
+      // Una lista sin marcas queda pendiente: «ninguno» debe confirmarse de forma explícita.
+      const crudo = Array.isArray(r[c.id]) ? r[c.id] : [];
+      const marcadas = crudo.filter((id) => c.opciones.some((o) => o.id === id));
+      const ninguno = crudo.includes(NINGUNO);
+      if (ninguno && marcadas.length) {
+        valores[c.id] = null;
+        errores[c.id] = `Marca elementos o «${TEXTO_NINGUNO}», no ambos.`;
+        if (requerido) faltan.push(c.id);
+        continue;
+      }
+      if (!ninguno && !marcadas.length) {
+        valores[c.id] = null;
+        if (requerido) faltan.push(c.id);
+        continue;
+      }
       valores[c.id] = marcadas;
-      if (requerido) contestadas += 1; // una lista vacía es una respuesta válida («ninguna»)
+      if (requerido) contestadas += 1;
       const textos = c.opciones.filter((o) => marcadas.includes(o.id)).map((o) => o.texto);
-      desglose.push({ campo: c, respuesta: textos.length ? textos.join(', ') : 'ninguna', valor: null, cuenta: textos.length });
+      desglose.push({ campo: c, respuesta: textos.length ? textos.join(', ') : minusculaInicial(TEXTO_NINGUNO), valor: null, cuenta: textos.length });
+    }
+  }
+  // Validaciones que dependen de varios campos (p. ej., velocidad imposible según distancia y tiempo).
+  if (escala.validar) {
+    const extra = escala.validar({ v: valores, r }) || {};
+    for (const [id, msg] of Object.entries(extra)) {
+      if (!msg) continue;
+      errores[id] = msg;
     }
   }
   return { valores, faltan, errores, desglose, total, contestadas };
+}
+
+// Respuestas sin los campos ocultos: lo que no se ve no se guarda ni influye en el resultado.
+const META = ['_fecha', '_fuente', '_noEvaluable', '_fechaBasal', '_vinculos', '_origen'];
+export function limpiarOcultas(escala, r = {}) {
+  const limpio = {};
+  for (const k of META) if (r[k] !== undefined) limpio[k] = r[k];
+  for (const c of escala.campos) {
+    if (!campoVisible(c, r)) continue;
+    if (r[c.id] !== undefined) limpio[c.id] = r[c.id];
+    if (c.unidades && r[`${c.id}_u`] !== undefined) limpio[`${c.id}_u`] = r[`${c.id}_u`];
+  }
+  return limpio;
 }
 
 export function bandaDe(escala, valor) {
@@ -275,11 +334,12 @@ export function textoEscala(escala, res, formato = 'parrafo', encabezado = '') {
 export function posicionMarcador(escala, valor, banda = null) {
   const n = escala.bandas?.length || 0;
   if (!n) return 0;
-  let i = escala.bandas.findIndex((b) => valor >= b.min && valor <= b.max);
-  if (i < 0 && banda) i = escala.bandas.indexOf(banda);
+  let i = banda ? escala.bandas.findIndex((b) => b === banda || (b.id && b.id === banda.id)) : -1;
+  if (i < 0) i = escala.bandas.findIndex((b) => valor >= b.min && valor <= b.max);
   if (i < 0) return 0;
   const b = escala.bandas[i];
-  const fraccion = b.max === b.min || valor < b.min || valor > b.max ? 0.5 : (valor - b.min) / (b.max - b.min);
+  let fraccion = 0.5;
+  if (Number.isFinite(b.max) && b.max > b.min) fraccion = Math.min(1, Math.max(0, (valor - b.min) / (b.max - b.min)));
   return (i + 0.1 + fraccion * 0.8) / n;
 }
 

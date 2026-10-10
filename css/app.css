@@ -1244,6 +1244,68 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .fr-cambio { font-size: 13px; font-weight: 600; color: var(--ink); }
 .fr-meta { font-size: 12px; color: var(--ink-muted); }
 
+
+/* ---------- Fase 1.1: cronología, comparación, datos vinculados ---------- */
+.ayuda-aplicacion { margin: calc(var(--space-2) * -1) 0 var(--space-4); font-size: 13px; line-height: 19px; color: var(--ink-muted); }
+#e-fechas { margin: 0 0 var(--space-4); }
+.ayuda.prefill { font-style: italic; }
+.nota-guardado > div { flex: 1; min-width: 0; }
+.nota-guardado p { margin: 0; }
+.lista-guardados { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.lista-guardados li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); flex-wrap: wrap; }
+.lista-guardados li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.btn.btn-chico { min-height: 36px; padding: 0 var(--space-3); font-size: 13px; }
+
+.vinculos { margin-bottom: var(--space-4); padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-200); }
+.vinculos .sub { margin: 0; }
+.vin-nota { margin: var(--space-1) 0 var(--space-3); font-size: 13px; line-height: 19px; color: var(--ink-muted); }
+.vinculos ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.vinculo { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius-sm); background: var(--surface-100); flex-wrap: wrap; }
+.vinculo > .ico { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--acento); }
+.vinculo > div { flex: 1 1 200px; min-width: 0; display: grid; gap: 2px; font-size: 14px; line-height: 20px; }
+.vinculo.sin-dato > .ico, .vinculo.no-aplica > .ico { color: var(--ink-muted); }
+.vinculo.sin-dato span, .vinculo.no-aplica span { color: var(--ink-muted); }
+.vinculo.usado { box-shadow: 0 0 0 1px var(--acento-borde); }
+.vin-fecha { font-size: 12px; font-weight: 600; color: var(--ink-muted); }
+.vin-adv { font-size: 13px; color: var(--orange-deep); }
+.vin-usado { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface-300); font-size: 12px; font-weight: 700; color: var(--ink); }
+.dato-vinculado { display: flex; gap: var(--space-2); align-items: flex-start; margin: var(--space-3) 0 0; font-size: 13px; line-height: 19px; color: var(--green-deep); }
+.dato-vinculado .ico { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+
+.casilla.ninguno { margin-top: var(--space-1); padding-top: var(--space-3); border-top: 1px dashed var(--line); font-weight: 600; }
+.campo-lista:not(.contestado) .cuenta-lista { color: var(--orange-deep); }
+
+.cambio { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; white-space: nowrap; }
+.cambio-nombre { font-weight: 500; font-size: 12px; color: var(--ink-muted); }
+.cambio-mejoria, .fr-cambio.cambio-mejoria { color: var(--green-deep); }
+.cambio-empeoramiento, .fr-cambio.cambio-empeoramiento { color: var(--orange-deep); }
+.cambio-sin_direccion, .cambio-no_interpretable, .cambio-sin_cambio { color: var(--ink-muted); }
+.fr-cambio { display: flex; gap: 6px; align-items: baseline; line-height: 18px; }
+.fr-ref { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: var(--radius-pill); border: 1px solid var(--line); font-size: 11px; font-weight: 600; color: var(--ink-muted); vertical-align: 2px; }
+.aviso-cambio { display: flex; gap: var(--space-2); align-items: flex-start; color: var(--orange-deep); }
+.aviso-cambio .ico { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+.nota-guardar { display: flex; gap: var(--space-2); align-items: flex-start; margin: var(--space-3) 0 0; font-size: 13px; line-height: 19px; color: var(--ink-muted); }
+.nota-guardar .ico { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+
+.tira-nota { display: flex; gap: var(--space-2); align-items: flex-start; margin: var(--space-2) 0 0; font-size: 13px; line-height: 19px; color: var(--ink-muted); }
+.tira-nota .ico { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+.ruta-tiempo { display: flex; align-items: center; gap: 6px; margin-top: var(--space-2); font-size: 14px; font-weight: 600; color: var(--ink-muted); }
+.ruta-tiempo .ico { width: 16px; height: 16px; }
+.ruta-min { display: block; font-size: 11px; font-weight: 500; }
+.paso-nota { font-size: 13px; line-height: 19px; color: var(--ink-muted); }
+.paso.complementario .paso-num { background: transparent; border: 1px dashed var(--line); }
+.grupo-pasos { margin: var(--space-2) 0 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.momento-ruta .segmentado label { flex: 1; justify-content: center; }
+
+.inicio-valoracion { display: flex; align-items: center; gap: 6px; margin-top: var(--space-2); font-size: 14px; color: var(--ink-muted); }
+.inicio-valoracion .ico { width: 16px; height: 16px; }
+.aviso-episodio, .avisos-cronologia { display: flex; gap: var(--space-2); align-items: flex-start; margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--orange-deep); background: var(--surface-200); font-size: 14px; line-height: 20px; }
+.avisos-cronologia { display: block; }
+.avisos-cronologia .titulo-tarjeta { display: flex; align-items: center; gap: 6px; margin: 0; }
+.avisos-cronologia ul { margin: var(--space-2) 0 0; padding-left: var(--space-6); }
+.aviso-episodio .ico, .avisos-cronologia .ico { width: 18px; height: 18px; flex: none; color: var(--orange-deep); }
+.en-curso-aviso { display: block; margin-top: 2px; font-size: 12px; color: var(--orange-deep) !important; }
+
 @media print {
-  .tira-ruta, .segmentado, .ficha, .aplicacion, .no-evaluable { display: none !important; }
+  .tira-ruta, .segmentado, .ficha, .aplicacion, .no-evaluable, .vinculos { display: none !important; }
 }

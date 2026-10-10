@@ -2,16 +2,19 @@
 // 1. Crea un archivo en esta carpeta siguiendo el formato de los existentes.
 // 2. Impórtalo aquí y agrégalo a la lista ESCALAS.
 // 3. Agrega su ruta a ARCHIVOS en sw.js y sube VERSION (para que funcione sin conexión).
-// 4. Corre las pruebas: node --test tests/
+// 4. Corre las pruebas: node --test tests/*.test.mjs
 //
 // Campos de un instrumento:
 //   id, nombre, corto, dominio, tipo (tamizaje | evaluacion | diagnostico | desempeno | calculadora | registro | pronostico | prescripcion)
 //   descripcion, objetivo, poblacion, aplicacion[], tiempo, aliases[], problemas[]
-//   campos[]: { id, texto, tipo: 'opciones' | 'sino' | 'numero' | 'checklist', opciones[], unidad, unidades[], min, max,
-//               opcional, visibleSi(r), anotaA, puntua, prefill: 'edad' | 'sexo' | 'escolaridad' | 'sppb' }
+//   campos[]: { id, texto, tipo: 'opciones' | 'sino' | 'numero' | 'checklist' (con «Ninguno de los anteriores» obligatorio), opciones[], unidad, unidades[], min, max,
+//               opcional, visibleSi(r), anotaA, puntua, prefill: 'edad' | 'sexo' | 'escolaridad12' }
 //   min, max, bandas[{ min, max, rango, etiqueta, nivel, texto, hallazgo, sugerencias[] }]
 //   calcular({ v, r, base, ctx }) para cálculo propio; resumen(res), resumenBreve(res)
-//   momentos (basal/ingreso/actual/egreso), fuente, mayorEsMejor, barra, notas[], licencia, referencias[]
+//   momentos (basal/ingreso/actual/egreso), fuente, barra, notas[], licencia, referencias[]
+//   direccionClinica ('mayor_mejor' | 'menor_mejor' | 'sin_direccion', obligatoria), unidadCambio, decimalesCambio,
+//   textoMejoria, textoEmpeoramiento, comparable(antes, despues), cambioExtra(antes, despues, { dif }), validar({ v, r }),
+//   vinculos[] (datos de otras pruebas de la misma valoración que el médico confirma antes de usarlos)
 
 import barthel from './barthel.js';
 import katz from './katz.js';

@@ -26,6 +26,8 @@ export default {
     'Úsalo solo en cirugía no cardiaca.',
   ],
   tiempo: '1 min',
+  // Estima riesgo según factores presentes; un cambio no expresa mejoría o deterioro clínico.
+  direccionClinica: 'sin_direccion',
   min: 0,
   max: 6,
   detalleEnResumen: true,

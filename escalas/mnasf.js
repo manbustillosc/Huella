@@ -16,6 +16,9 @@ export default {
     'Registra el puntaje total e indica si usaste el IMC o la circunferencia de pantorrilla.',
   ],
   tiempo: '5 min',
+  direccionClinica: 'mayor_mejor',
+  textoMejoria: 'mejoría del estado nutricional según el tamizaje',
+  textoEmpeoramiento: 'empeoramiento del estado nutricional según el tamizaje',
   min: 0,
   max: 14,
   campos: [

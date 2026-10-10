@@ -3,7 +3,8 @@ import { almacen } from '../almacen.js';
 import { escalas, porId, DOMINIOS, RUTAS, dominioDe, escalasDe } from '../datos.js';
 import { TIPOS } from '../motor.js';
 import { $, esc, icono, plural, sinAcentos, filaEscala, tarjetaDominio } from '../ui.js';
-import { progresoRuta } from './rutas-estado.js';
+import { progresoRuta, tiempoRuta } from './rutas-estado.js';
+import { diasDesde } from './valoracion.js';
 
 function tarjetaRuta(ruta) {
   const p = progresoRuta(ruta);
@@ -15,7 +16,7 @@ function tarjetaRuta(ruta) {
         <span class="ruta-nombre">${esc(ruta.nombre)}</span>
         <span class="ruta-desc">${esc(ruta.descripcion)}</span>
       </span>
-      <span class="ruta-meta">${empezada ? `<span class="mini-barra" aria-hidden="true"><span style="width:${(p.completos / p.total) * 100}%"></span></span>${p.completos}/${p.total}` : plural(p.total, 'paso', 'pasos')}</span>
+      <span class="ruta-meta">${empezada ? `<span class="mini-barra" aria-hidden="true"><span style="width:${(p.completos / p.total) * 100}%"></span></span>${p.completos}/${p.total}` : `${plural(p.total, 'paso', 'pasos')}<span class="ruta-min">${esc(tiempoRuta(ruta).texto)}</span>`}</span>
     </a>`;
 }
 
@@ -33,6 +34,7 @@ export function renderInicio() {
   const favs = almacen.favoritas().filter((id) => porId[id]);
   const frec = frecuentes().filter((e) => !favs.includes(e.id));
   const n = val.resultados.length;
+  const dias = diasDesde(val.creada);
   return `
     <section class="vista inicio">
       <header class="cabecera">
@@ -48,7 +50,7 @@ export function renderInicio() {
         ${n ? `
           <a class="en-curso" href="#/valoracion">
             ${icono('valoracion')}
-            <span><strong>Valoración en curso</strong><span>${plural(n, 'resultado guardado', 'resultados guardados')} · ver la nota</span></span>
+            <span><strong>Valoración en curso</strong><span>${plural(n, 'resultado guardado', 'resultados guardados')} · ${dias > 0 ? `iniciada hace ${plural(dias, 'día', 'días')}` : 'iniciada hoy'} · ver la nota</span>${dias > 7 ? '<span class="en-curso-aviso">Si es otro episodio clínico, inicia una nueva valoración para no mezclar resultados.</span>' : ''}</span>
             ${icono('adelante', 'chev')}
           </a>` : ''}
         <h2 class="seccion">Rutas guiadas</h2>

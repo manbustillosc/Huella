@@ -33,10 +33,13 @@ export default {
   poblacion: 'Personas mayores en la comunidad (Morley, 2012). Adaptación transcultural y validación en adultos mexicanos (Rosas-Carrasco, 2016).',
   aplicacion: [
     'Explica que harás 5 preguntas y registra cada respuesta.',
-    'Para las enfermedades, pregunta: «¿Algún médico le ha dicho que tiene…?» y marca las que diga.',
+    'Para las enfermedades, pregunta: «¿Algún médico le ha dicho que tiene…?» y marca las que diga; si no tiene ninguna, confírmalo con «Ninguno de los anteriores».',
     'Pérdida de peso: escribe el peso actual y el de hace un año (con ropa y sin zapatos); si no se conocen, responde directamente.',
   ],
   tiempo: '5 min',
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'reducción del número de componentes positivos',
+  textoEmpeoramiento: 'aumento del número de componentes positivos',
   min: 0,
   max: 5,
   campos: [
@@ -60,7 +63,7 @@ export default {
     },
     {
       id: 'enfermedades', tipo: 'checklist', texto: 'Enfermedades: ¿algún médico le ha dicho que tiene…?', textoCorto: 'enfermedades',
-      ayuda: 'Puntúa 1 si tiene 5 o más de las 11.',
+      ayuda: 'Puntúa 1 si tiene 5 o más de las 11. Si no tiene ninguna, marca «Ninguno de los anteriores».',
       opciones: ENFERMEDADES,
     },
     { id: 'peso_actual', tipo: 'numero', texto: 'Peso actual', unidad: 'kg', min: 20, max: 300, decimales: 1, opcional: true },

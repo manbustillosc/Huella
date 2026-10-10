@@ -17,6 +17,9 @@ export default {
     'En 5 preguntas suma la respuesta «no»; la puntuación de cada opción se muestra a la derecha.',
   ],
   tiempo: '5 min',
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'reducción de síntomas depresivos',
+  textoEmpeoramiento: 'aumento de síntomas depresivos',
   min: 0,
   max: 15,
   campos: [

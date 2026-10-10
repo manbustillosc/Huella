@@ -124,10 +124,19 @@ export default {
   tiempo: '5 a 10 min',
   momentos: true,
   fuente: true,
+  direccionClinica: 'mayor_mejor',
+  textoMejoria: 'mejoría en las AIVD',
+  textoEmpeoramiento: 'deterioro en las AIVD',
+  comparable(antes, despues) {
+    if (antes.max != null && despues.max != null && antes.max !== despues.max) {
+      return { noInterpretable: `cambiaron las actividades aplicables (${antes.max} y ${despues.max})` };
+    }
+    return null;
+  },
   min: 0,
   max: 8,
   barra: false,
-  textoEmpeoradas: 'actividades con menor puntaje que el basal',
+  textoEmpeoradas: 'actividades con menor puntaje que en la referencia',
   campos,
   bandas: [BANDA_INDEP, BANDA_DEP],
   calcular({ v }) {

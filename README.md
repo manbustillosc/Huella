@@ -13,14 +13,15 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `escalas/` | Una escala por archivo: reactivos, puntos, bandas de interpretación, notas y referencias. |
 | `escalas/index.js` | Lista de escalas que muestra la app. |
 | `js/dominios.js` | Dominios de valoración, problemas clínicos que cubren y escalas planeadas. |
-| `js/rutas.js` | Rutas guiadas («¿Qué deseas valorar?»): pasos y momento por defecto. |
-| `js/motor.js` | Tipos de campo, cálculo, estados (sin responder, no aplica, no evaluable), interpretación y texto por escala. |
-| `js/nota.js` | Comparación entre momentos (basal, ingreso, actual, egreso) y nota de la valoración. |
-| `js/almacen.js` | Guardado local: valoración, respuestas en curso y preferencias. |
+| `js/rutas.js` | Rutas guiadas («¿Qué deseas valorar?»): núcleo, complementarias, finalidad de cada paso y momento. |
+| `js/motor.js` | Tipos de campo, cálculo, estados (sin responder, no aplica, no evaluable), listas con «Ninguno», validaciones cruzadas, interpretación y texto por escala. |
+| `js/comparacion.js` | Orden cronológico, referencia, resultado vigente y dirección clínica de cada cambio. |
+| `js/nota.js` | Nota de la valoración: párrafo, lista y completa (resultados, interpretación, cambios, hallazgos, sugerencias). |
+| `js/almacen.js` | Guardado local: valoración, aplicaciones repetidas, respuestas en curso y preferencias. |
 | `js/app.js`, `js/vistas/` | Pantallas y navegación. |
 | `css/app.css` | Diseño con los colores y tipografías de la marca. |
 | `sw.js` | Copia sin conexión. |
-| `tests/` | Pruebas de cada escala y de la nota (`node --test tests/*.test.mjs`). |
+| `tests/` | Pruebas de escalas, comparaciones, nota, almacenamiento y rutas (`node --test tests/*.test.mjs`). `referencia-renal.json` contiene valores de una implementación independiente de CKD-EPI 2021 y Cockcroft-Gault. |
 
 ## Texto para el expediente
 
@@ -32,14 +33,21 @@ En el resultado de cada escala y en **Valoración**, el texto se copia en varios
 - **Lista**: un renglón por reactivo (escala) o por escala (valoración).
 - **Completa** (solo valoración): resultados por dominio, cambios respecto al basal, hallazgos que requieren atención, instrumentos no evaluables y sugerencias separadas de los resultados (`notaValoracion`).
 
-Cuando una escala se guarda en más de un momento (basal, ingreso, actual, egreso), el texto incluye la diferencia respecto al basal y los reactivos que empeoraron.
+## Cronología y comparaciones
+
+- Cada resultado guarda su **momento clínico** (basal, ingreso, actual, egreso) y su **fecha de aplicación**; el basal puede llevar además la fecha a la que corresponde el estado basal.
+- Basal, ingreso y egreso admiten un resultado; «actual» y los instrumentos sin momento admiten varias aplicaciones con distinta fecha. Reemplazar siempre pide confirmación.
+- El orden es cronológico: el basal primero y después por fecha de aplicación. El resultado vigente es el más reciente por fecha, no por el nombre del momento.
+- Cada instrumento declara su `direccionClinica` (`mayor_mejor`, `menor_mejor` o `sin_direccion`). La comparación distingue mejoría, empeoramiento, sin cambio, cambio no interpretable y variación sin significado clínico uniforme, con el valor sin redondear.
+- Huella avisa si las fechas no cuadran con los momentos o si una valoración abarca más de 90 días.
 
 ## Agregar una escala
 
 1. Crear `escalas/<nombre>.js` con el mismo formato que las existentes.
 2. Importarla en `escalas/index.js`.
 3. Agregar su ruta a `ARCHIVOS` en `sw.js` y subir `VERSION` (aquí y en `js/datos.js`).
-4. Correr las pruebas (`node --test tests/*.test.mjs`): revisan estructura, mínimo, máximo, bandas y que `sw.js` incluya todos los archivos.
+4. Declarar `direccionClinica` y, si aplica, `unidadCambio`, `decimalesCambio` y los textos de mejoría y empeoramiento.
+5. Correr las pruebas (`node --test tests/*.test.mjs`): revisan estructura, dirección clínica, mínimo, máximo, bandas, listas de verificación y que `sw.js` incluya todos los archivos.
 
 ## Aviso
 

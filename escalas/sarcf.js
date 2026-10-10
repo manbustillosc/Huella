@@ -19,6 +19,9 @@ export default {
   poblacion: 'Personas mayores en la comunidad (Malmstrom, 2013). Adaptación y validación en adultos mayores mexicanos (Parra-Rodríguez, 2016). Recomendado por el EWGSOP2 para la búsqueda de casos.',
   aplicacion: ['Aplica las 5 preguntas y marca la opción de cada una.'],
   tiempo: '2 min',
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'reducción de síntomas sugestivos de sarcopenia',
+  textoEmpeoramiento: 'aumento de síntomas sugestivos de sarcopenia',
   min: 0,
   max: 10,
   campos: [

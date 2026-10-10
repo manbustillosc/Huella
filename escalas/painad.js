@@ -31,7 +31,9 @@ export default {
   ],
   tiempo: '5 min de observación',
   momentos: true,
-  mayorEsMejor: false,
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'disminución de conductas sugestivas de dolor',
+  textoEmpeoramiento: 'aumento de conductas sugestivas de dolor',
   min: 0,
   max: 10,
   campos: [
@@ -48,9 +50,9 @@ export default {
   ],
   bandas: [
     { min: 0, max: 0, etiqueta: 'Sin conductas de dolor', nivel: 'bien', texto: 'No se observaron conductas sugestivas de dolor en esta evaluación.', sugerencias: [] },
-    { min: 1, max: 3, etiqueta: 'Dolor leve (orientativo)', nivel: 'leve', hallazgo: true, texto: 'Conductas compatibles con dolor de intensidad leve.', sugerencias: SUG_DOLOR },
-    { min: 4, max: 6, etiqueta: 'Dolor moderado (orientativo)', nivel: 'moderado', hallazgo: true, texto: 'Conductas compatibles con dolor de intensidad moderada.', sugerencias: SUG_DOLOR },
-    { min: 7, max: 10, etiqueta: 'Dolor intenso (orientativo)', nivel: 'grave', hallazgo: true, texto: 'Conductas compatibles con dolor intenso.', sugerencias: SUG_DOLOR },
+    { min: 1, max: 3, etiqueta: 'Dolor leve: rango orientativo', nivel: 'leve', hallazgo: true, texto: 'Conductas compatibles con dolor de intensidad leve.', sugerencias: SUG_DOLOR },
+    { min: 4, max: 6, etiqueta: 'Dolor moderado: rango orientativo', nivel: 'moderado', hallazgo: true, texto: 'Conductas compatibles con dolor de intensidad moderada.', sugerencias: SUG_DOLOR },
+    { min: 7, max: 10, etiqueta: 'Dolor intenso: rango orientativo', nivel: 'grave', hallazgo: true, texto: 'Conductas compatibles con dolor intenso.', sugerencias: SUG_DOLOR },
   ],
   notas: [
     'Los rangos de intensidad (1–3, 4–6, 7–10) son orientativos: el estudio original no validó puntos de corte. Cualquier puntaje mayor de 0 amerita buscar una causa.',
