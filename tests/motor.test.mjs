@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ESCALAS } from '../escalas/index.js';
 import { DOMINIOS } from '../js/dominios.js';
-import { normalizarEscala, calcular, validarEscala, resumenDe, resumenBreveDe, posicionMarcador, notaValoracion } from '../js/motor.js';
+import { normalizarEscala, calcular, validarEscala, resumenDe, resumenBreveDe, textoEscala, posicionMarcador, notaValoracion } from '../js/motor.js';
 
 const escalas = ESCALAS.map(normalizarEscala);
 const porId = Object.fromEntries(escalas.map((e) => [e.id, e]));
@@ -149,4 +149,43 @@ test('nota en párrafo: compacta, sin viñetas ni saltos de línea', () => {
     + 'Prequirúrgica: RCRI 1/6 (clase II, riesgo bajo; muerte, infarto o paro cardiaco a 30 días: 6.0 %; factor: creatinina preoperatoria mayor de 2.0 mg/dL).');
   // La lista conserva el formato por renglones
   assert.match(notaValoracion(v, porId, DOMINIOS, new Date(2026, 9, 10), 'lista'), /\nFUNCIONAL\n- Barthel/);
+});
+
+test('texto de una escala en párrafo y en lista', () => {
+  // Barthel 90: comer con ayuda, bañarse dependiente, resto independiente
+  const b = porId.barthel;
+  const rb = maximo(b);
+  rb.comer = 1;
+  rb.banarse = 1;
+  const resB = calcular(b, rb);
+  const parrafoB = textoEscala(b, resB, 'parrafo');
+  assert.ok(parrafoB.startsWith('Barthel: 90/100 (dependencia moderada). Comer: necesita ayuda (5); bañarse: dependiente (0); vestirse: independiente (10);'), parrafoB);
+  assert.ok(!parrafoB.includes('\n'));
+  const listaB = textoEscala(b, resB, 'lista').split('\n');
+  assert.equal(listaB.length, 11);
+  assert.equal(listaB[1], '- Comer: necesita ayuda (5)');
+
+  // GDS-15 todo "No": en párrafo solo los 5 reactivos que puntúan
+  const g = porId.gds15;
+  const resG = calcular(g, Object.fromEntries(g.items.map((i) => [i.id, 1])));
+  const parrafoG = textoEscala(g, resG, 'parrafo');
+  assert.equal(parrafoG.split('; ').length, 5, parrafoG);
+  assert.match(parrafoG, /Reactivos positivos: ¿está básicamente satisfecho con su vida\? no;/);
+  assert.match(textoEscala(g, resG, 'lista'), /\n- ¿Se aburre con frecuencia\? No \(0\)/);
+  const resG0 = calcular(g, Object.fromEntries(g.items.map((i) => [i.id, i.puntua === 'si' ? 1 : 0])));
+  assert.match(textoEscala(g, resG0, 'parrafo'), /Sin reactivos positivos\.$/);
+
+  // 4AT: respeta la sigla AMT4
+  const c = porId['4at'];
+  const resC = calcular(c, { alerta: 0, amt4: 1, atencion: 0, cambio: 1 });
+  assert.match(textoEscala(c, resC, 'parrafo'), /; AMT4: 1 error \(1\);/);
+
+  // RCRI: el párrafo es el resumen (ya nombra los factores); la lista detalla los 6
+  const r = porId.rcri;
+  const rr = Object.fromEntries(r.items.map((i) => [i.id, 1]));
+  rr.creatinina = 0;
+  const resR = calcular(r, rr);
+  assert.equal(textoEscala(r, resR, 'parrafo'), resumenDe(r, resR));
+  assert.match(resumenDe(r, resR), / Factor: creatinina/);
+  assert.equal(textoEscala(r, resR, 'lista').split('\n').length, 7);
 });

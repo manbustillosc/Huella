@@ -13,7 +13,7 @@ export default {
     {
       id: 'telefono', texto: 'Uso del teléfono',
       opciones: [
-        { texto: 'Lo usa por iniciativa propia; busca y marca números', valor: 1 },
+        { texto: 'Lo usa por iniciativa propia, busca y marca números', valor: 1 },
         { texto: 'Marca bien algunos números conocidos', valor: 1 },
         { texto: 'Contesta, pero no marca', valor: 1 },
         { texto: 'No usa el teléfono', valor: 0 },
@@ -41,7 +41,7 @@ export default {
       id: 'casa', texto: 'Cuidado de la casa',
       opciones: [
         { texto: 'Mantiene la casa solo o con ayuda ocasional para trabajos pesados', valor: 1 },
-        { texto: 'Hace tareas ligeras: lavar platos, tender camas', valor: 1 },
+        { texto: 'Hace tareas ligeras (lavar platos, tender camas)', valor: 1 },
         { texto: 'Hace tareas ligeras, pero sin mantener un nivel de limpieza adecuado', valor: 1 },
         { texto: 'Necesita ayuda en todas las labores de la casa', valor: 1 },
         { texto: 'No participa en ninguna labor de la casa', valor: 0 },

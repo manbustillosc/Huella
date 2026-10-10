@@ -52,7 +52,9 @@ export function calcular(escala, respuestas = {}) {
   };
 }
 
-const minusculaInicial = (t) => t.charAt(0).toLowerCase() + t.slice(1);
+// Cambia solo la primera letra (respetando «¿» inicial) y deja intactas las siglas: «AMT4», «GDS».
+const minusculaInicial = (t) => t.replace(/^(¿?)(\p{Lu})(?!\p{Lu})/u, (_, a, b) => a + b.toLowerCase());
+const mayusculaInicial = (t) => t.replace(/^(¿?)(\p{Ll})/u, (_, a, b) => a + b.toUpperCase());
 
 export function resumenDe(escala, resultado) {
   if (escala.resumen) return escala.resumen(resultado);
@@ -63,6 +65,38 @@ export function resumenDe(escala, resultado) {
 export function resumenBreveDe(escala, resultado) {
   if (escala.resumenBreve) return escala.resumenBreve(resultado);
   return `${escala.corto} ${resultado.puntaje}/${resultado.max} (${minusculaInicial(resultado.banda.etiqueta)})`;
+}
+
+// Texto de una escala para copiar al expediente, con el detalle de las respuestas.
+// 'lista': el resumen y un renglón por reactivo.
+// 'parrafo': todo seguido; de los reactivos de sí/no solo se mencionan los que suman puntos
+// (y ninguno si la escala ya los nombra en su resumen, como el RCRI).
+export function textoEscala(escala, resultado, formato = 'parrafo') {
+  const resumen = resumenDe(escala, resultado);
+  const { desglose } = resultado;
+  if (formato === 'lista') {
+    const filas = desglose.map(({ item, opcion }) =>
+      item.texto.endsWith('?')
+        ? `- ${item.texto} ${opcion.texto} (${opcion.valor})`
+        : `- ${item.texto}: ${minusculaInicial(opcion.texto)} (${opcion.valor})`);
+    return [resumen, ...filas].join('\n');
+  }
+  const partes = [resumen];
+  const conOpciones = desglose.filter(({ item }) => !item.compacto);
+  if (conOpciones.length) {
+    const texto = conOpciones
+      .map(({ item, opcion }) => `${minusculaInicial(item.texto)}: ${minusculaInicial(opcion.texto)} (${opcion.valor})`)
+      .join('; ');
+    partes.push(`${mayusculaInicial(texto)}.`);
+  }
+  const sino = desglose.filter(({ item }) => item.compacto);
+  if (sino.length && !escala.detalleEnResumen) {
+    const positivos = sino.filter(({ opcion }) => opcion.valor > 0);
+    partes.push(positivos.length
+      ? `Reactivos positivos: ${positivos.map(({ item, opcion }) => `${minusculaInicial(item.texto)} ${minusculaInicial(opcion.texto)}`).join('; ')}.`
+      : 'Sin reactivos positivos.');
+  }
+  return partes.join(' ');
 }
 
 // Posición del marcador en una barra de bandas de igual ancho (0–1).

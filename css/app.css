@@ -822,16 +822,6 @@ body[data-vista="escala"] .vista { padding-bottom: 0; }
   .amplio { display: inline; }
   .corto { display: none; }
 }
-.texto-nota {
-  margin-top: var(--space-4);
-  padding: var(--space-4);
-  border: 1px dashed var(--line);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--ink-muted);
-}
-.texto-nota .ceja { display: block; margin-bottom: var(--space-1); color: var(--ink-muted); }
 
 /* ---------- Valoración ---------- */
 .tarjeta {
@@ -903,6 +893,8 @@ body[data-vista="escala"] .vista { padding-bottom: 0; }
   margin: var(--space-8) 0 var(--space-3);
 }
 .cabecera-nota .seccion { margin: 0; }
+.resultado .cabecera-nota { margin-top: var(--space-6); }
+.resultado .nota { max-height: 360px; overflow-y: auto; }
 .segmentado {
   display: inline-flex;
   gap: 2px;

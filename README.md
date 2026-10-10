@@ -19,12 +19,14 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `sw.js` | Copia sin conexión. |
 | `tests/` | Pruebas de cada escala (`node --test tests/motor.test.mjs`). |
 
-## Nota para el expediente
+## Texto para el expediente
 
-En **Valoración**, la nota se puede copiar en dos formatos (la app recuerda el último que usaste):
+En el resultado de cada escala y en **Valoración**, el texto se copia en dos formatos. La app recuerda el último que usaste, en todas las pantallas.
 
-- **Párrafo**: todo seguido, para ahorrar espacio. Cada escala trae su versión breve (`resumenBreve`).
-- **Lista**: un encabezado por dominio y un renglón por escala (`resumen`).
+- **Párrafo**: todo seguido, para ahorrar espacio.
+  - En una escala: el resumen y las respuestas en una línea; de los reactivos de sí/no solo los que suman puntos (`textoEscala`).
+  - En la valoración: cada escala en su versión breve (`resumenBreve`), agrupadas por dominio.
+- **Lista**: un renglón por reactivo (escala) o por escala (valoración).
 
 ## Agregar una escala
 

@@ -35,6 +35,7 @@ export default {
     'La guía canadiense (2017) recomienda medir BNP o NT-proBNP antes de la cirugía en personas de 65 años o más, de 45 a 64 años con enfermedad cardiovascular significativa, o con RCRI de 1 o más.',
     'No aplica a cirugía cardiaca ni a TAVI.',
   ],
+  detalleEnResumen: true,
   resumen({ puntaje, max, banda, presentes }) {
     const clase = inicialMinuscula(banda.etiqueta.replace(' · ', ', '));
     const factores = presentes.length

@@ -1,10 +1,10 @@
 import { ESCALAS } from '../escalas/index.js';
 import { DOMINIOS } from './dominios.js';
 import { icono } from './iconos.js';
-import { normalizarEscala, calcular, resumenDe, resumenBreveDe, posicionMarcador, rangoTexto, notaValoracion } from './motor.js';
+import { normalizarEscala, calcular, resumenDe, resumenBreveDe, textoEscala, posicionMarcador, rangoTexto, notaValoracion } from './motor.js';
 import { almacen } from './almacen.js';
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const ETIQUETA_COPIAR = { parrafo: 'Copiar en párrafo', lista: 'Copiar en lista' };
 
 const escalas = ESCALAS.map(normalizarEscala);
@@ -190,6 +190,23 @@ function tarjetaDominio(d) {
     </a>`;
 }
 
+// Selector Párrafo / Lista para el texto del expediente (la elección se recuerda en todas las pantallas).
+function selectorFormato(formato) {
+  return `
+    <div class="segmentado" role="radiogroup" aria-label="Formato del texto">
+      ${[['parrafo', 'Párrafo'], ['lista', 'Lista']].map(([valor, texto]) => `
+        <label><input type="radio" name="formato-nota" id="formato-${valor}" value="${valor}"${formato === valor ? ' checked' : ''}>${icono(valor)}${texto}</label>`).join('')}
+    </div>`;
+}
+
+function alCambiarFormato(actualizar) {
+  vista.querySelectorAll('input[name="formato-nota"]').forEach((input) =>
+    input.addEventListener('change', () => {
+      almacen.guardarFormatoNota(input.value);
+      actualizar(input.value);
+    }));
+}
+
 /* ---------- Vistas ---------- */
 
 function vistaInicio() {
@@ -328,6 +345,7 @@ function vistaResultado({ id }) {
   const enVal = almacen.valoracion().resultados.find((r) => r.escalaId === id);
   const pos = posicionMarcador(e, res.puntaje);
   const estadoBoton = !enVal ? 'nuevo' : enVal.resumen === resumen ? 'igual' : 'distinto';
+  const formato = almacen.formatoNota();
   return `
     <section class="vista resultado">
       <a class="migas" href="#/e/${id}">${icono('atras')} ${esc(e.corto)}</a>
@@ -357,15 +375,19 @@ function vistaResultado({ id }) {
           <ol>${e.referencias.map((r) => `<li>${esc(r.texto)}${r.doi ? ` <a href="https://doi.org/${esc(r.doi)}" target="_blank" rel="noopener">doi:${esc(r.doi)}</a>` : ''}</li>`).join('')}</ol>
         </details>
       </article>
+      <div class="cabecera-nota">
+        <h2 class="seccion">Texto para el expediente</h2>
+        ${selectorFormato(formato)}
+      </div>
+      <pre class="nota" id="texto-escala" data-formato="${formato}">${esc(textoEscala(e, res, formato))}</pre>
       <div class="acciones">
         <button class="btn btn-primario" type="button" id="agregar"${estadoBoton === 'igual' ? ' data-agregado' : ''}>
           ${estadoBoton === 'igual' ? `${icono('check')} En la valoración` : estadoBoton === 'distinto' ? `${icono('reiniciar')} Actualizar en la valoración` : `${icono('mas')} Añadir a la valoración`}
         </button>
-        <button class="btn ancho" type="button" id="copiar">${icono('copiar')} Copiar resumen</button>
+        <button class="btn ancho" type="button" id="copiar">${icono('copiar')} ${ETIQUETA_COPIAR[formato]}</button>
         <a class="btn" href="#/e/${id}">${icono('editar')} Revisar<span class="amplio">&nbsp;respuestas</span></a>
         <button class="btn" type="button" id="nueva">${icono('reiniciar')} <span class="corto">Repetir</span><span class="amplio">Nueva aplicación</span></button>
       </div>
-      <p class="texto-nota"><span class="ceja">Texto para el expediente</span>${esc(resumen)}</p>
     </section>`;
 }
 
@@ -418,10 +440,7 @@ function vistaValoracion() {
         <div class="resultados-val">${grupos}</div>
         <div class="cabecera-nota">
           <h2 class="seccion">Nota para el expediente</h2>
-          <div class="segmentado" role="radiogroup" aria-label="Formato de la nota">
-            ${[['parrafo', 'parrafo', 'Párrafo'], ['lista', 'lista', 'Lista']].map(([valor, ico, texto]) => `
-              <label><input type="radio" name="formato-nota" id="formato-${valor}" value="${valor}"${formato === valor ? ' checked' : ''}>${icono(ico)}${texto}</label>`).join('')}
-          </div>
+          ${selectorFormato(formato)}
         </div>
         <pre class="nota" id="nota" data-formato="${formato}">${esc(notaValoracion(v, porId, DOMINIOS, new Date(), formato))}</pre>
         <div class="acciones dos">
@@ -561,7 +580,16 @@ const MONTAJES = {
       renderNavegacion(ruta());
       aviso('Añadido a la valoración');
     });
-    $('#copiar').addEventListener('click', () => copiar(resumen));
+    alCambiarFormato((formato) => {
+      const pre = $('#texto-escala');
+      pre.dataset.formato = formato;
+      pre.textContent = textoEscala(e, res, formato);
+      $('#copiar').innerHTML = `${icono('copiar')} ${ETIQUETA_COPIAR[formato]}`;
+    });
+    $('#copiar').addEventListener('click', () => {
+      const formato = almacen.formatoNota();
+      copiar(textoEscala(e, res, formato), formato === 'parrafo' ? 'Copiado en párrafo' : 'Copiado en lista');
+    });
     $('#nueva').addEventListener('click', () => {
       almacen.guardarRespuestas(id, {});
       location.hash = `#/e/${id}`;
@@ -577,11 +605,7 @@ const MONTAJES = {
       nota.textContent = notaValoracion(almacen.valoracion(), porId, DOMINIOS, new Date(), formato);
       $('#copiar-nota').innerHTML = `${icono('copiar')} ${ETIQUETA_COPIAR[formato]}`;
     };
-    vista.querySelectorAll('input[name="formato-nota"]').forEach((input) =>
-      input.addEventListener('change', () => {
-        almacen.guardarFormatoNota(input.value);
-        actualizarNota();
-      }));
+    alCambiarFormato(actualizarNota);
     const guardarPaciente = () => {
       const v = almacen.valoracion();
       v.paciente = {
