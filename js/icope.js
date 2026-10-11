@@ -44,7 +44,11 @@ export const DOMINIOS_ICOPE = [
       texto: 'El manual usa como ejemplo la SPPB: 0 a 9 puntos, movilidad limitada; 10 a 12, movilidad normal. Si ya está registrada, se reutiliza.',
       elegir: ['sppb'],
       alternativas: ['velocidad', 'tug'],
-      complementarios: [{ id: 'tinetti', nota: 'Equilibrio y marcha por separado si hay caídas o inestabilidad.' }],
+      complementarios: [
+        { id: 'tinetti', nota: 'Equilibrio y marcha por separado si hay caídas o inestabilidad.' },
+        { id: 'equilibrio4', nota: 'Equilibrio estático en 4 etapas (CDC STEADI); reutiliza el equilibrio del SPPB.' },
+        { id: 'dinamometria', nota: 'Fuerza de prensión, si hay debilidad o sospecha de sarcopenia.' },
+      ],
       planeadas: [],
     },
     intervenciones: [
@@ -63,6 +67,7 @@ export const DOMINIOS_ICOPE = [
       elegir: ['mnasf'],
       complementarios: [
         { id: 'sarcf', nota: 'Si hay debilidad o pérdida de fuerza: tamizaje de sarcopenia.' },
+        { id: 'dinamometria', nota: 'Fuerza de prensión: la fuerza baja orienta a sarcopenia probable (EWGSOP2).' },
         { id: 'bucal', nota: 'Problemas para masticar, dolor o prótesis: revisión bucal.' },
         { id: 'eat10', nota: 'Si hay síntomas al tragar: tamizaje de disfagia.' },
       ],

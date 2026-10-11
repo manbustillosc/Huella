@@ -50,6 +50,7 @@ export function renderAcerca() {
 
         <h2>Fuentes y créditos</h2>
         <p class="discreto">La valoración ICOPE es una adaptación del Manual de atención integrada para las personas mayores, 2.ª ed. (Organización Panamericana de la Salud, 2025; <a href="https://doi.org/10.37774/9789275330319" target="_blank" rel="noopener">doi:10.37774/9789275330319</a>), licencia CC BY-NC-SA 3.0 IGO; las partes adaptadas se comparten bajo la misma licencia. Esta publicación es una adaptación de una obra original de la Organización Panamericana de la Salud (OPS). Las opiniones expresadas en esta adaptación son responsabilidad exclusiva de los autores y no representan necesariamente los criterios de la OPS. Huella no usa el logotipo de la OPS ni de la OMS, y no reproduce la tabla optométrica.</p>
+        <p class="discreto">FRAX® y FRAXplus® son marcas registradas (© Osteoporosis Research Ltd.); Huella solo registra el resultado de la herramienta oficial y no reconstruye su algoritmo. Valores de la silla en 30 s y del equilibrio en 4 etapas: CDC STEADI.</p>
         <p class="discreto">Versiones en español conforme a la Guía de instrumentos de evaluación de la capacidad funcional del Instituto Nacional de Geriatría (2022) cuando aplica, citando la fuente, con fines asistenciales sin ánimo de lucro. Íconos: Lucide (licencia ISC). Tipografías: Fraunces e Inter Tight (SIL Open Font License 1.1).</p>
       </div>
     </section>`;

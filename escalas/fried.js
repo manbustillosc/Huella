@@ -81,6 +81,16 @@ export default {
   barra: false,
   min: 0,
   max: 5,
+  vinculos: [
+    {
+      id: 'dinamometria', escala: 'dinamometria', titulo: 'Dinamometría',
+      disponible: (res) => (Number.isFinite(res.extras?.dominante) ? true : 'La dinamometría guardada no tiene intentos con la mano dominante.'),
+      describir: (res) => `Prensión máxima de la mano dominante: ${res.extras.dominante} kg`,
+      advertencia: () => 'Fried usa la mano dominante y puntos de corte por sexo e IMC: confirma que el dinamómetro y la técnica coincidan con el método.',
+      aplicar: (res) => ({ fuerza_estado: 0, fuerza: String(res.extras.dominante) }),
+      campos: ['fuerza_estado', 'fuerza'],
+    },
+  ],
   campos: [
     { id: 'sexo', texto: 'Sexo', textoCorto: 'sexo', puntua: false, prefill: 'sexo', opciones: [{ texto: 'Mujer', valor: 1, clave: 'mujer' }, { texto: 'Hombre', valor: 0, clave: 'hombre' }] },
     {

@@ -119,7 +119,7 @@ export const RUTAS = [
   },
   {
     id: 'fragilidad', nombre: 'Fragilidad y movilidad', icono: 'fragilidad',
-    descripcion: 'Fragilidad, sarcopenia, desempeño físico, caídas y prescripción de ejercicio Vivifrail con los datos ya registrados.',
+    descripcion: 'Fragilidad, sarcopenia, desempeño físico, caídas, salud ósea y prescripción de ejercicio Vivifrail con los datos ya registrados.',
     pasos: [
       { id: 'frail', nota: 'Tamizaje autorreferido de fragilidad.' },
       { id: 'cfs', nota: 'Grado de fragilidad por juicio clínico.' },
@@ -132,6 +132,12 @@ export const RUTAS = [
       { id: 'velocidad', nota: 'Si necesitas el recorrido de 6 m (criterio de Vivifrail) o no hiciste el SPPB; puede reutilizar la marcha del SPPB.' },
       { id: 'fried', nota: 'Fenotipo de Fried con dinamómetro, marcha de 4.57 m y actividad física; los componentes sin medir no se simulan.' },
       { id: 'tinetti', nota: 'Subescalas de equilibrio y marcha si hay caídas o inestabilidad.' },
+      { id: 'dinamometria', nota: 'Fuerza de prensión (máximo de hasta 3 intentos por mano); reutilizable en el EWGSOP2 y en Fried.' },
+      { id: 'ewgsop2', nota: 'Algoritmo de sarcopenia: fuerza, masa muscular y desempeño; reutiliza los datos ya medidos.' },
+      { id: 'silla30', nota: 'Fuerza de las piernas con los valores del CDC STEADI; distinta de las 5 levantadas del SPPB.' },
+      { id: 'equilibrio4', nota: 'Equilibrio estático en 4 etapas (CDC STEADI); reutiliza el equilibrio del SPPB.' },
+      { id: 'dxa', nota: 'Si hay caídas o fracturas: densitometría y su categoría densitométrica.' },
+      { id: 'frax', nota: 'Registro de la probabilidad de fractura calculada en la herramienta oficial (modelo de México).' },
     ],
     planes: ['Downton'],
   },

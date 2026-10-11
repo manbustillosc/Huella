@@ -63,14 +63,17 @@ import { iciq, sintomasUrinarios, diarioMiccional, funcionIntestinal } from './c
 import { isi, epworth, stopbang, suenoClinico } from './sueno.js';
 import { agudezaVisual, audiometria, hhies, ohat, saludBucal } from './sensorial.js';
 import { eat10, fois, degluObs, iddsi } from './deglucion.js';
+import { frax, dxa } from './osea.js';
+import { silla30, equilibrio4, dinamometria, ewgsop2 } from './movilidad.js';
 
 export const ESCALAS = [
   barthel, katz, lawton,
   icopeCognicion, minicog, moca, rudas, cdr, fast,
   icopePsicologica, gds15, phq9, cornell,
   cuatroAt, cam, rass, camicu, npiq,
-  frail, cfs, fried, sarcf, sppb, vivifrail,
-  icopeLocomotora, tug, velocidad, tinetti,
+  frail, cfs, fried, sarcf, dinamometria, ewgsop2, sppb, vivifrail,
+  icopeLocomotora, tug, velocidad, tinetti, silla30, equilibrio4,
+  dxa, frax,
   icopeVitalidad, mnasf,
   icopeVision, agudezaVisual, icopeAudicion, audiometria, hhies, ohat, saludBucal,
   eat10, degluObs, fois, iddsi,

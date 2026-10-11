@@ -81,6 +81,15 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - Salud sensorial y oral: agudeza visual (CIE-11), audiometría (grados de la OMS 2021), HHIE-S y OHAT como registro, y revisión bucal breve.
 - Deglución: EAT-10 (registro), FOIS, observación clínica y registro de la textura IDDSI indicada por personal capacitado. Un tamizaje positivo se deriva; Huella no indica dietas ni pruebas con agua.
 
+## Salud ósea, fuerza y equilibrio
+
+- FRAX®: solo registro de las probabilidades a 10 años calculadas en la herramienta oficial (fraxplus.org) con el modelo de México, indicando si se usó la DMO. Huella no reconstruye el algoritmo ni aplica umbrales de tratamiento. FRAX® y FRAXplus® son marcas registradas de Osteoporosis Research Ltd.
+- Densitometría (DXA): T-scores por sitio (se usa el más bajo) o Z-score según la ISCD; categorías densitométricas de la OMS. La osteoporosis densitométrica se distingue de la clínica (fractura por fragilidad), que establece el médico. Sugiere evaluar caídas y fragilidad.
+- Levantarse de la silla en 30 s con los valores del CDC STEADI por edad y sexo (60 a 94 años); no usa los cortes de la prueba de 5 levantadas.
+- Equilibrio en 4 etapas (CDC STEADI), que puede reutilizar el equilibrio del SPPB.
+- Dinamometría: hasta 3 intentos por mano, mano dominante, equipo; usa el máximo y los cortes del EWGSOP2. La fuerza baja no diagnostica sarcopenia por sí sola. Se reutiliza en el algoritmo EWGSOP2 (máximo) y en Fried (mano dominante, con advertencia de método); ICOPE la ofrece como complementaria.
+- Algoritmo EWGSOP2: sarcopenia probable, no confirmada, confirmada o grave según fuerza, masa muscular (ASM o ASM/talla², DXA o BIA) y desempeño; reutiliza la dinamometría, el SPPB, la velocidad de marcha y el TUG.
+
 ## Agregar una escala
 
 1. Crear `escalas/<nombre>.js` con el mismo formato que las existentes.
@@ -96,6 +105,8 @@ Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algun
 ## Créditos
 
 - Valoración ICOPE: adaptación del *Manual de atención integrada para las personas mayores*, 2.ª ed. (OPS, 2025; https://doi.org/10.37774/9789275330319), licencia CC BY-NC-SA 3.0 IGO; las partes adaptadas se comparten bajo la misma licencia. Esta publicación es una adaptación de una obra original de la Organización Panamericana de la Salud (OPS). Las opiniones expresadas en esta adaptación son responsabilidad exclusiva de los autores y no representan necesariamente los criterios de la OPS.
+- FRAX® y FRAXplus® son marcas registradas; © Osteoporosis Research Ltd. Huella solo registra el resultado de la herramienta oficial.
+- Valores de referencia de la silla en 30 s y criterio del equilibrio en 4 etapas: CDC STEADI (se citan los valores publicados; no se reproducen los materiales).
 - Íconos: [Lucide](https://lucide.dev), licencia ISC (`assets/LICENSE-Lucide.txt`).
 - Tipografías: Fraunces e Inter Tight, SIL Open Font License 1.1 (`assets/fonts/`).
 

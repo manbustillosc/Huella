@@ -1,4 +1,5 @@
 import { REF_INGER_2022, SUG } from './_comun.js';
+const minus = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
 // Clasificación de Huella: movilidad funcional según la guía del INGER (2022).
 export function categoriaTug(seg) {
@@ -117,11 +118,11 @@ export default {
   },
   resumen(res) {
     if (res.extras.incapaz) return `TUG: ${res.extras.seguridad ? 'suspendida por seguridad' : 'no puede realizar la prueba'}.`;
-    return `TUG: ${res.valor} s (${res.banda.etiqueta.toLowerCase()}; STEADI ${res.extras.steadi ? 'positivo' : 'negativo'})${res.extras.auxiliar ? `, con ${res.extras.auxiliar}` : ''}.`;
+    return `TUG: ${res.valor} s (${minus(res.banda.etiqueta)}; STEADI ${res.extras.steadi ? 'positivo' : 'negativo'})${res.extras.auxiliar ? `, con ${res.extras.auxiliar}` : ''}.`;
   },
   resumenBreve(res) {
     if (res.extras.incapaz) return `TUG ${res.extras.seguridad ? 'suspendida por seguridad' : 'no puede realizarla'}`;
-    return `TUG ${res.valor} s (${res.banda.etiqueta.toLowerCase()})`;
+    return `TUG ${res.valor} s (${minus(res.banda.etiqueta)})`;
   },
   detalleEnResumen: true,
   notas: [

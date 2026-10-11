@@ -26,7 +26,7 @@ export const DOMINIOS = [
   },
   {
     id: 'fragilidad', nombre: 'Fragilidad y sarcopenia',
-    descripcion: 'Fragilidad, fuerza, desempeño físico y prescripción de ejercicio.',
+    descripcion: 'Fragilidad, fuerza de prensión, sarcopenia (EWGSOP2), desempeño físico y prescripción de ejercicio.',
     problemas: ['debilidad', 'pérdida de peso', 'ejercicio'],
     planeadas: [],
   },
@@ -35,6 +35,12 @@ export const DOMINIOS = [
     descripcion: 'Marcha, equilibrio y riesgo de caídas.',
     problemas: ['caídas', 'marcha', 'equilibrio'],
     planeadas: ['Downton', 'Short FES-I'],
+  },
+  {
+    id: 'osea', nombre: 'Salud ósea',
+    descripcion: 'Densitometría, probabilidad de fractura (registro de FRAX®) y su relación con caídas y fragilidad.',
+    problemas: ['osteoporosis', 'osteopenia', 'fractura', 'densitometría'],
+    planeadas: [],
   },
   {
     id: 'nutricion', nombre: 'Nutrición',

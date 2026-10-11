@@ -101,4 +101,10 @@ export const EJEMPLOS = {
   fois: () => resp('fois', { nivel: '5 · Dieta oral total de varias consistencias, con preparación especial o compensaciones' }),
   deglucion: () => resp('deglucion', { signos: ['tos'] }),
   iddsi: () => resp('iddsi', { bebidas: 'Nivel 2 · Poco espeso', alimentos: 'Nivel 5 · Picado y húmedo', indico: 'Fonoaudiología o logopedia' }),
+  frax: () => resp('frax', { modelo: 'México', mayor: 12.5, cadera: 4.1, dmo: 'Con DMO del cuello femoral' }),
+  dxa: () => resp('dxa', { sexo: 'Mujer', edad: 74, menopausia: 'Sí', t_columna: -2.1, t_cuello: -2.6, t_cadera: -2.2, fractura: 'No' }),
+  silla30: () => resp('silla30', { sexo: 'Mujer', edad: 78, brazos: 'No', repeticiones: 8 }),
+  equilibrio4: () => resp('equilibrio4', { etapa1: 'Lo mantiene 10 segundos', etapa2: 'Lo mantiene 10 segundos', etapa3: 'No lo mantiene 10 segundos' }),
+  dinamometria: () => resp('dinamometria', { sexo: 'Mujer', dominante: 'Derecha', equipo: 'Hidráulico (p. ej., Jamar)', der1: 14, der2: 15.5, der3: 15, izq1: 13, izq2: 14, izq3: 13.5 }),
+  ewgsop2: () => resp('ewgsop2', { sexo: 'Mujer', fuerza_tipo: 'Prensión (kg)', prension: 15.5, masa_tipo: 'ASM/talla² (kg/m²)', asmi: 5.2, metodo: 'Bioimpedancia (BIA)', desempeno_tipo: 'Velocidad de marcha (m/s)', marcha: 0.7 }),
 };
