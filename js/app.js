@@ -4,6 +4,7 @@ import { VERSION, escalas, porId, DOMINIOS, RUTAS, escalasDe, dominioDe, rutaDe 
 import { momentoDe, MOMENTOS } from './motor.js';
 import { $, esc, icono, aviso, botonEstrella, nombreCorto, cuentaDominio } from './ui.js';
 import { renderMedicacion, montarMedicacion } from './vistas/medicacion.js';
+import { renderIcope, montarIcope, PESTANAS_ICOPE } from './vistas/icope.js';
 import { renderInicio, montarInicio, renderDominio, renderFavoritas } from './vistas/inicio.js';
 import { renderEscala, montarEscala, renderResultado, montarResultado, contexto } from './vistas/escala.js';
 import { renderRuta, montarRuta } from './vistas/ruta.js';
@@ -22,8 +23,12 @@ function parsearEscala(segmento) {
 }
 
 function ruta() {
-  const partes = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
+  // Un ancla interna (#/icope/detallada#d-vision) no forma parte de la ruta.
+  const partes = location.hash.replace(/^#\/?/, '').split('#')[0].split('/').map(decodeURIComponent);
   const [a, b, c, d] = partes;
+  if ((a === 'r' && b === 'icope' && !c) || a === 'icope') {
+    return { vista: 'icope', pestana: a === 'icope' && PESTANAS_ICOPE.some(([id]) => id === b) ? b : 'panel' };
+  }
   if (a === 'd' && dominioDe(b)) return { vista: 'dominio', id: b };
   if (a === 'e') {
     const x = parsearEscala(b);
@@ -58,6 +63,7 @@ function render() {
       ruta: renderRuta,
       valoracion: renderValoracion,
       medicacion: renderMedicacion,
+      icope: renderIcope,
       favoritas: renderFavoritas,
       acerca: renderAcerca,
     }[r.vista](r);
@@ -83,6 +89,7 @@ function montar(r) {
   if (r.vista === 'ruta') montarRuta(r, render);
   if (r.vista === 'valoracion') montarValoracion(render, navegacion);
   if (r.vista === 'medicacion') montarMedicacion(r, render, navegacion);
+  if (r.vista === 'icope') montarIcope(r, render, navegacion);
   if (r.vista === 'acerca') montarAcerca(() => { aplicarTema(); navegacion(); }, navegacion);
 }
 
@@ -94,6 +101,7 @@ function titulo(r) {
   if (r.vista === 'ruta') return `${rutaDe(r.id).nombre} · ${base}`;
   if (r.vista === 'valoracion') return `Valoración · ${base}`;
   if (r.vista === 'medicacion') return `Revisión de medicamentos · ${base}`;
+  if (r.vista === 'icope') return `Valoración ICOPE · ${base}`;
   if (r.vista === 'favoritas') return `Favoritas · ${base}`;
   if (r.vista === 'acerca') return `Acerca de · ${base}`;
   return base;
@@ -108,7 +116,7 @@ const ARCOS = `<svg class="arcos" viewBox="0 0 260 260" fill="none" stroke="curr
 function renderNavegacion(r) {
   const nVal = almacen.valoracion().resultados.length;
   const domAct = r.vista === 'dominio' ? r.id : ['escala', 'resultado'].includes(r.vista) && !r.ruta ? porId[r.id].dominio : null;
-  const rutaAct = r.vista === 'ruta' ? r.id : r.ruta?.id;
+  const rutaAct = r.vista === 'ruta' ? r.id : r.vista === 'icope' ? 'icope' : r.ruta?.id;
   const item = (href, ico, texto, activo, extra = '', clase = '') =>
     `<a class="nav-item${activo ? ' activo' : ''}${clase}" href="${href}"${activo ? ' aria-current="page"' : ''}>${icono(ico)}<span>${esc(texto)}</span>${extra}</a>`;
 
@@ -155,6 +163,7 @@ function renderNavegacion(r) {
   }
   if (r.vista === 'valoracion') tituloBarra = 'Valoración';
   if (r.vista === 'medicacion') { tituloBarra = 'Medicamentos'; atras = '#/d/polifarmacia'; }
+  if (r.vista === 'icope') tituloBarra = 'ICOPE';
   if (r.vista === 'favoritas') tituloBarra = 'Favoritas';
   if (r.vista === 'acerca') tituloBarra = 'Acerca de';
 
@@ -175,7 +184,7 @@ function renderNavegacion(r) {
   const tab = (href, ico, texto, activo, extra = '') =>
     `<a href="${href}"${activo ? ' class="activo" aria-current="page"' : ''}>${icono(ico)}<span>${texto}</span>${extra}</a>`;
   $('#pestanas').innerHTML = `
-    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion'].includes(r.vista))}
+    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion', 'icope'].includes(r.vista))}
     ${tab('#/favoritas', 'estrella', 'Favoritas', r.vista === 'favoritas')}
     ${tab('#/valoracion', 'valoracion', 'Valoración', r.vista === 'valoracion', nVal ? `<span class="insignia">${nVal}</span>` : '')}`;
 }

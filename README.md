@@ -18,6 +18,9 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `js/comparacion.js` | Orden cronológico, referencia, resultado vigente y dirección clínica de cada cambio. |
 | `js/medicacion.js`, `js/vistas/medicacion.js` | Revisión de medicamentos: registro, STOPP/START v3 criterio por criterio, revisión manual de Beers 2023 y salidas para la nota. |
 | `escalas/stoppstart-datos.js` | Redacción condensada en español de los 190 criterios STOPP/START v3 (CC BY 4.0, con atribución). |
+| `escalas/icope.js` | Evaluación básica ICOPE (paso 1): un instrumento por dominio de la capacidad intrínseca y los factores clave del cuadro 3.2, adaptados del manual de la OPS (2025, CC BY-NC-SA 3.0 IGO). |
+| `js/icope.js`, `js/vistas/icope.js` | Valoración ICOPE: estado de cada dominio, evaluación detallada sugerida (reutiliza resultados), panel de capacidad intrínseca sin puntaje global, plan y seguimiento. |
+| `js/plan.js` | Plan de atención: valoración del médico por problema, prioridad, objetivos, intervenciones, revaloraciones, preferencias de la persona y bitácora de cambios. |
 | `js/herramientas.js` | Herramientas con pantalla propia (revisión de medicamentos) para dominios, búsqueda, favoritas y rutas. |
 | `js/nota.js` | Nota de la valoración: párrafo, lista y completa (resultados, interpretación, cambios, hallazgos, sugerencias). |
 | `js/almacen.js` | Guardado local: valoración, aplicaciones repetidas, respuestas en curso y preferencias. |
@@ -62,6 +65,15 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - Beers 2023: revisión manual de las tablas 2 a 7 con el artículo oficial; Huella no reproduce sus tablas.
 - Salidas: medicamentos, criterios revisados, posibles problemas, información pendiente y sugerencias. Nada se suspende ni se ajusta automáticamente.
 
+## Valoración ICOPE
+
+- Seis dominios (cognición, capacidad locomotora, vitalidad, visión, audición y capacidad psicológica), cada uno con su estado: conservado, alterado, pendiente o no evaluable. No hay puntaje global ni índice de capacidad intrínseca.
+- Paso 1: preguntas de filtro y pruebas del cuadro 3.1; una respuesta afirmativa al filtro (cognición, visión, audición) lleva directo a la evaluación detallada. Los factores clave (apoyo social, quien cuida, incontinencia urinaria) y el riesgo cardiovascular se registran aparte: no son dominios.
+- Paso 2: instrumentos disponibles por dominio (Mini-Cog, MoCA o RUDAS; SPPB, velocidad de marcha o TUG; MNA-SF; GDS-15 o PHQ-9), reutilizando lo ya registrado; registro de evaluaciones hechas fuera de Huella (examen ocular, audiometría) y valoración del médico (hallazgo de tamizaje, sospecha clínica, diagnóstico confirmado, descartado, pendiente).
+- Paso 3: lo que importa a la persona, prioridad decidida por el médico, objetivos (basal, meta, plazo, responsable, indicador) e intervenciones orientativas del manual que solo se agregan al tocarlas.
+- Paso 4: estado de objetivos e intervenciones, fechas de revaloración, evolución entre aplicaciones y bitácora de cambios del plan.
+- La prueba de la silla del SPPB puede reutilizarse en la evaluación básica de la movilidad, con confirmación.
+
 ## Agregar una escala
 
 1. Crear `escalas/<nombre>.js` con el mismo formato que las existentes.
@@ -76,6 +88,7 @@ Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algun
 
 ## Créditos
 
+- Valoración ICOPE: adaptación del *Manual de atención integrada para las personas mayores*, 2.ª ed. (OPS, 2025; https://doi.org/10.37774/9789275330319), licencia CC BY-NC-SA 3.0 IGO; las partes adaptadas se comparten bajo la misma licencia. Esta publicación es una adaptación de una obra original de la Organización Panamericana de la Salud (OPS). Las opiniones expresadas en esta adaptación son responsabilidad exclusiva de los autores y no representan necesariamente los criterios de la OPS.
 - Íconos: [Lucide](https://lucide.dev), licencia ISC (`assets/LICENSE-Lucide.txt`).
 - Tipografías: Fraunces e Inter Tight, SIL Open Font License 1.1 (`assets/fonts/`).
 

@@ -173,7 +173,7 @@ export default {
     const prog = programaVivifrail(total);
     return {
       puntaje: total,
-      extras: { eq, marcha, silla, velocidad, distanciaMarcha, tiempoMarcha: mejor, programa: prog, noRealizadas },
+      extras: { eq, marcha, silla, velocidad, distanciaMarcha, tiempoMarcha: mejor, tiempoSilla: v.silla_pre.valor === 1 && v.silla_estado.valor === 1 ? v.silla_t : null, programa: prog, noRealizadas },
       lineas: [
         `Equilibrio ${eq}/4 · Marcha ${marcha}/4 · Silla ${silla}/4.`,
         lineaMarcha,

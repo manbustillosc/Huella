@@ -7,8 +7,8 @@ import { calcular } from '../js/motor.js';
 import { pasosConEstado, progresoRuta, siguientePendiente, tiempoRuta, urlPaso } from '../js/vistas/rutas-estado.js';
 import { porId, resp, calc, todos, guardado } from './ayuda.mjs';
 
-test('las siete rutas apuntan a instrumentos existentes con momentos válidos', () => {
-  assert.equal(RUTAS.length, 7);
+test('las ocho rutas apuntan a instrumentos existentes con momentos válidos', () => {
+  assert.equal(RUTAS.length, 8);
   for (const r of RUTAS) {
     const claves = new Set();
     for (const p of pasosDe(r)) {

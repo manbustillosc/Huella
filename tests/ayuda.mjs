@@ -77,4 +77,11 @@ export const EJEMPLOS = {
   dasi: () => resp('dasi', { cuidado: 'Sí', casa: 'Sí', cuadras: 'Sí', escaleras: 'Sí', correr: 'No', ligero: 'Sí', moderado: 'Sí', pesado: 'No', jardin: 'No', sexual: 'No', recreacion: 'No', deporte: 'No' }),
   pps: () => resp('pps', { nivel: '50 %' }),
   gijon: () => resp('gijon', { familiar: 'Vive con cónyuge de similar edad', economica: '1 a 8 veces el salario mínimo mensual', vivienda: 'Adecuada a necesidades', relaciones: 'Relaciones sociales', apoyo: 'Con apoyo familiar y vecinal' }),
+  'icope-cog': () => resp('icope-cog', { filtro: 'No', fecha: 'Responde correctamente', lugar: 'Responde correctamente', palabras: 'Recuerda 2' }),
+  'icope-loc': () => resp('icope-loc', { seguro: 'Sí', completo: 'Sí, las completó', tiempo: 12.5 }),
+  'icope-vit': () => resp('icope-vit', { peso: 'No', apetito: 'Sí' }),
+  'icope-vis': () => resp('icope-vis', { filtro1: 'No', filtro2: 'No', metodo: 'Tabla de la OMS impresa', gafas: 'No usa gafas', externa: 'Sin alteraciones', lejos_der: 'Ve al menos 3 de las E pequeñas (6/12 o mejor)', lejos_izq: 'Ve al menos 3 de las E pequeñas (6/12 o mejor)', cerca: 'Ve al menos 3 E (N6)' }),
+  'icope-aud': () => resp('icope-aud', { audifonos: 'No', filtro: 'Sí' }),
+  'icope-psi': () => resp('icope-psi', { tristeza: 'No', interes: 'No' }),
+  'icope-fac': () => resp('icope-fac', { vivienda: 'No', economia: 'No', soledad: 'Sí', participacion: 'No', cuidador: 'No tiene', orina: 'Sí' }),
 };

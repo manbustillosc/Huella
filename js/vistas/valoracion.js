@@ -7,6 +7,8 @@ import { ordenarCronologico, compararResultados, etiquetaAplicacion, fechaCorta,
 import { $, $$, esc, icono, plural, aviso, copiar, selectorFormato, alCambiarFormato, ETIQUETA_COPIAR, confirmarEnDosToques } from '../ui.js';
 import { progresoRuta } from './rutas-estado.js';
 import { medicacionDe, resumenMedicacion } from '../medicacion.js';
+import { planDe, planConContenido } from '../plan.js';
+import { estadosIcope, avanceBasica, ESTADOS_ICOPE } from '../icope.js';
 
 export const diasDesde = (ts) => (ts ? Math.max(0, Math.floor((Date.now() - ts) / 86400000)) : 0);
 
@@ -55,7 +57,10 @@ export function renderValoracion() {
   const enCurso = RUTAS.map((r) => ({ r, p: progresoRuta(r) })).filter((x) => x.p.completos + x.p.omitidos > 0 && x.p.pendientes.length);
   const { avisos } = v.resultados.length ? hallazgosYSugerencias(v, porId) : { avisos: [] };
   const med = resumenMedicacion(medicacionDe(v));
-  const hayNota = v.resultados.length || med.hayContenido;
+  const plan = planDe(v);
+  const icope = estadosIcope(v, isoDe(new Date()));
+  const avIcope = avanceBasica(icope);
+  const hayNota = v.resultados.length || med.hayContenido || planConContenido(plan);
   return `
     <section class="vista valoracion">
       <header class="cabecera">
@@ -94,6 +99,12 @@ export function renderValoracion() {
         <a class="en-curso tarjeta-med" href="#/medicacion/resumen">
           ${icono('polifarmacia')}
           <span><strong>Revisión de medicamentos</strong><span>${plural(med.m.meds.length, 'medicamento', 'medicamentos')} · ${med.revisados.stopp + med.revisados.start} de 190 criterios STOPP/START · ${plural(med.problemas.length, 'posible problema', 'posibles problemas')}${med.pendientes.length ? ` · ${plural(med.pendientes.length, 'dato pendiente', 'datos pendientes')}` : ''}</span></span>
+          ${icono('adelante', 'chev')}
+        </a>` : ''}
+      ${avIcope.evaluados || planConContenido(plan) ? `
+        <a class="en-curso tarjeta-med" href="#/icope/panel">
+          ${icono('icope')}
+          <span><strong>Valoración ICOPE y plan de atención</strong><span>${avIcope.evaluados} de ${avIcope.total} dominios evaluados${avIcope.alterados.length ? ` · ${ESTADOS_ICOPE.alterado.nombre.toLowerCase()}: ${esc(avIcope.alterados.join(', ').toLowerCase())}` : ''} · ${plural(plan.objetivos.length, 'objetivo', 'objetivos')} · ${plural(plan.intervenciones.length, 'intervención', 'intervenciones')}</span></span>
           ${icono('adelante', 'chev')}
         </a>` : ''}
       ${hayNota ? `

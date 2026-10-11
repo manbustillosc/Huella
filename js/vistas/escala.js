@@ -156,14 +156,14 @@ function datosAplicacion(e, r, momento) {
     <p class="error-campo" id="e-fechas" role="alert" hidden></p>`;
 }
 
-function bloqueNoEvaluable(r) {
+function bloqueNoEvaluable(e, r) {
   return `
     <details class="no-evaluable"${r._noEvaluable ? ' open' : ''}>
       <summary>${icono('alerta')} No fue posible aplicarla</summary>
       <label class="campo-mini"><span>Motivo</span>
         <select id="ne-motivo">
           <option value="">— Sí fue posible aplicarla —</option>
-          ${MOTIVOS_NO_EVALUABLE.map((m) => `<option${r._noEvaluable === m ? ' selected' : ''}>${esc(m)}</option>`).join('')}
+          ${(e.motivosNoEvaluable || MOTIVOS_NO_EVALUABLE).map((m) => `<option${r._noEvaluable === m ? ' selected' : ''}>${esc(m)}</option>`).join('')}
         </select>
       </label>
       <p>Se registrará como «no evaluable», distinto de «sin responder», y no se interpretará.</p>
@@ -277,6 +277,8 @@ function pieEscala(e, res, r) {
   let num;
   if (r._noEvaluable) { etq = 'Resultado'; num = 'No evaluable'; }
   else if (!e.calcular) { etq = res.completo ? 'Puntaje' : 'Parcial'; num = `${res.puntaje ?? 0}<small>/${e.max}</small>`; }
+  else if (res.completo && res.puntaje == null && res.valor == null && String(res.mostrar || '').length !== 0 && String(res.mostrar).length <= 5) { etq = 'Resultado'; num = esc(res.mostrar); }
+  else if (res.completo && res.puntaje == null && res.valor == null) { etq = 'Resultado'; num = `<span class="parcial-texto">${esc(res.mostrar || res.banda.etiqueta)}</span>`; }
   else if (res.completo) { etq = 'Resultado'; num = `${esc(res.mostrar)}<small> ${esc(res.sufijo)}</small>`; }
   else { etq = 'Avance'; num = `${res.contestadas}<small> de ${res.total}</small>`; }
   return `
@@ -347,7 +349,8 @@ export function renderEscala(params) {
     const visible = campoVisible(c, r);
     if (visible && !c.secundario) n += 1;
     const html = htmlCampo(c, n, r);
-    return visible ? html : html.replace(/^(\s*<(div|fieldset))/, '$1 hidden');
+    const grupo = c.grupo ? `<h2 class="grupo-campos">${esc(c.grupo)}</h2>` : '';
+    return grupo + (visible ? html : html.replace(/^(\s*<(div|fieldset))/, '$1 hidden'));
   }).join('');
   return `
     <section class="vista escala">
@@ -366,7 +369,7 @@ export function renderEscala(params) {
       ${datosAplicacion(e, r, ctx.momento)}
       ${avisoGuardados(ctx, r)}
       ${panelVinculos(e, r)}
-      ${e.permiteNoEvaluable ? bloqueNoEvaluable(r) : ''}
+      ${e.permiteNoEvaluable ? bloqueNoEvaluable(e, r) : ''}
       <form id="form-escala" class="reactivos${r._noEvaluable ? ' inactivo' : ''}" novalidate>${campos}</form>
       <div class="pie-escala" id="pie-escala" style="--avance:${res.total ? (res.contestadas / res.total) * 100 : 0}%">${pieEscala(e, res, r)}</div>
     </section>`;
@@ -754,7 +757,10 @@ export function renderResultado(params) {
         <h1 class="ceja">${esc(e.corto)} · Resultado${m ? ` · ${esc(m.nombre)}` : ''}</h1>
         ${res.noEvaluable
           ? '<p class="puntaje"><span class="puntaje-texto">No evaluable</span></p>'
-          : `<p class="puntaje"><span class="puntaje-num${String(res.mostrar).length > 4 ? ' largo' : ''}">${esc(res.mostrar)}</span><span class="puntaje-de">${esc(res.sufijo)}</span></p>`}
+          : res.puntaje == null && res.valor == null && String(res.mostrar || '').length !== 0 && String(res.mostrar).length > 5
+            ? `<p class="puntaje"><span class="puntaje-texto">${esc(res.mostrar)}</span></p>`
+            : res.puntaje == null && res.valor == null && !res.mostrar ? ''
+            : `<p class="puntaje"><span class="puntaje-num${String(res.mostrar).length > 4 ? ' largo' : ''}">${esc(res.mostrar)}</span><span class="puntaje-de">${esc(res.sufijo)}</span></p>`}
         <p class="chip nivel-${b.nivel}"><span class="punto" aria-hidden="true"></span>${esc(b.etiqueta)}</p>
         ${res.alertas?.length ? `
           <div class="alerta-seguridad" role="alert">

@@ -19,7 +19,7 @@ export function renderAcerca() {
         <h2 id="privacidad">${icono('escudo')} Qué se guarda y dónde</h2>
         <p>Todo se calcula en este navegador. Huella no tiene servidor y no envía datos a ningún lugar.</p>
         <ul>
-          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, respuestas, y la lista de medicamentos con su revisión STOPP/START y Beers): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio: inicia una nueva para no mezclar resultados de episodios distintos.</li>
+          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, respuestas, la lista de medicamentos con su revisión STOPP/START y Beers, y el plan de atención con sus objetivos, intervenciones, preferencias y bitácora): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio: inicia una nueva para no mezclar resultados de episodios distintos.</li>
           <li><strong>Respuestas en edición</strong>: en el almacenamiento de la pestaña; se borran al cerrarla y nunca se mezclan con otra valoración.</li>
           <li><strong>Preferencias</strong> (favoritas, tema, formato de la nota, instrumentos más usados): en el almacenamiento local.</li>
         </ul>
@@ -49,6 +49,7 @@ export function renderAcerca() {
         <p>Una vez instalada funciona sin conexión.</p>
 
         <h2>Fuentes y créditos</h2>
+        <p class="discreto">La valoración ICOPE es una adaptación del Manual de atención integrada para las personas mayores, 2.ª ed. (Organización Panamericana de la Salud, 2025; <a href="https://doi.org/10.37774/9789275330319" target="_blank" rel="noopener">doi:10.37774/9789275330319</a>), licencia CC BY-NC-SA 3.0 IGO; las partes adaptadas se comparten bajo la misma licencia. Esta publicación es una adaptación de una obra original de la Organización Panamericana de la Salud (OPS). Las opiniones expresadas en esta adaptación son responsabilidad exclusiva de los autores y no representan necesariamente los criterios de la OPS. Huella no usa el logotipo de la OPS ni de la OMS, y no reproduce la tabla optométrica.</p>
         <p class="discreto">Versiones en español conforme a la Guía de instrumentos de evaluación de la capacidad funcional del Instituto Nacional de Geriatría (2022) cuando aplica, citando la fuente, con fines asistenciales sin ánimo de lucro. Íconos: Lucide (licencia ISC). Tipografías: Fraunces e Inter Tight (SIL Open Font License 1.1).</p>
       </div>
     </section>`;

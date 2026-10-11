@@ -6,6 +6,7 @@ import { $, esc, icono, plural, sinAcentos, filaEscala, filaHerramienta, tarjeta
 import { HERRAMIENTAS, herramientaDe, herramientasDe } from '../herramientas.js';
 import { progresoRuta, tiempoRuta } from './rutas-estado.js';
 import { diasDesde } from './valoracion.js';
+import { tarjetaInicioIcope } from './icope.js';
 
 function tarjetaRuta(ruta) {
   const p = progresoRuta(ruta);
@@ -54,8 +55,9 @@ export function renderInicio() {
             <span><strong>Valoración en curso</strong><span>${plural(n, 'resultado guardado', 'resultados guardados')} · ${dias > 0 ? `iniciada hace ${plural(dias, 'día', 'días')}` : 'iniciada hoy'} · ver la nota</span>${dias > 7 ? '<span class="en-curso-aviso">Si es otro episodio clínico, inicia una nueva valoración para no mezclar resultados.</span>' : ''}</span>
             ${icono('adelante', 'chev')}
           </a>` : ''}
+        ${tarjetaInicioIcope()}
         <h2 class="seccion">Rutas guiadas</h2>
-        <div class="rejilla-rutas">${RUTAS.map(tarjetaRuta).join('')}</div>
+        <div class="rejilla-rutas">${RUTAS.filter((r) => r.id !== 'icope').map(tarjetaRuta).join('')}</div>
         ${favs.length ? `
           <h2 class="seccion">Favoritas</h2>
           <div class="lista-escalas">${favs.map((id) => filaFav(id)).join('')}</div>` : ''}

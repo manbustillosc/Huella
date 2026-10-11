@@ -6,6 +6,22 @@
 // Un paso sin momento usa el de la ruta; en «hospital» el médico elige ingreso, actual o egreso.
 export const RUTAS = [
   {
+    id: 'icope', nombre: 'Valoración ICOPE', icono: 'icope',
+    descripcion: 'Capacidad intrínseca en seis dominios (OMS/OPS): evaluación básica, evaluación detallada, plan personalizado y seguimiento. Sin puntaje global.',
+    pantalla: '#/icope/panel',
+    pasos: [
+      { id: 'icope-cog', nota: 'Pregunta de filtro y prueba de memoria y orientación.' },
+      { id: 'icope-loc', nota: 'Prueba de la silla: cinco levantadas en 14 segundos.' },
+      { id: 'icope-vit', nota: 'Pérdida de peso y falta de apetito.' },
+      { id: 'icope-vis', nota: 'Preguntas de filtro y agudeza visual con la tabla de la OMS.' },
+      { id: 'icope-aud', nota: 'Pregunta de filtro y una prueba de audición.' },
+      { id: 'icope-psi', nota: 'Dos preguntas sobre síntomas depresivos.' },
+    ],
+    complementarios: [
+      { id: 'icope-fac', nota: 'Apoyo social, persona a cargo del cuidado, incontinencia urinaria y riesgo cardiovascular; no son dominios de la capacidad intrínseca.' },
+    ],
+  },
+  {
     id: 'rapida', nombre: 'Valoración geriátrica rápida', icono: 'rapida',
     descripcion: 'Núcleo breve para consulta: funcionalidad básica, cognición, ánimo y fragilidad. Las complementarias se agregan según los hallazgos.',
     pasos: [

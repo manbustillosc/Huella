@@ -43,6 +43,12 @@ export const DOMINIOS = [
     planeadas: ['MUST', 'EAT-10 (registro)'],
   },
   {
+    id: 'sensorial', nombre: 'Salud sensorial y oral',
+    descripcion: 'Visión, audición y salud bucodental.',
+    problemas: ['visión', 'audición', 'sordera', 'lentes', 'audífonos', 'boca', 'dientes'],
+    planeadas: [],
+  },
+  {
     id: 'piel', nombre: 'Integridad cutánea',
     descripcion: 'Riesgo de lesiones por presión.',
     problemas: ['úlceras', 'escaras', 'lesiones por presión'],

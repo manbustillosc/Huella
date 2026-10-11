@@ -7,6 +7,7 @@ import {
   textoRespectoA, textoCambio, inconsistenciasCronologicas, amplitudDias,
 } from './comparacion.js';
 import { partesNota } from './medicacion.js';
+import { planDe, planConContenido, lineasPlan, nombreAmbito, ambitosConContenido, PRIORIDADES, nombreDe } from './plan.js';
 
 export { fechaCorta };
 export const FORMATOS_NOTA = ['parrafo', 'lista', 'completa'];
@@ -162,6 +163,9 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
       partes.push(med.revision);
       if (med.problemas.length) partes.push(`Posibles problemas de prescripción: ${med.problemas.map((x) => x.split(':')[0]).join(', ')}.`);
     }
+    const plan = planDe(valoracion);
+    const pp = planConContenido(plan) ? parrafoPlan(plan) : '';
+    if (pp) partes.push(pp);
     return partes.join(' ');
   }
 
@@ -231,6 +235,11 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
       l.push('', '5. SUGERENCIAS ORIENTATIVAS (no son resultados)');
       l.push(...todas.map((x) => `- ${x}`));
     }
+    const plan = planDe(valoracion);
+    if (planConContenido(plan)) {
+      l.push('', `${todas.length ? 6 : 5}. PLAN DE ATENCIÓN (decidido por el médico)`);
+      l.push(...lineasPlan(plan));
+    }
     return l.join('\n');
   }
 
@@ -263,5 +272,20 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
     if (med.problemas.length) lineas.push(...med.problemas.map((x) => `- Posible problema: ${x}`));
     if (med.pendientes.length) lineas.push(...med.pendientes.map((x) => `- Pendiente: ${x}`));
   }
+  const plan = planDe(valoracion);
+  if (planConContenido(plan)) lineas.push('', 'PLAN DE ATENCIÓN', ...lineasPlan(plan));
   return lineas.join('\n');
+}
+
+// Plan en una sola frase para la nota en párrafo.
+function parrafoPlan(plan) {
+  const partes = ambitosConContenido(plan).map((a) => {
+    const prio = plan.prioridades[a];
+    const objs = plan.objetivos.filter((x) => x.ambito === a).map((x) => x.texto);
+    const ints = plan.intervenciones.filter((x) => x.ambito === a).map((x) => x.texto.replace(/\.$/, ''));
+    const det = [prio ? `prioridad ${nombreDe(PRIORIDADES, prio).toLowerCase()}` : '', objs.length ? `objetivos: ${objs.join('; ')}` : '', ints.length ? `intervenciones: ${ints.join('; ')}` : ''].filter(Boolean);
+    return det.length ? `${nombreAmbito(a)}: ${det.join('; ')}` : '';
+  }).filter(Boolean);
+  const importa = plan.preferencias.importa ? ` Lo que más le importa: ${plan.preferencias.importa}.` : '';
+  return partes.length ? `Plan de atención: ${partes.join('. ')}.${importa}` : importa.trim();
 }

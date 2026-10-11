@@ -15,6 +15,7 @@
 //   momentos (basal/ingreso/actual/egreso), fuente, barra, notas[], licencia, referencias[]
 //   direccionClinica ('mayor_mejor' | 'menor_mejor' | 'sin_direccion', obligatoria), unidadCambio, decimalesCambio,
 //   textoMejoria, textoEmpeoramiento, comparable(antes, despues), cambioExtra(antes, despues, { dif }), validar({ v, r }),
+//   icope: dominio ICOPE al que pertenece una evaluación básica (paso 1); motivosNoEvaluable[]: motivos propios; campos[].grupo: encabezado
 //   vinculos[] (datos de otras pruebas de la misma valoración que el médico confirma antes de usarlos)
 //   siguientes[{ id, si(res), motivo }] (siguiente paso sugerido según el resultado; nunca se aplica solo)
 //   calcular puede devolver alertas[] (avisos de seguridad destacados que también llegan a la nota)
@@ -55,19 +56,23 @@ import gijon from './gijon.js';
 import ariscat from './ariscat.js';
 import dasi from './dasi.js';
 import pps from './pps.js';
+import {
+  icopeCognicion, icopeLocomotora, icopeVitalidad, icopeVision, icopeAudicion, icopePsicologica, icopeFactores,
+} from './icope.js';
 
 export const ESCALAS = [
   barthel, katz, lawton,
-  minicog, moca, rudas, cdr, fast,
-  gds15, phq9, cornell,
+  icopeCognicion, minicog, moca, rudas, cdr, fast,
+  icopePsicologica, gds15, phq9, cornell,
   cuatroAt, cam, rass, camicu, npiq,
   frail, cfs, fried, sarcf, sppb, vivifrail,
-  tug, velocidad, tinetti,
-  mnasf,
+  icopeLocomotora, tug, velocidad, tinetti,
+  icopeVitalidad, mnasf,
+  icopeVision, icopeAudicion,
   braden,
   painad,
   rcri, ariscat, dasi,
   pps,
-  zarit, gijon,
+  icopeFactores, zarit, gijon,
   ckdepi, cockcroft,
 ];
