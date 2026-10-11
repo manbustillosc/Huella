@@ -33,23 +33,23 @@ test('FRAX: solo registro del resultado oficial, sin algoritmo ni umbrales de tr
   assert.match(e.licencia.texto, /Osteoporosis Research Ltd/);
   assert.match(e.licencia.enlace, /^https:\/\/www\.fraxplus\.org\//);
   assert.ok(!/OMS|WHO|Organización Mundial/.test(e.nombre + e.descripcion + e.licencia.texto), 'no se presenta como herramienta de la OMS');
-  assert.deepEqual(e.campos.map((c) => c.id), ['modelo', 'mayor', 'cadera', 'dmo']);
+  assert.deepEqual(e.campos.map((c) => c.id), ['modelo', 'mayor', 'cadera', 'dmo', 'herramienta']);
   assert.equal(e.bandas.length, 1, 'una sola categoría neutra: no clasifica alto o bajo');
-  const res = calc('frax', { modelo: 'México', mayor: 25, cadera: 9, dmo: 'Sin DMO (solo con el IMC)' });
+  const res = calc('frax', { modelo: 'México', mayor: 25, cadera: 9, dmo: 'Sin DMO (solo con el IMC)', herramienta: 'FRAXplus® (fraxplus.org)' });
   assert.equal(res.banda.nivel, 'neutro');
   assert.ok(!res.banda.hallazgo);
   assert.ok(res.lineas.some((l) => /sin DMO/.test(l)));
   assert.equal(res.mostrar, '25');
-  assert.equal(cifraGuardada(guardado('frax', resp('frax', { modelo: 'México', mayor: 25, cadera: 9, dmo: 'Sin DMO (solo con el IMC)' }))), '25 %');
+  assert.equal(cifraGuardada(guardado('frax', resp('frax', { modelo: 'México', mayor: 25, cadera: 9, dmo: 'Sin DMO (solo con el IMC)', herramienta: 'FRAXplus® (fraxplus.org)' }))), '25 %');
   // Cadera mayor que fractura mayor: error de captura
-  const mal = calc('frax', { modelo: 'México', mayor: 5, cadera: 8, dmo: 'Con DMO del cuello femoral' });
+  const mal = calc('frax', { modelo: 'México', mayor: 5, cadera: 8, dmo: 'Con DMO del cuello femoral', herramienta: 'FRAXplus® (fraxplus.org)' });
   assert.ok(!mal.completo && mal.errores.cadera);
   // Otro país: aviso
-  assert.ok(calc('frax', { modelo: 'Otro país', mayor: 5, cadera: 1, dmo: 'Con DMO del cuello femoral' }).lineas.some((l) => /otro país/.test(l)));
+  assert.ok(calc('frax', { modelo: 'Otro país', mayor: 5, cadera: 1, dmo: 'Con DMO del cuello femoral', herramienta: 'FRAXplus® (fraxplus.org)' }).lineas.some((l) => /otro país/.test(l)));
   // Comparación con y sin DMO
-  const a = guardado('frax', resp('frax', { modelo: 'México', mayor: 10, cadera: 3, dmo: 'Con DMO del cuello femoral' }));
-  const b = guardado('frax', resp('frax', { modelo: 'México', mayor: 12, cadera: 3, dmo: 'Sin DMO (solo con el IMC)' }));
-  assert.match(porId.frax.comparable(a, b).advertencia, /DMO/);
+  const a = guardado('frax', resp('frax', { modelo: 'México', mayor: 10, cadera: 3, dmo: 'Con DMO del cuello femoral', herramienta: 'FRAXplus® (fraxplus.org)' }));
+  const b = guardado('frax', resp('frax', { modelo: 'México', mayor: 12, cadera: 3, dmo: 'Sin DMO (solo con el IMC)', herramienta: 'FRAXplus® (fraxplus.org)' }));
+  assert.match(porId.frax.comparable(a, b).textoNoInterpretable, /^Comparación longitudinal no interpretable: los resultados proceden de condiciones de cálculo diferentes/);
 });
 
 test('DXA: categorías de la OMS con el T-score más bajo; osteoporosis densitométrica distinta de la clínica', () => {
@@ -84,7 +84,7 @@ test('DXA: categorías de la OMS con el T-score más bajo; osteoporosis densitom
   assert.deepEqual(ids, ['frax', 'tug', 'equilibrio4']);
   const a = guardado('dxa', resp('dxa', { sexo: 'Mujer', edad: 70, menopausia: 'Sí', t_columna: -2.6, fractura: 'No' }));
   const b = guardado('dxa', resp('dxa', { sexo: 'Mujer', edad: 72, menopausia: 'Sí', t_columna: -2.4, fractura: 'No' }));
-  assert.match(porId.dxa.comparable(a, b).advertencia, /cambio mínimo significativo/);
+  assert.match(porId.dxa.comparable(a, b).noInterpretable, /cambio mínimo significativo/);
 });
 
 test('silla 30 s: valores del CDC STEADI por edad y sexo; uso de brazos registra 0', () => {

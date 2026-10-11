@@ -1,13 +1,14 @@
 // Seguimiento: episodio (código anónimo, fechas, estado y cierre), evolución de las mediciones repetidas con gráfica,
 // revaloraciones, estado de objetivos e intervenciones, cambios del plan, exportación e importación local.
-import { almacen } from '../almacen.js';
+import { almacen, mensajeFallo } from '../almacen.js';
 import { porId, VERSION } from '../datos.js';
 import { planDe, nombreAmbito } from '../plan.js';
 import { seriesEvolucion, revaloraciones, objetivoVencido } from '../atencion.js';
 import {
   episodioDe, fechasEvaluacion, cerrarEpisodio, reabrirEpisodio, fijarEtiquetaEpisodio, exportarEpisodio, nombreArchivo,
-  validarImportacion, tieneContenido, ESTADOS_EPISODIO, MAX_ETIQUETA_EPISODIO, MAX_EPISODIOS,
+  tieneContenido, ESTADOS_EPISODIO, MAX_ETIQUETA_EPISODIO, MAX_EPISODIOS,
 } from '../episodio.js';
+import { validarImportacion, MAX_BYTES_IMPORTACION } from '../importacion.js';
 import { textoCambio, textoRespectoA, fechaCorta } from '../comparacion.js';
 import { $, $$, esc, icono, plural, hoyISO, aviso, confirmarEnDosToques } from '../ui.js';
 import { filaObjetivo, filaIntervencion, formularioCambio, conectarPlan, conectarQuitar, avisoDatos } from './plan-ui.js';
@@ -83,6 +84,7 @@ function tarjetaSerie(s) {
 function tarjetaEpisodio(v) {
   const ep = episodioDe(v);
   const fechas = fechasEvaluacion(v);
+  const lleno = almacen.episodios().length >= MAX_EPISODIOS && tieneContenido(v);
   return `
     <section class="tarjeta episodio" id="episodio">
       <div class="ep-cab">
@@ -104,9 +106,11 @@ function tarjetaEpisodio(v) {
       <div class="acciones dos">
         ${ep.estado === 'cerrado'
           ? `<button class="btn" type="button" id="reabrir-episodio">${icono('reiniciar')} Reabrir episodio</button>`
-          : `<button class="btn" type="button" id="cerrar-episodio">${icono('archivo')} Cerrar episodio y empezar otro</button>`}
+          : `<button class="btn" type="button" id="cerrar-episodio"${lleno ? ' disabled aria-describedby="aviso-limite"' : ''}>${icono('archivo')} Cerrar episodio y empezar otro</button>`}
         <a class="btn btn-primario" href="#/informe/seguimiento">${icono('documento')} Informe de seguimiento</a>
       </div>
+      ${lleno ? `<p class="aviso-episodio" id="aviso-limite">${icono('alerta')} ${esc(mensajeFallo('limite'))}</p>` : ''}
+      <p class="aviso-episodio" id="aviso-guardado" role="alert" hidden></p>
       ${ep.estado === 'cerrado' ? '<p class="aviso-episodio">Este episodio está cerrado. Puedes consultarlo y generar informes; si agregas resultados, reábrelo primero.</p>' : ''}
     </section>`;
 }
@@ -205,6 +209,11 @@ export function montarSeguimiento(rerender, alCambiar) {
     alCambiar();
     if (enfocar) panel.querySelector(enfocar)?.focus({ preventScroll: true });
   };
+  const avisoFallo = (motivo) => {
+    const caja = $('#aviso-guardado', panel);
+    if (caja) { caja.hidden = false; caja.textContent = mensajeFallo(motivo); caja.scrollIntoView({ block: 'center' }); }
+    aviso(mensajeFallo(motivo));
+  };
   const exportar = (v) => {
     descargar(nombreArchivo(v, hoy), JSON.stringify(exportarEpisodio(v, VERSION), null, 2));
     aviso('Episodio exportado');
@@ -215,10 +224,10 @@ export function montarSeguimiento(rerender, alCambiar) {
     if (cerrar) confirmarEnDosToques(cerrar, {
       texto: `${icono('alerta')} Toca otra vez para cerrar y archivar el episodio`,
       accion: () => {
-        const v = almacen.valoracion();
-        cerrarEpisodio(v, hoy);
-        almacen.guardarValoracion(v);
-        almacen.archivarYNueva();
+        // Se archiva una copia cerrada; la valoración en curso solo cambia si el archivo quedó guardado.
+        const cerrada = cerrarEpisodio(JSON.parse(JSON.stringify(almacen.valoracion())), hoy);
+        const r = almacen.archivarYNueva(cerrada);
+        if (!r.ok) { avisoFallo(r.motivo); return; }
         alCambiar();
         rerender();
         aviso('Episodio cerrado y archivado; empieza uno nuevo');
@@ -245,25 +254,36 @@ export function montarSeguimiento(rerender, alCambiar) {
     }));
     $$('[data-abrir-ep]', panel).forEach((b) => confirmarEnDosToques(b, {
       texto: `${icono('alerta')} Confirmar`,
-      accion: () => { if (almacen.abrirEpisodio(b.dataset.abrirEp)) { alCambiar(); rerender(); aviso('Episodio abierto'); } },
+      accion: () => {
+        const r = almacen.abrirEpisodio(b.dataset.abrirEp);
+        if (!r.ok) { avisoFallo(r.motivo); return; }
+        alCambiar(); rerender(); aviso('Episodio abierto');
+      },
     }));
     $$('[data-borrar-ep]', panel).forEach((b) => confirmarEnDosToques(b, {
       texto: `${icono('alerta')} Borrar`,
-      accion: () => { almacen.borrarEpisodio(b.dataset.borrarEp); redibujar(); aviso('Episodio borrado de este navegador'); },
+      accion: () => {
+        const r = almacen.borrarEpisodio(b.dataset.borrarEp);
+        if (!r.ok) { avisoFallo(r.motivo); return; }
+        redibujar(); aviso('Episodio borrado de este navegador');
+      },
     }));
     $('#importar', panel)?.addEventListener('change', (ev) => {
       const archivo = ev.target.files?.[0];
       const caja = $('#vista-importacion', panel);
       importable = null;
       if (!archivo) return;
-      if (archivo.size > 2 * 1024 * 1024) { caja.hidden = false; caja.innerHTML = '<p class="error-campo">El archivo es demasiado grande para un episodio de Huella.</p>'; return; }
+      if (archivo.size > MAX_BYTES_IMPORTACION) { caja.hidden = false; caja.innerHTML = '<p class="error-campo">El archivo es demasiado grande para un episodio de Huella.</p>'; return; }
       const lector = new FileReader();
       lector.onload = () => {
         let datos = null;
         try { datos = JSON.parse(String(lector.result)); } catch { datos = null; }
         const r = validarImportacion(datos, porId);
         caja.hidden = false;
-        if (!r.ok) { caja.innerHTML = `<p class="error-campo" role="alert">${r.errores.map(esc).join(' ')}</p>`; return; }
+        if (!r.ok) {
+          caja.innerHTML = `<div class="importacion error" role="alert"><p><strong>No se importó nada.</strong> El archivo no pasó la validación${r.totalErrores > r.errores.length ? ` (${r.totalErrores} problemas; se muestran los primeros ${r.errores.length})` : ''}:</p><ul>${r.errores.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
+          return;
+        }
         importable = r.valoracion;
         const existentes = [almacen.valoracion(), ...almacen.episodios()].map((e) => episodioDe(e).codigo);
         if (existentes.includes(r.resumen.codigo)) r.avisos.push(`Ya hay un episodio con el código ${r.resumen.codigo} en este navegador: se agregará como otra copia.`);
@@ -278,8 +298,8 @@ export function montarSeguimiento(rerender, alCambiar) {
           texto: `${icono('alerta')} Toca otra vez para importar`,
           accion: () => {
             if (!importable) return;
-            const ok = almacen.importarEpisodio(importable);
-            if (!ok) { aviso(`Ya hay ${MAX_EPISODIOS} episodios: borra alguno antes de importar`); return; }
+            const r2 = almacen.importarEpisodio(importable);
+            if (!r2.ok) { avisoFallo(r2.motivo); return; }
             redibujar();
             aviso('Episodio importado a episodios cerrados');
           },

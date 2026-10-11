@@ -17,7 +17,7 @@ const CONDICIONES = [
   cond('icc', 'Insuficiencia cardiaca', 1, 'Sintomática y con respuesta a su tratamiento.'),
   cond('vascular', 'Enfermedad vascular periférica', 1, 'Claudicación, derivación arterial por insuficiencia, gangrena, insuficiencia arterial aguda o aneurisma no tratado de 6 cm o más.'),
   cond('cerebro', 'Enfermedad cerebrovascular', 1, 'Evento vascular cerebral con secuelas leves o sin ellas, o isquemia cerebral transitoria. La hemiplejía se registra aparte.'),
-  cond('demencia', 'Demencia', 1, 'Deterioro cognitivo crónico.'),
+  cond('demencia', 'Demencia', 1, 'Demencia clínicamente establecida (diagnóstico de síndrome demencial). No cuentan la queja subjetiva de memoria, el trastorno neurocognitivo leve, un tamizaje cognitivo alterado aislado ni el delirium.'),
   cond('pulmonar', 'Enfermedad pulmonar crónica', 1, 'Disnea sintomática por una enfermedad respiratoria crónica, incluida el asma.'),
   cond('conectivo', 'Enfermedad del tejido conectivo', 1, 'Lupus, polimiositis, enfermedad mixta del tejido conectivo, polimialgia reumática o artritis reumatoide moderada o grave.'),
   cond('ulcera', 'Enfermedad ulcerosa péptica', 1, 'Úlcera péptica que ha requerido tratamiento, incluida la que sangró.'),
@@ -67,9 +67,9 @@ export const charlson = {
     'La edad se usa solo para el índice combinado edad-comorbilidad, que se informa aparte.',
   ],
   tiempo: '3 min',
-  direccionClinica: 'menor_mejor',
-  textoMejoria: 'menor puntaje',
-  textoEmpeoramiento: 'mayor carga de comorbilidad',
+  // Fase 3.1: sin dirección automática. Un índice menor suele reflejar condiciones retiradas o reclasificadas del
+  // registro, no una mejoría clínica; uno mayor, condiciones añadidas. Se informan las condiciones que cambiaron.
+  direccionClinica: 'sin_direccion',
   barra: false,
   min: 0,
   max: 33,
@@ -93,17 +93,31 @@ export const charlson = {
     return {
       puntaje, max: 33, lineas, lineasNota: lineas,
       banda: { ...charlson.bandas.find((b) => puntaje >= b.min && puntaje <= b.max), sugerencias: puntaje >= 3 ? ['Integrar la carga de comorbilidad en las metas de atención, la revisión de la medicación y la planificación del seguimiento.'] : [] },
-      extras: { original: puntaje, combinado, edadPts, presentes: presentes.length },
+      extras: { original: puntaje, combinado, edadPts, presentes: presentes.length, condiciones: presentes },
     };
   },
   resumen: (res) => `Charlson: ${res.puntaje} (${minus(res.banda.etiqueta)}); índice combinado con la edad ${res.extras.combinado}.`,
   resumenBreve: (res) => `Charlson ${res.puntaje} (con edad ${res.extras.combinado})`,
   comparable: (a, b) => (a.extras?.edadPts != null && b.extras?.edadPts != null && a.extras.edadPts !== b.extras.edadPts ? { advertencia: `El índice combinado cambió también por la edad (de ${a.extras.combinado} a ${b.extras.combinado}); la comparación usa el índice original, que refleja solo la comorbilidad.` } : null),
+  cambioExtra(a, b) {
+    const ca = a.extras?.condiciones;
+    const cb = b.extras?.condiciones;
+    const avisos = [];
+    if (ca && cb) {
+      const nuevas = cb.filter((x) => !ca.includes(x));
+      const retiradas = ca.filter((x) => !cb.includes(x));
+      if (nuevas.length) avisos.push(`Condiciones registradas en la aplicación más reciente que no estaban antes: ${nuevas.join('; ')}.`);
+      if (retiradas.length) avisos.push(`Condiciones que ya no se registraron: ${retiradas.join('; ')}.`);
+    }
+    if (b.puntaje < a.puntaje) avisos.push('Un índice menor refleja condiciones retiradas o reclasificadas (p. ej., un tumor fuera de la ventana de 5 años o una corrección del registro); no equivale a mejoría clínica.');
+    return avisos;
+  },
   notas: [
     'Pesos de Charlson et al. (1987): 1 punto (infarto, insuficiencia cardiaca, vascular periférica, cerebrovascular, demencia, pulmonar crónica, tejido conectivo, úlcera, hepática leve, diabetes sin daño a órgano blanco); 2 (hemiplejía, renal moderada o grave, diabetes con daño a órgano blanco, tumor sin metástasis, leucemia, linfoma); 3 (hepática moderada o grave); 6 (tumor metastásico, sida).',
     'Índice combinado (Charlson et al., 1994): un punto por cada década después de los 40 años (50 a 59 años: 1; 60 a 69: 2; 70 a 79: 3; 80 a 89: 4; 90 a 99: 5). Algunas calculadoras limitan la edad a 4 puntos desde los 80 años.',
     'Huella no muestra porcentajes de mortalidad: las cifras originales provienen de cohortes y horizontes concretos (p. ej., mortalidad a 1 año en 559 pacientes de medicina interna) y no se trasladan a otra población.',
     'Las adaptaciones con códigos de diagnóstico (Deyo, Quan) o pesos actualizados son instrumentos distintos.',
+    'Las definiciones resumen las del artículo original (1987). En demencia, el original dice «déficit cognitivo crónico»; Huella exige una demencia clínicamente establecida para no contar el trastorno neurocognitivo leve, un tamizaje alterado ni el delirium. Limitaciones: cohorte pequeña de pacientes de medicina interna de un solo centro, condiciones definidas en los años ochenta (p. ej., sida) y sin graduar la gravedad dentro de cada condición.',
   ],
   referencias: [
     { texto: 'Charlson ME, Pompei P, Ales KL, MacKenzie CR. A new method of classifying prognostic comorbidity in longitudinal studies: development and validation. J Chronic Dis. 1987;40(5):373-83.', doi: '10.1016/0021-9681(87)90171-8' },
@@ -246,7 +260,7 @@ export const news2 = {
   poblacion: 'Adultos de 16 años o más en el hospital o en la atención prehospitalaria; no validado en el embarazo.',
   aplicacion: [
     'Registra los signos vitales medidos en el mismo momento.',
-    'Usa la escala 2 de SpO₂ solo si el médico confirmó insuficiencia respiratoria hipercápnica e indicó una meta de 88 a 92%; en los demás casos, la escala 1.',
+    'Usa la escala 2 de SpO₂ solo si hay insuficiencia respiratoria hipercápnica confirmada por gasometría (en este ingreso o en uno previo) y un clínico competente prescribió una meta de 88 a 92% y lo dejó registrado; en los demás casos, y si hay duda, la escala 1.',
     'Conciencia (ACVPU): una confusión nueva o que empeora cuenta como C, aunque la persona esté despierta.',
   ],
   tiempo: '2 min',
@@ -263,7 +277,7 @@ export const news2 = {
       id: 'escala_spo2', texto: 'Escala de SpO₂', textoCorto: 'escala de SpO₂', puntua: false,
       opciones: [
         { texto: 'Escala 1', valor: 1, detalle: 'La habitual.' },
-        { texto: 'Escala 2', valor: 2, detalle: 'Solo con insuficiencia respiratoria hipercápnica confirmada y meta de 88 a 92% indicada por el médico.' },
+        { texto: 'Escala 2', valor: 2, detalle: 'Solo con insuficiencia respiratoria hipercápnica confirmada por gasometría y meta de 88 a 92% prescrita y registrada. Si hay duda, usa la escala 1.' },
       ],
     },
     { id: 'spo2', tipo: 'numero', texto: 'Saturación de oxígeno (SpO₂)', unidad: '%', min: 50, max: 100, entero: true },
@@ -296,7 +310,7 @@ export const news2 = {
       `Puntos: FR ${v.fr} (${p.fr}); SpO₂ ${v.spo2}% en escala ${escala2 ? 2 : 1} (${p.spo2}); ${v.oxigeno.valor === 1 ? 'oxígeno' : 'aire ambiente'} (${p.oxigeno}); PAS ${v.pas} (${p.pas}); pulso ${v.fc} (${p.fc}); ${minus(v.conciencia.texto)} (${p.conciencia}); temperatura ${v.temp} °C (${p.temp}).`,
     ];
     if (con3.length) lineas.push(`Parámetros con 3 puntos: ${con3.join(', ')}.`);
-    if (escala2) lineas.push('Escala 2 de SpO₂: confirma que la meta de 88 a 92% está indicada por el médico.');
+    if (escala2) lineas.push('Escala 2 de SpO₂: confirma que la hipercapnia está documentada por gasometría y que la meta de 88 a 92% está prescrita; si deja de estar indicada, vuelve a la escala 1.');
     lineas.push(`${resp} La respuesta y el escalamiento siguen el protocolo de tu institución.`);
     return {
       puntaje: total, max: 20, banda: { ...banda, sugerencias: banda.hallazgo ? ['Valorar al paciente y aplicar el protocolo institucional de escalamiento; el puntaje no sustituye el juicio clínico.'] : [] },

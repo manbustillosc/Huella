@@ -165,6 +165,20 @@ export const AMBITOS_ICOPE = [...DOMINIOS_ICOPE.map((d) => ambitoIcope(d.id)), a
 
 export const icopeDe = (v) => ({ detalle: {}, ...(v?.icope || {}) });
 
+// El médico confirma que una evaluación detallada anterior sigue vigente para el tamizaje alterado actual.
+export function confirmarReutilizacion(icope, dom, { tipo, id, cribado }, hoy) {
+  icope.reutilizacion = { ...(icope.reutilizacion || {}), [dom]: { tipo, id, cribado, fecha: hoy } };
+  return icope;
+}
+export function retirarReutilizacion(icope, dom) {
+  if (icope.reutilizacion) {
+    const r = { ...icope.reutilizacion };
+    delete r[dom];
+    icope.reutilizacion = r;
+  }
+  return icope;
+}
+
 const mas = (iso, meses) => {
   const d = new Date(`${iso}T12:00:00`);
   d.setMonth(d.getMonth() + meses);
@@ -209,13 +223,33 @@ export function estadoDominio(dom, v, hoy) {
   const externas = (icopeDe(v).detalle[dom.id] || []).slice().sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
   const problema = problemaDe(plan, ambito);
 
+  // Vigencia de la evaluación detallada respecto al tamizaje actual: solo cuenta sola si es de la misma fecha o
+  // posterior al tamizaje alterado vigente. Una evaluación anterior (p. ej., normal hace meses) requiere que el
+  // médico confirme que sigue siendo válida; la confirmación vale solo para ese tamizaje.
+  const fechaTam = vig?.fecha || '';
+  const abierto = v.episodio?.abierto || '';
+  const candidatos = [
+    ...detallada.filter((x) => x.r && (det.elegir.includes(x.id) || (det.alternativas || []).includes(x.id)))
+      .map((x) => ({ tipo: 'resultado', id: x.r.id, fecha: x.r.fecha || '', texto: textoInstrumento(x.r), noEvaluable: Boolean(x.r.noEvaluable) })),
+    ...externas.map((x) => ({ tipo: 'externa', id: x.id, fecha: x.fecha || '', texto: `${x.prueba} (${fechaCorta(x.fecha)})` })),
+  ];
+  const validos = candidatos.filter((c) => !c.noEvaluable);
+  const recientes = validos.filter((c) => c.fecha && fechaTam && c.fecha >= fechaTam && (!abierto || c.fecha >= abierto));
+  const previas = validos.filter((c) => !recientes.includes(c));
+  const conf = icopeDe(v).reutilizacion?.[dom.id];
+  const confirmada = conf && vig && conf.cribado === vig.id ? previas.find((c) => c.tipo === conf.tipo && c.id === conf.id) || null : null;
+  const noRealizables = candidatos.filter((c) => c.noEvaluable && c.fecha >= fechaTam);
+  const vigencia = recientes.length ? 'vigente' : confirmada ? 'confirmada' : previas.length ? 'por_confirmar' : noRealizables.length ? 'no_realizable' : 'pendiente';
+
   let necesidad;
   if (estado === 'pendiente') necesidad = { tipo: 'basica', texto: 'Falta la evaluación básica.' };
   else if (estado === 'no_evaluable') necesidad = { tipo: 'detallada', texto: 'Evaluación básica no evaluable: considera la evaluación detallada directamente o repetirla cuando sea posible.' };
   else if (estado === 'alterado') {
-    necesidad = hechas.length || externas.length
-      ? { tipo: 'hecha', texto: `Evaluación detallada registrada: ${[...hechas.map((x) => textoInstrumento(x.r)), ...externas.slice(0, 1).map((x) => `${x.prueba} (${fechaCorta(x.fecha)})`)].join('; ')}.` }
-      : { tipo: 'detallada', texto: `Pendiente: evaluación detallada (paso 2)${det.externo ? `: ${det.externo.toLowerCase()}` : ''}.` };
+    if (vigencia === 'vigente') necesidad = { tipo: 'hecha', texto: `Evaluación detallada vigente, posterior al tamizaje del ${fechaCorta(fechaTam)}: ${recientes.map((c) => c.texto).join('; ')}.` };
+    else if (vigencia === 'confirmada') necesidad = { tipo: 'hecha', reutilizada: true, texto: `Evaluación previa confirmada por el médico como vigente${conf.fecha ? ` el ${fechaCorta(conf.fecha)}` : ''}: ${confirmada.texto}.` };
+    else if (vigencia === 'por_confirmar') necesidad = { tipo: 'confirmar', candidatos: previas, texto: `Evaluación previa que requiere confirmación: ${previas.map((c) => c.texto).join('; ')} es anterior al tamizaje alterado del ${fechaCorta(fechaTam)}. Confírmala si sigue siendo válida o aplica una evaluación detallada nueva.` };
+    else if (vigencia === 'no_realizable') necesidad = { tipo: 'no_realizable', texto: `Evaluación detallada no realizable: ${noRealizables.map((c) => c.texto).join('; ')}. Considera otra herramienta, repetirla cuando sea posible o la referencia.` };
+    else necesidad = { tipo: 'detallada', texto: `Pendiente: evaluación detallada (paso 2)${det.externo ? `: ${det.externo.toLowerCase()}` : ''}.` };
   } else {
     const desde = mas(vig.fecha, dom.meses);
     necesidad = { tipo: 'ninguna', texto: `No requiere evaluación detallada. Repetir la evaluación básica ${dom.mesesMax ? 'cada 1 a 2 años' : 'al menos cada año'} (a partir del ${fechaCorta(desde)}) o antes si hay un evento agudo.`, proxima: desde };
@@ -243,7 +277,7 @@ export function estadoDominio(dom, v, hoy) {
     porFiltro: Boolean(vig?.extras?.filtro),
     hallazgo: vig ? hallazgoDe(vig) : '',
     instrumento: vig ? (vig.noEvaluable ? `${porId[dom.escala].corto}: no evaluable` : `${porId[dom.escala].corto}${vig.extras?.filtro ? ' (pregunta de filtro)' : ''}`) : '',
-    detallada, hechas, externas, necesidad, evolucion, problema,
+    detallada, hechas, externas, necesidad, vigencia, evolucion, problema,
     prioridad: plan.prioridades[ambito] || null,
     objetivos: plan.objetivos.filter((o) => o.ambito === ambito),
     intervenciones: plan.intervenciones.filter((i) => i.ambito === ambito),
@@ -274,7 +308,7 @@ export function avanceBasica(estados) {
 function lineaDominio(x) {
   if (x.estado === 'pendiente') return `- ${x.dom.nombre}: pendiente de evaluación básica.`;
   const partes = [`${ESTADOS_ICOPE[x.estado].nombre.toLowerCase()} (${fechaCorta(x.fecha)}): ${x.hallazgo}`];
-  if (x.estado === 'alterado') partes.push(x.necesidad.tipo === 'hecha' ? x.necesidad.texto.replace(/\.$/, '') : 'evaluación detallada pendiente');
+  if (x.estado === 'alterado') partes.push(x.necesidad.tipo === 'pendiente' || x.necesidad.tipo === 'detallada' ? 'evaluación detallada pendiente' : minusculaInicial(x.necesidad.texto.replace(/\.$/, '')));
   if (x.problema) partes.push(`valoración del médico: ${nombreDe(ESTADOS_PROBLEMA, x.problema.estado).toLowerCase()}${x.problema.nota ? ` (${x.problema.nota})` : ''}`);
   return `- ${x.dom.nombre}: ${partes.join('; ')}.`;
 }
@@ -299,7 +333,7 @@ export function textoIcope(v, hoy) {
     if (f.tabaco) l.push('- Consumo de tabaco en los últimos 12 meses.');
   }
   for (const x of f.relacionados.filter((y) => y.r)) l.push(`- ${x.tema}: ${porId[x.id].corto} ${valorGuardado(x.r)} (${fechaCorta(x.r.fecha)}).`);
-  const pendientes = estados.filter((x) => x.necesidad.tipo === 'detallada').map((x) => x.dom.nombre.toLowerCase());
+  const pendientes = estados.filter((x) => ['detallada', 'confirmar', 'no_realizable'].includes(x.necesidad.tipo)).map((x) => x.dom.nombre.toLowerCase());
   if (pendientes.length) l.push('', `Evaluación detallada pendiente: ${pendientes.join(', ')}.`);
   const evo = estados.flatMap((x) => x.evolucion.map((e) => `- ${x.dom.nombre}. ${e}`));
   if (evo.length) l.push('', 'Evolución:', ...evo);

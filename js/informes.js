@@ -43,7 +43,7 @@ export const pieInforme = (version) => `Documento de apoyo elaborado con Huella 
 
 function evolucionBreve(v, porId, dominios, hoy) {
   const l = [];
-  const { hallazgos, cambios, alertas } = hallazgosYSugerencias(v, porId, hoy);
+  const { cambios, alertas } = hallazgosYSugerencias(v, porId, hoy);
   const ids = [...new Set(v.resultados.map((r) => r.escalaId))].filter((id) => porId[id]);
   const vigentes = dominios.flatMap((d) => ids.filter((id) => porId[id].dominio === d.id)).map((id) => {
     const vig = vigenteDe(v.resultados.filter((r) => r.escalaId === id));
@@ -53,9 +53,23 @@ function evolucionBreve(v, porId, dominios, hoy) {
   l.push('', 'RESULTADOS VIGENTES');
   l.push(...(vigentes.length ? vigentes.map((x) => `- ${x}.`) : ['- Sin instrumentos aplicados.']));
   if (cambios.length) l.push('', 'CAMBIOS', ...cambios.filter((c) => !c.startsWith('  ')).map((c) => `- ${c}`));
-  if (alertas.length || hallazgos.length) l.push('', 'HALLAZGOS', ...alertas.map((a) => `- ALERTA: ${a}`), ...hallazgos.map((h) => `- ${h}`));
+  // Fase 3.1: los hallazgos se nombran sin repetir los valores que ya están en «Resultados vigentes» ni los cambios.
+  const requieren = [];
+  for (const id of dominios.flatMap((d) => ids.filter((x) => porId[x].dominio === d.id))) {
+    const lista = v.resultados.filter((r) => r.escalaId === id);
+    const vig = vigenteDe(lista);
+    if (vig.noEvaluable) continue;
+    const cmp = lista.length > 1 ? compararResultados(lista, porId[id]) : null;
+    const empeora = cmp?.ultima?.vsRef.tipo === 'empeoramiento';
+    if (vig.hallazgo || empeora) requieren.push(`${porId[id].corto}${empeora ? ' (empeoramiento respecto a la referencia)' : ''}`);
+  }
   const med = partesNota(v.medicacion);
-  if (med?.problemas.length) l.push(`- Posibles problemas de prescripción: ${med.problemas.map((x) => x.split(':')[0]).join(', ')}.`);
+  const hall = [
+    ...alertas.map((a) => `- ALERTA: ${a}`),
+    ...(requieren.length ? [`- Requieren atención: ${requieren.join('; ')}.`] : []),
+    ...(med?.problemas.length ? [`- Posibles problemas de prescripción: ${med.problemas.map((x) => x.split(':')[0]).join(', ')}.`] : []),
+  ];
+  if (hall.length) l.push('', 'HALLAZGOS', ...hall);
   const plan = planDe(v);
   const probs = problemasPlan(v, porId, hoy).filter((p) => p.asignado || p.prioridad || p.objetivos.length || p.intervenciones.length);
   if (probs.length) {

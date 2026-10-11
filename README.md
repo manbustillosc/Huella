@@ -27,12 +27,16 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `js/vistas/catalogo.js` | Catálogo de futuras herramientas (sin implementar). |
 | `js/herramientas.js` | Herramientas con pantalla propia (revisión de medicamentos) para dominios, búsqueda, favoritas y rutas. |
 | `js/nota.js` | Nota de la valoración: párrafo, lista y completa (resultados, interpretación, cambios, hallazgos, sugerencias). |
-| `js/almacen.js` | Guardado local: valoración, aplicaciones repetidas, respuestas en curso y preferencias. |
+| `js/almacen.js` | Guardado local con escrituras comprobadas y tres estados (guardado, solo esta sesión, no guardado); valoración, episodios archivados sin descartes automáticos, respuestas en curso y preferencias. |
+| `js/importacion.js` | Validación estricta de archivos importados: todo o nada, máximo 500 resultados y 2 MB. |
+| `js/pendientes.js`, `js/vistas/pendientes.js` | Centro de pendientes, vigencia de los resultados e inicio rápido. |
 | `js/app.js`, `js/vistas/` | Pantallas y navegación. |
 | `css/app.css` | Diseño con los colores y tipografías de la marca. |
 | `sw.js` | Copia sin conexión. |
 | `LICENCIAS.md` | Licencia, permisos y atribución de cada instrumento y material de terceros; pendientes y borradores de solicitud. |
-| `tests/` | Pruebas de escalas, comparaciones, nota, almacenamiento y rutas (`node --test tests/*.test.mjs`). `referencia-renal.json` contiene valores de una implementación independiente de CKD-EPI 2021 y Cockcroft-Gault. |
+| `tests/` | Pruebas de escalas, comparaciones, nota, almacenamiento, importación, rutas, referencias entre módulos y archivos de la PWA (`node --test tests/*.test.mjs`). `referencia-renal.json` contiene valores de una implementación independiente de CKD-EPI 2021 y Cockcroft-Gault. |
+| `.github/workflows/publicar.yml` | Ejecuta las pruebas y publica en `main` (GitHub Pages) solo si pasan. |
+| `AUDITORIA.md` | Revisión transversal del catálogo de la fase 3.1. |
 
 ## Texto para el expediente
 
@@ -108,6 +112,22 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **Plan de atención** (`#/plan`): la lista de problemas reúne los hallazgos de tamizaje de los instrumentos (estado derivado), los dominios ICOPE alterados y los problemas que agrega el médico. Estados: hallazgo de tamizaje, sospecha clínica, diagnóstico confirmado por el médico, descartado y pendiente de evaluación. Prioridad alta, intermedia o seguimiento, nunca automática. Objetivos con basal, meta, plazo, responsable, indicador y estado; intervenciones por categoría a partir de sugerencias que solo se agregan al tocarlas; revaloración por problema; lo que importa a la persona (no es un documento de voluntad anticipada).
 - **Seguimiento** (`#/seguimiento`): episodio con código aleatorio, fecha de apertura, fechas de evaluación, etiqueta opcional, cierre y reapertura. Gráficas cuando un instrumento tiene dos o más mediciones en el episodio; el cambio cuantitativo se distingue del clínicamente significativo, que solo se califica con los umbrales publicados que declara el instrumento. Estado de objetivos e intervenciones, revaloraciones vencidas y bitácora. Exportación e importación local en JSON con avisos de privacidad; la importación se agrega a los episodios cerrados y nunca reemplaza el episodio en curso.
 - **Informes** (`#/informe`): evolución breve, nota geriátrica completa, resumen por dominio, informe ICOPE, plan de atención e informe de seguimiento. Vista previa, copiar, imprimir o guardar en PDF desde el diálogo de impresión. Sin firma ni certificación automática.
+
+## Estabilidad y seguridad clínica (fase 3.1)
+
+- **Guardado comprobado.** Cada escritura se lee de nuevo. La barra lateral muestra «Guardado en este navegador», «Solo disponible durante esta sesión» (sin almacenamiento local) o «No guardado» (la escritura falló); en los dos últimos casos aparece también en la barra superior y en el resultado, con el motivo.
+- **Sin pérdidas silenciosas.** Con 30 episodios archivados, Huella no cierra ni importa otro hasta que exportes y borres alguno. Cerrar, abrir, archivar, importar y borrar solo cambian algo si la escritura se comprueba; abrir un episodio sigue un orden que nunca deja un episodio sin copia.
+- **Importación estricta.** Todo o nada: estructura, tipos, fechas reales, intervalos de puntaje, unidad, recálculo desde las respuestas, instrumentos conocidos, identificadores únicos, plan, medicación e ICOPE anidados, campos no reconocidos y datos de identificación. Más de 500 resultados o más de 2 MB: rechazo completo con el límite explícito.
+- **Comparaciones que no se interpretan.** DXA: T-score frente a Z-score, sitios distintos o diferencias aisladas del T-score; el seguimiento usa la DMO del mismo sitio y equipo con el cambio mínimo significativo del centro. FRAX: modelo, herramienta o uso de DMO distintos. TFG y Charlson: sin dirección automática. CDR y FAST: una disminución del estadio se advierte.
+- **ICOPE.** Una evaluación detallada solo cuenta si es de la fecha del tamizaje alterado o posterior, y del episodio; una anterior requiere que el médico confirme que sigue vigente (la confirmación vale solo para ese tamizaje). Estados: vigente, previa confirmada, previa por confirmar, no realizable y pendiente. No hay un plazo de validez uniforme.
+- **Pendientes** (`#/pendientes`): instrumentos sin terminar en esta sesión, no evaluables, evaluaciones pendientes (ICOPE y rutas), objetivos abiertos, revaloraciones vencidas y resultados por revisar su vigencia. Solo enlaza; no cambia nada.
+- **Vigencia de los resultados.** Reciente (la aplicación más reciente, del episodio y de los últimos 90 días), aplicación anterior, requiere confirmación (anterior a la apertura del episodio) y posiblemente desactualizado (más de 90 días, periodo de referencia de Huella y no criterio de validez del instrumento, o un estado momentáneo —RASS, CAM-ICU, CAM, 4AT, NEWS2— de otro día).
+- **Inicio rápido**: resultados recientes e instrumentos más usados.
+
+## Pruebas y publicación
+
+- `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.
+- GitHub Pages publica la rama `main`. Los cambios se suben a la rama `desarrollo`; la acción *Pruebas y publicación* ejecuta las pruebas, comprueba que la versión de la caché cambió si cambió la app y, solo si todo pasa, avanza `main` (avance rápido). Si algo falla, el sitio publicado no cambia. Los cambios en `.github/workflows` se publican a mano, porque el token de la acción no puede modificar flujos de trabajo.
 
 ## Agregar una escala
 

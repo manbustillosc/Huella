@@ -152,20 +152,20 @@ export const degluObs = {
 /* ---------- IDDSI: registro de la textura indicada ---------- */
 
 const BEBIDAS = [
-  { texto: 'Nivel 0 · Fino', valor: 0 },
-  { texto: 'Nivel 1 · Ligeramente espeso', valor: 1 },
-  { texto: 'Nivel 2 · Poco espeso', valor: 2 },
-  { texto: 'Nivel 3 · Moderadamente espeso', valor: 3 },
-  { texto: 'Nivel 4 · Extremadamente espeso', valor: 4 },
+  { texto: 'Nivel 0 · Fina', valor: 0 },
+  { texto: 'Nivel 1 · Ligeramente espesa', valor: 1 },
+  { texto: 'Nivel 2 · Poco espesa', valor: 2 },
+  { texto: 'Nivel 3 · Moderadamente espesa', valor: 3 },
+  { texto: 'Nivel 4 · Extremadamente espesa', valor: 4 },
   { texto: 'Sin indicación de bebidas', valor: -1, especial: true },
 ];
 const ALIMENTOS = [
-  { texto: 'Nivel 3 · Licuado', valor: 3 },
+  { texto: 'Nivel 3 · Licuada', valor: 3 },
   { texto: 'Nivel 4 · Puré', valor: 4 },
-  { texto: 'Nivel 5 · Picado y húmedo', valor: 5 },
+  { texto: 'Nivel 5 · Picada y húmeda', valor: 5 },
   { texto: 'Nivel 6 · Suave y tamaño bocado', valor: 6 },
   { texto: 'Nivel 7 · Fácil de masticar', valor: 7 },
-  { texto: 'Nivel 7 · Normal (regular)', valor: 7 },
+  { texto: 'Nivel 7 · Regular', valor: 7 },
   { texto: 'Sin indicación de alimentos (p. ej., nada por boca)', valor: -1, especial: true },
 ];
 
@@ -210,7 +210,7 @@ export const iddsi = {
   resumenBreve: () => 'IDDSI: textura indicada registrada',
   notas: [
     'Huella registra la indicación; no la propone ni la deduce de un tamizaje.',
-    'Niveles IDDSI: bebidas 0 a 4 y alimentos 3 a 7, más alimentos de transición. Los alimentos de transición no se incluyen aquí.',
+    'Niveles IDDSI: bebidas 0 a 4 y alimentos 3 a 7, más alimentos de transición. Los alimentos de transición no se incluyen aquí. Nombres de los niveles según la tarjeta de referencia IDDSI en español armonizado (2025).',
   ],
   licencia: { texto: 'El marco y los descriptores de la IDDSI están autorizados bajo la licencia Creative Commons Attribution-ShareAlike 4.0 International. © The International Dysphagia Diet Standardisation Initiative.', enlace: 'https://iddsi.org/framework' },
   referencias: [

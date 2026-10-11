@@ -60,6 +60,15 @@ export default {
   direccionClinica: 'sin_direccion',
   unidadCambio: 'mL/min',
   decimalesCambio: 0,
+  cambioExtra(antes, despues) {
+    const avisos = [];
+    if (antes.valor > 0 && Number.isFinite(despues.valor)) {
+      const rel = ((despues.valor - antes.valor) / antes.valor) * 100;
+      avisos.push(`Cambio relativo: ${rel >= 0 ? '+' : ''}${rel.toFixed(1)} % (de ${Math.round(antes.valor)} a ${Math.round(despues.valor)} mL/min).`);
+    }
+    avisos.push('La depuración estimada cambia también con el peso, la edad y la masa muscular: un aumento no equivale a recuperación renal. Revisa si las dosis siguen siendo adecuadas.');
+    return avisos;
+  },
   comparable(antes, despues) {
     const a = antes.extras?.peso;
     const b = despues.extras?.peso;

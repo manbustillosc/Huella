@@ -68,19 +68,23 @@ export default {
   ],
   tiempo: '1 min',
   momentos: true,
-  direccionClinica: 'mayor_mejor',
+  // Sin dirección automática: un aumento de la TFG estimada no equivale a recuperación renal ni una disminución a
+  // progresión. Se informan la diferencia absoluta y relativa, el cambio de categoría y la variabilidad esperada (KDIGO 2024).
+  direccionClinica: 'sin_direccion',
   unidadCambio: 'mL/min/1.73 m²',
   decimalesCambio: 0,
-  textoMejoria: 'mayor TFG estimada',
-  textoEmpeoramiento: 'menor TFG estimada',
   cambioExtra(antes, despues) {
-    const ga = ORDEN_G.indexOf(gDeEtiqueta(antes.etiqueta));
-    const gb = ORDEN_G.indexOf(gDeEtiqueta(despues.etiqueta));
     const avisos = [];
-    if (ga >= 0 && gb > ga && antes.valor > 0 && (despues.valor - antes.valor) / antes.valor <= -0.25) {
-      avisos.push('Cumple la definición de KDIGO (2012) de descenso definido de la TFG: cambio a una categoría peor con disminución de 25 % o más respecto a la referencia. Confirma que la creatinina esté estable (sin lesión renal aguda).');
+    if (antes.valor > 0 && Number.isFinite(despues.valor)) {
+      const rel = ((despues.valor - antes.valor) / antes.valor) * 100;
+      const ga = gDeEtiqueta(antes.etiqueta);
+      const gb = gDeEtiqueta(despues.etiqueta);
+      avisos.push(`Cambio relativo: ${rel >= 0 ? '+' : ''}${rel.toFixed(1)} % (de ${antes.valor.toFixed(1)} a ${despues.valor.toFixed(1)} mL/min/1.73 m²); categoría ${ga === gb ? `sin cambio (${gb})` : `de ${ga} a ${gb}`}.`);
+      avisos.push(Math.abs(rel) > 20
+        ? 'El cambio supera el 20 %, por encima de la variabilidad esperada entre mediciones (KDIGO 2024, punto de práctica 2.1.3): requiere evaluación clínica. Tras iniciar un tratamiento con efecto hemodinámico (IECA, ARA II, iSGLT2), el umbral es una reducción mayor del 30 % (2.1.4).'
+        : 'El cambio es del 20 % o menos, dentro de la variabilidad esperada entre mediciones (KDIGO 2024, punto de práctica 2.1.3).');
     }
-    avisos.push('La creatinina tiene variación biológica y analítica: interpreta con cautela los cambios pequeños.');
+    avisos.push('Un aumento de la TFG estimada no equivale a recuperación renal ni una disminución a progresión: considera creatinina inestable o lesión renal aguda, pérdida de masa muscular o sarcopenia, cambios de dieta y fármacos. La relevancia clínica requiere interpretación.');
     return avisos;
   },
   campos: [
@@ -122,6 +126,7 @@ export default {
     'TFG estimada no es diagnóstico de enfermedad renal crónica: se requieren 3 meses o más de TFG <60 o de marcadores de daño renal (como albuminuria ≥30 mg/g), y clasificar también por albuminuria (A1–A3).',
     'No es válida en lesión renal aguda, embarazo, cambios extremos de masa muscular o dieta, ni en amputaciones. En sarcopenia y desnutrición la creatinina baja sobrestima la filtración: considera cistatina C.',
     'Estima la filtración indexada a 1.73 m²; no es la depuración de creatinina de Cockcroft-Gault que muchas fichas técnicas usan para ajustar dosis.',
+    'Seguimiento (KDIGO 2024): un cambio de la TFG estimada mayor del 20 % en una medición posterior supera la variabilidad esperada y amerita evaluación (punto de práctica 2.1.3); tras iniciar un tratamiento con efecto hemodinámico, una reducción mayor del 30 % (2.1.4). Huella muestra la diferencia absoluta y relativa sin calificarla como mejoría o deterioro.',
   ],
   referencias: [
     { texto: 'Inker LA, Eneanya ND, Coresh J, et al. New creatinine- and cystatin C-based equations to estimate GFR without race. N Engl J Med. 2021;385(19):1737-49.', doi: '10.1056/NEJMoa2102953' },

@@ -29,7 +29,7 @@ El aviso «© 2026 Manuel Bustillos. Todos los derechos reservados» cubre el c�
 | ICOPE (OPS, 2025) | OPS, CC BY-NC-SA 3.0 IGO | Atribución, aviso de que la OPS no respalda la adaptación, sin logotipos, sin fines de lucro y misma licencia para lo adaptado. |
 | 4AT | © 2011–2014 MacLullich, Ryan y Cash, CC BY 4.0 | Atribución exacta como **versión modificada** (redacción en español propia y formato digital). Incluye el aviso de que la validación del 4AT oficial no se traslada a esa versión, el enlace al 4AT-ES validado y la exención de garantía. Puntos e interpretación sin cambios. |
 | CAM | NIDUS Measurement and Harmonization Core, CC BY-NC-SA 4.0 | Atribución, cita solicitada, cambios indicados y la adaptación compartida bajo la misma licencia. |
-| IDDSI | The IDDSI, CC BY-SA 4.0 | Atribución y nombres oficiales en español. |
+| IDDSI | The IDDSI, CC BY-SA 4.0 | Atribución y nombres oficiales de los niveles según la tarjeta de referencia en español armonizado (2025; corregidos el 11/10/2026). |
 | STOPP/START v3 | O'Mahony et al., 2023, CC BY 4.0 | Atribución. Se indica que es una redacción condensada en español y que no es la traducción oficial. |
 | NEWS2 | Royal College of Physicians (sin restricción de copyright, con condiciones) | Cita «Reproducido de: Royal College of Physicians…». Tabla y umbrales sin modificar. Aviso de traducción no aprobada por el RCP. No se reproduce la gráfica. |
 

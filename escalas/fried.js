@@ -67,7 +67,7 @@ export default {
   problemas: ['fragilidad', 'debilidad', 'pérdida de peso', 'lentitud', 'cansancio'],
   descripcion: 'Cinco componentes medidos (pérdida de peso, agotamiento, debilidad, lentitud y baja actividad): robusto, prefrágil o frágil.',
   objetivo: 'Identificar fragilidad física con los criterios operativos del Cardiovascular Health Study.',
-  poblacion: 'Personas de 65 años o más que viven en la comunidad (Fried, 2001). Excluye, por diseño, a personas con Parkinson, evento vascular cerebral reciente, deterioro cognitivo grave o en tratamiento con antidepresivos.',
+  poblacion: 'Personas de 65 años o más que viven en la comunidad (Fried, 2001). El análisis original excluyó a personas con enfermedad de Parkinson o antecedente de evento vascular cerebral, MMSE menor de 18 o en tratamiento con levodopa/carbidopa, donepezilo o antidepresivos.',
   aplicacion: [
     'Registra cada componente con el método original: dinamómetro para la fuerza, cronómetro en 15 pies (4.57 m) a paso habitual y cuestionario de Minnesota para la actividad.',
     'Si un componente no se midió, márcalo así: Huella solo clasifica cuando el resultado no depende de él.',

@@ -847,12 +847,14 @@ export function montarResultado(params, alGuardar) {
     // Las respuestas en edición quedan ligadas a la aplicación guardada para futuras correcciones.
     almacen.guardarRespuestas(e.id, ctx.momento, { ...r, _origen: guardado.id });
     alGuardar();
+    const est = almacen.estadoGuardado();
+    const sufijo = est.estado === 'error' ? ' solo en esta pestaña: el navegador no permitió guardarlo. Exporta el episodio desde Seguimiento.' : est.estado === 'sesion' ? ' (solo durante esta sesión)' : '';
     if (ctx.ruta) {
-      aviso(`${e.corto} guardado`);
+      aviso(`${e.corto} guardado${sufijo}`);
       continuarRuta();
       return;
     }
-    aviso(accion === 'reemplazar' ? 'Resultado reemplazado en la valoración' : 'Añadido a la valoración');
+    aviso(`${accion === 'reemplazar' ? 'Resultado reemplazado en la valoración' : 'Añadido a la valoración'}${sufijo}`);
     const btn = $('#agregar');
     btn.classList.remove('armado');
     btn.dataset.agregado = '';

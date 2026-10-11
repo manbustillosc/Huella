@@ -1,0 +1,62 @@
+# Pruebas y publicación de Huella (fase 3.1).
+# GitHub Pages publica la rama main. Los cambios se suben a la rama «desarrollo»: esta acción ejecuta las pruebas y,
+# solo si todas pasan, avanza main hasta esa versión. Si una prueba falla, main no cambia y el sitio sigue igual.
+# En repositorios públicos, GitHub Actions no tiene costo.
+name: Pruebas y publicación
+
+on:
+  push:
+    branches: [desarrollo, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pruebas:
+    name: Pruebas y verificaciones
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Pruebas (escalas, almacenamiento, importación, módulos, archivos de la PWA y versión)
+        run: node --test tests/*.test.mjs
+      - name: La versión de la caché cambia cuando cambia la app
+        run: |
+          git fetch --quiet origin main
+          if git diff --quiet origin/main -- index.html manifest.webmanifest css js escalas assets; then
+            echo "Sin cambios en los archivos de la app respecto a main."
+          else
+            antes=$(git show origin/main:sw.js | grep -o "huella-[0-9.]*" | head -1)
+            ahora=$(grep -o "huella-[0-9.]*" sw.js | head -1)
+            echo "Versión publicada: $antes · versión nueva: $ahora"
+            if [ "$antes" = "$ahora" ]; then
+              echo "::error::Cambiaron archivos de la app y la versión del service worker sigue igual ($ahora). Sube VERSION en sw.js y en js/datos.js."
+              exit 1
+            fi
+          fi
+
+  publicar:
+    name: Publicar en main (GitHub Pages)
+    needs: pruebas
+    if: github.event_name == 'push' && github.ref == 'refs/heads/desarrollo'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Avanzar main hasta esta versión (solo avance rápido; nunca reescribe main)
+        run: git push origin HEAD:refs/heads/main

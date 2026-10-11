@@ -72,11 +72,12 @@ export default {
       advertencia: () => 'La sedación cambia en minutos: úsala solo si corresponde a esta evaluación.',
       describir: (res) => `RASS ${signoRass(res.valor)}`,
       aplicar: (res) => ({ rass: OPCIONES_RASS.findIndex((o) => o.valor === res.valor) }),
-      siguientes: [
-    { id: 'rass', si: (res) => Boolean(res.noEvaluable), motivo: 'Reevalúa la sedación más tarde; con RASS −3 o mayor, repite el CAM-ICU.' },
-  ],
-  campos: ['rass'],
+      campos: ['rass'],
     },
+  ],
+  // Fase 3.1: estaba dentro del vínculo y nunca se mostraba.
+  siguientes: [
+    { id: 'rass', si: (res) => Boolean(res.noEvaluable), motivo: 'Reevalúa la sedación más tarde; con RASS −3 o mayor, repite el CAM-ICU.' },
   ],
   campos: [
     { id: 'rass', texto: 'Paso 1 · RASS en este momento', textoCorto: 'RASS', puntua: false, opciones: OPCIONES_RASS },

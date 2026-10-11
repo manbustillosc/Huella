@@ -10,6 +10,10 @@ import { tarjetaInicioIcope } from './icope.js';
 import { planDe } from '../plan.js';
 import { problemasPlan, revaloraciones } from '../atencion.js';
 import { episodioDe, fechasEvaluacion } from '../episodio.js';
+import { resultadosRecientes } from '../pendientes.js';
+import { pendientesActuales } from './pendientes.js';
+import { valorGuardado } from '../nota.js';
+import { etiquetaAplicacion, fechaCorta } from '../comparacion.js';
 
 function tarjetaRuta(ruta) {
   const p = progresoRuta(ruta);
@@ -45,6 +49,8 @@ function seccionAtencion(val, dias) {
   const ep = episodioDe(val);
   const n = val.resultados.length;
   const fechas = fechasEvaluacion(val).length;
+  const pend = pendientesActuales();
+  const alertasPend = pend.grupos.flatMap((g) => g.items).filter((x) => x.vencido || x.estado === 'desactualizado').length + (pend.grupos.find((g) => g.id === 'revaloraciones')?.items.length || 0);
   const tile = (href, ico, titulo, linea, extra = '', clase = '') => `
     <a class="tile-atencion${clase}" href="${href}">
       <span class="tile-ico">${icono(ico)}</span>
@@ -58,8 +64,25 @@ function seccionAtencion(val, dias) {
         ${tile('#/plan#problemas', 'lista', 'Problemas', probs.length ? `${esc(plural(probs.length, 'problema', 'problemas'))}${sinValorar ? ` · ${sinValorar} por valorar` : ''}` : 'Sin problemas')}
         ${tile('#/plan', 'plan', 'Plan', plan.objetivos.length || plan.intervenciones.length ? `${esc(plural(plan.objetivos.length, 'objetivo', 'objetivos'))} · ${esc(plural(plan.intervenciones.length, 'intervención', 'intervenciones'))}` : 'Sin objetivos')}
         ${tile('#/seguimiento', 'historial', 'Seguimiento', `${esc(ep.codigo)}${fechas ? ` · ${esc(plural(fechas, 'fecha', 'fechas'))}` : ''}`, vencidas ? `<span class="en-curso-aviso">${esc(plural(vencidas, 'revaloración vencida', 'revaloraciones vencidas'))}</span>` : '')}
+        ${tile('#/pendientes', 'pendiente', 'Pendientes', pend.total ? esc(plural(pend.total, 'pendiente', 'pendientes')) : 'Nada pendiente', alertasPend ? `<span class="en-curso-aviso">${esc(plural(alertasPend, 'vencido o desactualizado', 'vencidos o desactualizados'))}</span>` : '')}
         ${tile('#/informe', 'documento', 'Informes', 'Evolución, nota, ICOPE, plan')}
       </div>
+    </section>`;
+}
+
+// Inicio rápido: últimos resultados guardados e instrumentos más usados en este dispositivo.
+function seccionRapida(val, frec) {
+  const recientes = resultadosRecientes(val, porId, 3);
+  if (!recientes.length && !frec.length) return '';
+  return `
+    <section class="inicio-rapido" aria-labelledby="rapido-t">
+      <h2 class="seccion" id="rapido-t">Inicio rápido</h2>
+      ${recientes.length ? `
+        <p class="ceja">Resultados recientes</p>
+        <ul class="lista-recientes">${recientes.map(({ r, href }) => `<li><a href="${href}"><strong>${esc(porId[r.escalaId].corto)}</strong> <span>${esc(valorGuardado(r))}</span><span class="discreto">${esc(etiquetaAplicacion(r) || fechaCorta(r.fecha))}</span></a></li>`).join('')}</ul>` : ''}
+      ${frec.length ? `
+        <p class="ceja">Usadas con frecuencia</p>
+        <div class="lista-escalas">${frec.map((e) => filaEscala(e, { conDominio: true })).join('')}</div>` : ''}
     </section>`;
 }
 
@@ -86,6 +109,7 @@ export function renderInicio() {
       <div id="busqueda" hidden></div>
       <div id="contenido-inicio">
         ${enCurso ? atencion : ''}
+        ${seccionRapida(val, frec)}
         <h2 class="seccion">Valoraciones</h2>
         ${tarjetaInicioIcope()}
         <div class="rejilla-rutas">${valoraciones.map(tarjetaRuta).join('')}</div>
@@ -106,9 +130,6 @@ export function renderInicio() {
         ${favs.length ? `
           <h2 class="seccion">Favoritas</h2>
           <div class="lista-escalas">${favs.map((id) => filaFav(id)).join('')}</div>` : ''}
-        ${frec.length ? `
-          <h2 class="seccion">Usadas con frecuencia</h2>
-          <div class="lista-escalas">${frec.map((e) => filaEscala(e, { conDominio: true })).join('')}</div>` : ''}
         <h2 class="seccion">Dominios</h2>
         <div class="rejilla-dominios">${DOMINIOS.map(tarjetaDominio).join('')}</div>
       </div>

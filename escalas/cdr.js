@@ -55,6 +55,8 @@ export default {
   decimalesCambio: 1,
   textoMejoria: 'menor estadio registrado, sujeto a interpretación clínica',
   textoEmpeoramiento: 'progresión del estadio',
+  // Fase 3.1: una disminución del estadio se acompaña siempre de una advertencia.
+  comparable: (a, b) => (Number.isFinite(a.valor) && Number.isFinite(b.valor) && b.valor < a.valor ? { advertencia: 'Un estadio menor no es lo esperable en una demencia neurodegenerativa: verifica la asignación y el informante, y si la evaluación previa coincidió con delirium, depresión, enfermedad aguda u otra causa reversible.' } : null),
   min: 0,
   max: 3,
   siguientes: [

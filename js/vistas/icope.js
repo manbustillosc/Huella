@@ -5,6 +5,7 @@ import { porId } from '../datos.js';
 import {
   DOMINIOS_ICOPE, FACTORES, ESTADOS_ICOPE, NECESIDADES_ICOPE, LICENCIA_ICOPE, ENLACE_ICOPE, RUTA_ICOPE,
   estadosIcope, estadoFactores, avanceBasica, textoIcope, ambitoIcope, nombreAmbitoIcope, icopeDe, dominioIcope,
+  confirmarReutilizacion, retirarReutilizacion,
 } from '../icope.js';
 import {
   planDe, ESTADOS_PROBLEMA, PRIORIDADES, ESTADOS_OBJETIVO, ESTADOS_INTERVENCION, CATEGORIAS_INTERVENCION, CAMPOS_OBJETIVO,
@@ -39,6 +40,30 @@ function pieLicencia() {
     <p class="pie-icope">${icono('libro')}<span>${esc(LICENCIA_ICOPE.texto)} <a href="${ENLACE_ICOPE}" target="_blank" rel="noopener">Manual ICOPE (OPS, 2025)</a>.</span></p>`;
 }
 
+/* ---------- Vigencia de la evaluación detallada ---------- */
+
+const VIGENCIA = {
+  vigente: 'Evaluación detallada vigente',
+  confirmada: 'Evaluación previa confirmada',
+  por_confirmar: 'Evaluación previa: requiere confirmación',
+  no_realizable: 'Evaluación no realizable',
+  pendiente: 'Evaluación detallada pendiente',
+};
+export function chipVigencia(x) {
+  if (x.estado !== 'alterado') return '';
+  return `<span class="chip-vigencia vig-${x.vigencia}">${esc(VIGENCIA[x.vigencia])}</span>`;
+}
+// Botones para que el médico confirme (o retire) la reutilización de una evaluación anterior al tamizaje actual.
+function accionesVigencia(x) {
+  if (x.estado !== 'alterado' || !x.vigente) return '';
+  if (x.necesidad.tipo === 'confirmar') {
+    return `<ul class="icope-reuso">${x.necesidad.candidatos.map((c) => `
+      <li><span>${esc(c.texto)}</span><button class="btn btn-chico" type="button" data-confirmar-reuso="${esc(x.dom.id)}" data-tipo="${esc(c.tipo)}" data-id="${esc(c.id)}" data-cribado="${esc(x.vigente.id)}" data-texto="${esc(c.texto)}">${icono('check')} Confirmar que sigue vigente</button></li>`).join('')}</ul>`;
+  }
+  if (x.necesidad.reutilizada) return `<button class="btn btn-chico" type="button" data-retirar-reuso="${esc(x.dom.id)}">${icono('reiniciar')} Retirar la confirmación</button>`;
+  return '';
+}
+
 /* ---------- Panel ---------- */
 
 function filaDato(titulo, contenido) {
@@ -49,9 +74,9 @@ function tarjetaPanel(x) {
   const accion = x.estado === 'pendiente'
     ? `<a class="btn btn-chico btn-primario" href="${urlEscala(x.dom.escala)}">${icono('iniciar')} Aplicar</a>`
     : `<a class="btn btn-chico" href="${urlEscala(x.dom.escala)}">${icono('reiniciar')} Repetir</a>`;
-  const necesidad = x.necesidad.tipo === 'detallada'
-    ? `${esc(x.necesidad.texto)} <a href="${urlPestana('detallada')}#d-${x.dom.id}">Ver opciones</a>`
-    : esc(x.necesidad.texto);
+  const necesidad = ['detallada', 'confirmar', 'no_realizable'].includes(x.necesidad.tipo)
+    ? `${chipVigencia(x)} ${esc(x.necesidad.texto)} <a href="${urlPestana('detallada')}#d-${x.dom.id}">Ver opciones</a>`
+    : `${chipVigencia(x)} ${esc(x.necesidad.texto)}`;
   const objetivos = x.objetivos.length
     ? `${esc(x.objetivos[0].texto)}${x.objetivos.length > 1 ? ` <span class="discreto">y ${plural(x.objetivos.length - 1, 'objetivo más', 'objetivos más')}</span>` : ''}`
     : x.estado === 'alterado' ? `<span class="discreto">Sin objetivos.</span> <a href="${urlPestana('plan')}#p-${x.dom.id}">Agregar</a>` : '';
@@ -202,6 +227,7 @@ function tarjetaDetallada(x) {
       <summary><span class="ico-dominio">${icono(x.dom.icono)}</span><span class="icope-det-nombre">${esc(x.dom.nombre)}</span>${chipEstado(x.estado)}</summary>
       ${x.estado === 'conservado' ? '<p class="discreto">La evaluación básica no indica evaluación detallada; puedes hacerla si hay sospecha clínica.</p>' : ''}
       ${x.estado === 'pendiente' ? `<p class="discreto">Sin evaluación básica. <a href="${urlEscala(x.dom.escala)}">Aplicarla</a>.</p>` : ''}
+      ${x.estado === 'alterado' ? `<div class="icope-vigencia">${chipVigencia(x)}<p>${esc(x.necesidad.texto)}</p>${accionesVigencia(x)}</div>` : ''}
       <p>${esc(det.texto)}</p>
       ${grupos}
       <p class="icope-sub">${det.externo ? esc(det.externo) : 'Evaluación realizada fuera de Huella'}</p>
@@ -514,6 +540,28 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
   }
 
   panel.addEventListener('click', (ev) => {
+    const c = ev.target.closest('[data-confirmar-reuso]');
+    if (c) {
+      const dom = c.dataset.confirmarReuso;
+      guardar(({ icope, plan }) => {
+        confirmarReutilizacion(icope, dom, { tipo: c.dataset.tipo, id: c.dataset.id, cribado: c.dataset.cribado }, hoy);
+        registrarCambio(plan, `${dominioIcope(dom).nombre}: el médico confirmó como vigente una evaluación detallada previa (${c.dataset.texto}).`, hoy);
+      });
+      redibujar();
+      aviso('Evaluación previa confirmada como vigente');
+      return;
+    }
+    const rr = ev.target.closest('[data-retirar-reuso]');
+    if (rr) {
+      const dom = rr.dataset.retirarReuso;
+      guardar(({ icope, plan }) => {
+        retirarReutilizacion(icope, dom);
+        registrarCambio(plan, `${dominioIcope(dom).nombre}: se retiró la confirmación de la evaluación detallada previa.`, hoy);
+      });
+      redibujar();
+      aviso('Confirmación retirada');
+      return;
+    }
     const b = ev.target.closest('[data-agregar-int]');
     if (!b) return;
     const ambito = b.dataset.agregarInt;

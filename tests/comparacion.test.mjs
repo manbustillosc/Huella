@@ -94,11 +94,16 @@ test('variables continuas: se usa el valor sin redondear y el cambio mínimo pub
 });
 
 test('calculadoras: TFG con definición de KDIGO y Cockcroft-Gault con pesos distintos', () => {
+  // Fase 3.1: sin dirección automática; diferencia absoluta y relativa, categoría y umbral de KDIGO 2024 (>20 %).
   const tfg = clasificarCambio(porId.ckdepi, { valor: 62, etiqueta: 'G2 · TFG levemente disminuida' }, { valor: 44.4, etiqueta: 'G3b · TFG moderada a gravemente disminuida' });
-  assert.equal(tfg.tipo, 'empeoramiento');
-  assert.ok(tfg.advertencias.some((a) => /KDIGO/.test(a)));
+  assert.equal(tfg.tipo, 'sin_direccion');
+  assert.ok(tfg.advertencias.some((a) => /Cambio relativo: -28\.4 %.*de G2 a G3b/.test(a)));
+  assert.ok(tfg.advertencias.some((a) => /supera el 20 %.*KDIGO 2024/.test(a)));
   const leve = clasificarCambio(porId.ckdepi, { valor: 62, etiqueta: 'G2 · TFG levemente disminuida' }, { valor: 58, etiqueta: 'G3a · TFG leve a moderadamente disminuida' });
-  assert.ok(!leve.advertencias.some((a) => /KDIGO/.test(a)), 'cambio de categoría sin caída ≥25 % no cumple la definición');
+  assert.ok(leve.advertencias.some((a) => /20 % o menos, dentro de la variabilidad esperada/.test(a)), 'un cambio de categoría con −6 % está dentro de la variabilidad');
+  const sube = clasificarCambio(porId.ckdepi, { valor: 40, etiqueta: 'G3b · TFG moderada a gravemente disminuida' }, { valor: 55, etiqueta: 'G3a · TFG leve a moderadamente disminuida' });
+  assert.notEqual(sube.tipo, 'mejoria', 'un aumento no se califica como recuperación');
+  assert.ok(sube.advertencias.some((a) => /no equivale a recuperación renal/.test(a)));
   const cg = clasificarCambio(porId.cockcroft, { valor: 40, extras: { peso: 'real' } }, { valor: 48, extras: { peso: 'ajustado' } });
   assert.ok(cg.advertencias.some((a) => /distinto peso/.test(a)));
 });

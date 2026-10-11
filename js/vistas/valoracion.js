@@ -1,5 +1,5 @@
 // Valoración en curso: datos clínicos no identificables, resultados por dominio en orden cronológico y nota.
-import { almacen } from '../almacen.js';
+import { almacen, mensajeFallo } from '../almacen.js';
 import { porId, DOMINIOS, RUTAS } from '../datos.js';
 import { FUENTES } from '../motor.js';
 import { notaValoracion, valorGuardado, hallazgosYSugerencias } from '../nota.js';
@@ -10,13 +10,14 @@ import { medicacionDe, resumenMedicacion } from '../medicacion.js';
 import { planDe, planConContenido } from '../plan.js';
 import { estadosIcope, avanceBasica, ESTADOS_ICOPE } from '../icope.js';
 import { episodioDe } from '../episodio.js';
+import { vigenciaResultado, VIGENCIAS, TEXTO_PERIODOS } from '../pendientes.js';
 
 export const diasDesde = (ts) => (ts ? Math.max(0, Math.floor((Date.now() - ts) / 86400000)) : 0);
 
 const urlResultado = (r) => `#/e/${r.escalaId}${r.momento ? `@${r.momento}` : ''}/resultado`;
 const ICONO_CAMBIO = { mejoria: '↑', empeoramiento: '↓', sin_cambio: '=', sin_direccion: '~', no_interpretable: '?' };
 
-function filaResultado(r, cambio = null, esRef = false, ref = null) {
+function filaResultado(r, cambio = null, esRef = false, ref = null, vig = null) {
   const e = porId[r.escalaId];
   const etq = etiquetaAplicacion(r) || (r.fecha ? fechaCorta(r.fecha) : '');
   const fuente = r.fuente ? `fuente: ${(FUENTES.find((f) => f.id === r.fuente)?.nombre || r.fuente).toLowerCase()}` : '';
@@ -31,17 +32,18 @@ function filaResultado(r, cambio = null, esRef = false, ref = null) {
           ${r.alertas?.length ? `<span class="fr-alerta">${icono('alerta')} Alerta de seguridad: ${esc(r.alertas[0].split(':')[0])}</span>` : ''}
           ${cambio ? `<span class="fr-cambio cambio-${cambio.tipo}"><span aria-hidden="true">${ICONO_CAMBIO[cambio.tipo]}</span> ${esc(textoCambio(cambio, ref ? textoRespectoA(ref) : ''))}</span>` : ''}
           ${meta ? `<span class="fr-meta">${esc(meta)}</span>` : ''}
+          ${vig && vig.estado !== 'reciente' ? `<span class="fr-vigencia vig-${vig.estado}" title="${esc(vig.texto)}"><span class="chip-vig">${esc(VIGENCIAS[vig.estado].nombre)}</span> ${vig.estado === 'anterior' ? '' : esc(vig.texto)}</span>` : ''}
         </span>
       </a>
       <button class="btn-icono" type="button" data-quitar="${esc(r.id)}" aria-label="Quitar ${esc(e.corto)}${etq ? ` ${esc(etq)}` : ''} de la valoración">${icono('cerrar')}</button>
     </div>`;
 }
 
-function grupoEscala(rs) {
+function grupoEscala(rs, v, hoy) {
   const e = porId[rs[0].escalaId];
   const cmp = rs.length > 1 ? compararResultados(rs, e) : null;
-  if (!cmp) return filaResultado(rs[0]);
-  return cmp.filas.map((f) => filaResultado(f.r, f.esRef ? null : f.vsRef, f.esRef, cmp.ref)).join('');
+  if (!cmp) return filaResultado(rs[0], null, false, null, vigenciaResultado(rs[0], rs, v, hoy));
+  return cmp.filas.map((f) => filaResultado(f.r, f.esRef ? null : f.vsRef, f.esRef, cmp.ref, vigenciaResultado(f.r, rs, v, hoy))).join('');
 }
 
 export function renderValoracion() {
@@ -49,11 +51,12 @@ export function renderValoracion() {
   const p = v.paciente || {};
   const formato = almacen.formatoNota();
   const dias = diasDesde(v.creada);
+  const hoy = isoDe(new Date());
   const grupos = DOMINIOS.map((d) => {
     const rs = v.resultados.filter((r) => porId[r.escalaId]?.dominio === d.id);
     if (!rs.length) return '';
     const ids = [...new Set(ordenarCronologico(rs).map((r) => r.escalaId))];
-    return `<p class="ceja grupo-val">${esc(d.nombre)}</p>${ids.map((id) => grupoEscala(rs.filter((r) => r.escalaId === id))).join('')}`;
+    return `<p class="ceja grupo-val">${esc(d.nombre)}</p>${ids.map((id) => grupoEscala(rs.filter((r) => r.escalaId === id), v, hoy)).join('')}`;
   }).join('');
   const enCurso = RUTAS.map((r) => ({ r, p: progresoRuta(r) })).filter((x) => x.p.completos + x.p.omitidos > 0 && x.p.pendientes.length);
   const { avisos } = v.resultados.length ? hallazgosYSugerencias(v, porId) : { avisos: [] };
@@ -69,6 +72,7 @@ export function renderValoracion() {
         <p class="ceja">Valoración en curso</p>
         <h1>Valoración</h1>
         <p class="entradilla">Se guarda solo en este navegador, sin nombre ni datos de identificación. <a href="#/acerca">Qué se guarda y sus límites</a>.</p>
+        ${lineaGuardado()}
         ${v.creada ? `<p class="inicio-valoracion">${icono('calendario')} Episodio <a href="#/seguimiento">${esc(ep.codigo)}</a> · iniciado el ${esc(fechaCorta(isoDe(new Date(v.creada))))}${dias > 0 ? ` (hace ${plural(dias, 'día', 'días')})` : ' (hoy)'}.</p>` : ''}
       </header>
       ${ep.estado === 'cerrado' ? `<p class="aviso-episodio">${icono('alerta')} Este episodio está cerrado (${esc(fechaCorta(ep.cerrado))}). Puedes consultarlo y generar informes; para agregar resultados, reábrelo en <a href="#/seguimiento">Seguimiento</a>.</p>` : ''}
@@ -113,6 +117,7 @@ export function renderValoracion() {
       ${hayNota ? `
         ${v.resultados.length ? `<div class="resultados-val">${grupos}</div>` : ''}
         <p class="discreto">Cada instrumento se muestra en orden cronológico; el cambio se compara con el basal o, si no hay, con la primera aplicación. Toca un resultado para revisarlo o corregirlo.</p>
+        <p class="discreto">${esc(TEXTO_PERIODOS)} <a href="#/pendientes">Ver pendientes</a>.</p>
         <div class="cabecera-nota">
           <h2 class="seccion">Nota para el expediente</h2>
           ${selectorFormato(formato, ['parrafo', 'lista', 'completa'])}
@@ -130,6 +135,14 @@ export function renderValoracion() {
           <a class="btn btn-primario" href="#/">Ir al inicio</a>
         </div>`}
     </section>`;
+}
+
+// Estado del guardado de la valoración, con la hora de la última escritura comprobada.
+function lineaGuardado() {
+  const est = almacen.estadoGuardado();
+  const hora = est.ultimoOk ? new Date(est.ultimoOk).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : '';
+  const detalle = est.estado === 'guardado' ? (hora ? ` · comprobado a las ${hora}` : '') : `. ${mensajeFallo(est.motivo)}`;
+  return `<p class="senal-guardado est-g-${est.estado} en-pagina" role="status">${icono(est.estado === 'guardado' ? 'check' : 'alerta')}<span>${esc(est.texto)}${esc(detalle)}</span></p>`;
 }
 
 function descripcionFormato(f) {
@@ -172,7 +185,8 @@ export function montarValoracion(rerender, alCambiar) {
     confirmarEnDosToques(nueva, {
       texto: `${icono('alerta')} Toca otra vez para borrar todos los resultados`,
       accion: () => {
-        almacen.nuevaValoracion();
+        const r = almacen.nuevaValoracion();
+        if (!r.ok) { aviso(mensajeFallo(r.motivo)); return; }
         alCambiar();
         rerender();
         aviso('Valoración borrada; puedes empezar una nueva');

@@ -20,10 +20,18 @@ export function renderAcerca() {
         <p>Todo se calcula en este navegador. Huella no tiene servidor y no envía datos a ningún lugar.</p>
         <ul>
           <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, respuestas, la lista de medicamentos con su revisión STOPP/START y Beers, y el plan de atención con sus objetivos, intervenciones, preferencias y bitácora): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio con un código aleatorio (p. ej., EP-7KQ3MX): ciérralo en Seguimiento para no mezclar resultados de episodios distintos.</li>
-          <li><strong>Episodios cerrados</strong> (hasta 30): al cerrar un episodio en Seguimiento se archiva en este navegador con su código aleatorio. Puedes abrirlo, exportarlo o borrarlo; no se sincroniza con ningún servidor.</li>
+          <li><strong>Episodios cerrados</strong> (hasta 30): al cerrar un episodio en Seguimiento se archiva en este navegador con su código aleatorio. Puedes abrirlo, exportarlo o borrarlo; no se sincroniza con ningún servidor. Huella nunca borra un episodio por su cuenta: con 30 archivados, no permite cerrar ni importar otro hasta que exportes y borres alguno.</li>
+          <li><strong>Importación</strong>: un archivo se importa completo o no se importa. Se rechaza entero si tiene una estructura o una fecha inválida, un puntaje imposible o que no coincide con sus respuestas, una unidad inconsistente, un instrumento desconocido, identificadores repetidos, campos no reconocidos, datos de identificación o más de 500 resultados.</li>
           <li><strong>Archivos exportados</strong>: la exportación descarga un archivo JSON en tu dispositivo. Contiene información de salud sin identificadores; guárdalo en un lugar seguro y bórralo cuando no lo necesites.</li>
           <li><strong>Respuestas en edición</strong>: en el almacenamiento de la pestaña; se borran al cerrarla y nunca se mezclan con otra valoración.</li>
           <li><strong>Preferencias</strong> (favoritas, tema, formato de la nota, instrumentos más usados): en el almacenamiento local.</li>
+        </ul>
+        <h2>Estado del guardado</h2>
+        <p>Huella comprueba cada escritura leyéndola de nuevo. La barra lateral (y la barra superior cuando algo falla) indica uno de tres estados:</p>
+        <ul>
+          <li><strong>Guardado en este navegador</strong>: la escritura se comprobó.</li>
+          <li><strong>Solo disponible durante esta sesión</strong>: el navegador no permite el almacenamiento local (p. ej., algunas ventanas privadas); lo capturado se pierde al cerrar la pestaña. Exporta el episodio antes de cerrarla.</li>
+          <li><strong>No guardado</strong>: la última escritura falló (almacenamiento lleno o bloqueado). Lo capturado sigue en la pestaña; exporta el episodio desde Seguimiento.</li>
         </ul>
         <h2>Límites</h2>
         <ul>

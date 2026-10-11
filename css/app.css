@@ -1663,3 +1663,48 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 /* Botones de acción con etiquetas largas (p. ej., «Actualizar la aplicación del 11/10/2026 y continuar»): se ajustan en
    varias líneas en lugar de ensanchar la página en pantallas de 320 px. */
 .acciones .btn { white-space: normal; text-align: center; line-height: 20px; padding-top: 6px; padding-bottom: 6px; }
+
+/* Señal del estado del guardado */
+.senal-guardado { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; line-height: 16px; font-weight: 600; }
+.senal-guardado .ico { width: 14px; height: 14px; flex: none; }
+.pie-lateral .senal-guardado { color: var(--lateral-muted); margin-top: var(--space-1); }
+.pie-lateral .senal-guardado.est-g-sesion, .pie-lateral .senal-guardado.est-g-error { color: var(--lateral-ink); background: rgba(0, 0, 0, 0.18); padding: 4px 8px; border-radius: var(--radius-sm); }
+.barra .senal-guardado { min-height: 32px; padding: 0 10px; margin-right: var(--space-1); border-radius: var(--radius-pill); text-decoration: none; white-space: nowrap; }
+.senal-guardado.est-g-sesion { color: var(--orange-deep); }
+.senal-guardado.est-g-error { color: var(--terracotta-deep); }
+.barra .senal-guardado.est-g-sesion, .barra .senal-guardado.est-g-error { background: var(--surface-200); border: 1px solid currentColor; }
+.senal-guardado.en-pagina { margin-bottom: var(--space-2); color: var(--ink-muted); font-weight: 500; }
+.senal-guardado.en-pagina.est-g-sesion, .senal-guardado.en-pagina.est-g-error { display: flex; align-items: flex-start; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); border: 1px solid currentColor; background: var(--surface-200); font-weight: 600; }
+.senal-guardado.en-pagina.est-g-error { color: var(--terracotta-deep); }
+.senal-guardado.en-pagina.est-g-sesion { color: var(--orange-deep); }
+
+/* ICOPE: vigencia de la evaluación detallada */
+.chip-vigencia { display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; margin-right: 4px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 700; border: 1px solid var(--line); background: var(--surface-100); color: var(--ink); vertical-align: middle; }
+.chip-vigencia.vig-vigente, .chip-vigencia.vig-confirmada { color: var(--green-deep); border-color: var(--green); }
+.chip-vigencia.vig-por_confirmar { color: var(--orange-deep); border-color: var(--orange); }
+.chip-vigencia.vig-pendiente, .chip-vigencia.vig-no_realizable { color: var(--terracotta-deep); border-color: var(--terracotta); }
+.icope-vigencia { margin: var(--space-3) 0; padding: var(--space-3); border: 1px dashed var(--line); border-radius: var(--radius-md); }
+.icope-vigencia p { margin: var(--space-2) 0 !important; font-size: 14px !important; line-height: 20px !important; }
+.icope-reuso { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.icope-reuso li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); font-size: 14px; }
+.icope-reuso .btn { margin-top: 0 !important; white-space: normal; }
+
+/* ---------- Fase 3.1: vigencia de resultados, pendientes e inicio rápido ---------- */
+.fr-vigencia { display: block; margin-top: 2px; font-size: 12px; line-height: 18px; color: var(--ink-muted); }
+.chip-vig { display: inline-flex; align-items: center; min-height: 20px; padding: 0 7px; margin-right: 4px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700; border: 1px solid var(--line); background: var(--surface-100); color: var(--ink-muted); vertical-align: middle; }
+.vig-desactualizado .chip-vig { color: var(--orange-deep); border-color: var(--orange); }
+.vig-confirmar .chip-vig { color: var(--terracotta-deep); border-color: var(--terracotta); }
+.grupo-pendientes h2 { display: flex; align-items: center; gap: var(--space-2); }
+.grupo-pendientes h2 .ico { width: 20px; height: 20px; }
+.grupo-pendientes .cuenta { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 8px; border-radius: var(--radius-pill); background: var(--surface-200); font-family: var(--font-sans); font-size: 13px; font-weight: 700; color: var(--ink); }
+.lista-pendientes { list-style: none; margin: var(--space-2) 0 var(--space-4); padding: 0; display: grid; gap: var(--space-2); }
+.lista-pendientes a { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 44px; padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-100); color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.lista-pendientes a:hover { border-color: var(--acento-borde); }
+.lista-pendientes .pend-alerta a { border-left: 4px solid var(--orange); }
+.lista-pendientes .chev { flex: none; width: 18px; height: 18px; color: var(--ink-muted); }
+.inicio-rapido .ceja { margin-top: var(--space-3); }
+.lista-recientes { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.lista-recientes a { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px var(--space-2); min-height: 44px; padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-100); color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.lista-recientes a:hover { border-color: var(--acento-borde); }
+.lista-recientes .discreto { margin: 0; font-size: 12px; }
+@media print { .fr-vigencia { display: none; } }

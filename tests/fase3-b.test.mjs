@@ -189,7 +189,7 @@ test('deglución: EAT-10 ≥3 deriva a personal capacitado; FOIS; IDDSI solo reg
   assert.match(porId.deglucion.aplicacion[0], /No hagas pruebas con agua/);
   const i = calcular(porId.iddsi, EJEMPLOS.iddsi());
   assert.equal(i.banda.nivel, 'neutro');
-  assert.match(i.lineas[0], /Bebidas: Nivel 2 · Poco espeso\. Alimentos: Nivel 5 · Picado y húmedo/);
+  assert.match(i.lineas[0], /Bebidas: Nivel 2 · Poco espesa\. Alimentos: Nivel 5 · Picada y húmeda/);
   assert.equal(porId.iddsi.siguientes, undefined, 'no propone texturas');
   assert.ok(!porId.eat10.siguientes?.some((s) => s.id === 'iddsi'), 'el tamizaje no lleva a indicar una textura');
 });

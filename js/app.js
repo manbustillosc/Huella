@@ -1,5 +1,5 @@
 // Huella · enrutador, navegación y arranque.
-import { almacen } from './almacen.js';
+import { almacen, mensajeFallo } from './almacen.js';
 import { VERSION, escalas, porId, DOMINIOS, RUTAS, escalasDe, dominioDe, rutaDe } from './datos.js';
 import { momentoDe, MOMENTOS } from './motor.js';
 import { $, esc, icono, aviso, botonEstrella, nombreCorto, cuentaDominio } from './ui.js';
@@ -14,6 +14,7 @@ import { renderPlanAtencion, montarPlanAtencion } from './vistas/atencion.js';
 import { renderSeguimiento, montarSeguimiento } from './vistas/seguimiento.js';
 import { renderInforme, montarInforme } from './vistas/informe.js';
 import { renderCatalogo } from './vistas/catalogo.js';
+import { renderPendientes } from './vistas/pendientes.js';
 import { FORMATOS_INFORME } from './informes.js';
 
 const vista = $('#vista');
@@ -50,6 +51,7 @@ function ruta() {
   if (a === 'seguimiento') return { vista: 'seguimiento' };
   if (a === 'informe') return { vista: 'informe', formato: FORMATOS_INFORME.some((f) => f.id === b) ? b : FORMATOS_INFORME[0].id };
   if (a === 'catalogo') return { vista: 'catalogo' };
+  if (a === 'pendientes') return { vista: 'pendientes' };
   if (a === 'favoritas') return { vista: 'favoritas' };
   if (a === 'acerca') return { vista: 'acerca' };
   return { vista: 'inicio' };
@@ -79,6 +81,7 @@ function render() {
       seguimiento: renderSeguimiento,
       informe: renderInforme,
       catalogo: renderCatalogo,
+      pendientes: renderPendientes,
     }[r.vista](r);
   }
   document.body.dataset.vista = r.vista;
@@ -124,6 +127,7 @@ function titulo(r) {
   if (r.vista === 'seguimiento') return `Seguimiento · ${base}`;
   if (r.vista === 'informe') return `Informes · ${base}`;
   if (r.vista === 'catalogo') return `Futuras herramientas · ${base}`;
+  if (r.vista === 'pendientes') return `Pendientes · ${base}`;
   return base;
 }
 
@@ -169,7 +173,8 @@ function renderNavegacion(r) {
     </nav>
     <div class="pie-lateral">
       ${ARCOS}
-      <p>${escalas.length} instrumentos · versión ${VERSION}<br>Datos solo en este navegador</p>
+      <p>${escalas.length} instrumentos · versión ${VERSION}</p>
+      ${senalGuardado('lateral')}
       <div class="botones">
         <button class="btn-lateral" type="button" data-tema>${icono(temaOscuro() ? 'sol' : 'luna')}<span>${temaOscuro() ? 'Claro' : 'Oscuro'}</span></button>
         <a class="btn-lateral" href="#/acerca">${icono('info')}<span>Acerca de</span></a>
@@ -204,20 +209,32 @@ function renderNavegacion(r) {
          <span>Huella</span>
        </a>
        <div class="acciones-barra">
+         ${almacen.estadoGuardado().estado === 'guardado' ? '' : senalGuardado('barra')}
          <button class="btn-icono" type="button" data-tema aria-label="Cambiar a tema ${temaOscuro() ? 'claro' : 'oscuro'}">${icono(temaOscuro() ? 'sol' : 'luna')}</button>
          <a class="btn-icono" href="#/acerca" aria-label="Acerca de Huella">${icono('info')}</a>
        </div>`
     : `<a class="btn-icono" href="${atras}" aria-label="Regresar">${icono('atras')}</a>
        <span class="barra-titulo">${esc(tituloBarra)}</span>
+       ${almacen.estadoGuardado().estado === 'guardado' ? '' : senalGuardado('barra')}
        ${esEscala ? botonEstrella(r.id) : r.vista === 'medicacion' ? botonEstrella('medicacion') : ''}`;
 
   const tab = (href, ico, texto, activo, extra = '') =>
     `<a href="${href}"${activo ? ' class="activo" aria-current="page"' : ''}>${icono(ico)}<span>${texto}</span>${extra}</a>`;
   $('#pestanas').innerHTML = `
-    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion', 'icope', 'favoritas', 'catalogo'].includes(r.vista))}
+    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion', 'icope', 'favoritas', 'catalogo', 'pendientes'].includes(r.vista))}
     ${tab('#/valoracion', 'valoracion', 'Valoración', r.vista === 'valoracion', nVal ? `<span class="insignia">${nVal}</span>` : '')}
     ${tab('#/plan', 'plan', 'Plan', ['plan', 'seguimiento'].includes(r.vista))}
     ${tab('#/informe', 'documento', 'Informes', r.vista === 'informe')}`;
+}
+
+// Señal del estado del guardado: discreta si todo quedó guardado; visible si solo dura la sesión o si falló.
+function senalGuardado(lugar) {
+  const est = almacen.estadoGuardado();
+  const corto = { guardado: 'Guardado', sesion: 'Solo esta sesión', error: 'No guardado' }[est.estado];
+  const titulo = est.estado === 'guardado' ? est.texto : `${est.texto}. ${mensajeFallo(est.motivo)}`;
+  const ico = est.estado === 'guardado' ? 'check' : 'alerta';
+  if (lugar === 'barra') return `<a class="senal-guardado est-g-${est.estado}" href="#/seguimiento" title="${esc(titulo)}" aria-label="${esc(titulo)}">${icono(ico)}<span>${corto}</span></a>`;
+  return `<p class="senal-guardado est-g-${est.estado}" title="${esc(titulo)}">${icono(ico)}<span>${esc(est.texto)}</span></p>`;
 }
 
 /* ---------- Eventos globales ---------- */
@@ -258,6 +275,11 @@ function aplicarTema() {
 }
 
 /* ---------- Arranque ---------- */
+
+almacen.alCambiarGuardado((est) => {
+  renderNavegacion(ruta());
+  if (est.estado === 'error') aviso(mensajeFallo(est.motivo));
+});
 
 aplicarTema();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

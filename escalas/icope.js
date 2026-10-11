@@ -3,12 +3,14 @@
 // Adaptación del Manual de atención integrada para las personas mayores, 2.ª ed. (OPS, 2025; CC BY-NC-SA 3.0 IGO).
 // No hay puntaje global de capacidad intrínseca: cada dominio se informa por separado.
 
+// Forma de cita propuesta por la OPS (página legal de la edición en español, 2025).
 export const REF_ICOPE = {
-  texto: 'Organización Panamericana de la Salud. Manual de atención integrada para las personas mayores. Guía sobre la evaluación y los esquemas de atención centrados en la persona en la atención primaria de salud. 2.ª ed. Washington, D.C.: OPS; 2025.',
+  texto: 'Organización Panamericana de la Salud. Manual de atención integrada para las personas mayores. Guía sobre la evaluación y los esquemas de atención centrados en la persona en la atención primaria de salud. Segunda edición. Washington, D.C.: OPS; 2025. ISBN 978-92-75-33031-9 (PDF). Licencia CC BY-NC-SA 3.0 IGO.',
   doi: '10.37774/9789275330319',
 };
+// Edición original de la OMS: la página oficial indica publicación el 22 de septiembre de 2025, ISBN 978-92-4-010372-6.
 export const REF_ICOPE_OMS = {
-  texto: 'World Health Organization. Integrated care for older people (ICOPE): guidance for person-centred assessment and pathways in primary care. 2nd ed. Geneva: WHO; 2024.',
+  texto: 'World Health Organization. Integrated care for older people (ICOPE): guidance for person-centred assessment and pathways in primary care. 2nd ed. Geneva: WHO; 2025. ISBN 978-92-4-010372-6. Licence CC BY-NC-SA 3.0 IGO.',
   enlace: 'https://www.who.int/publications/i/item/9789240103726',
 };
 export const LICENCIA_ICOPE = {

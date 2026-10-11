@@ -80,41 +80,4 @@ export function exportarEpisodio(v, versionApp, ahora = new Date()) {
 
 export const nombreArchivo = (v, hoy) => `huella-${episodioDe(v).codigo || 'episodio'}-${hoy}.json`;
 
-const esObjeto = (x) => x && typeof x === 'object' && !Array.isArray(x);
-const PACIENTE = { edad: 3, sexo: 6, escolaridad: 2, contexto: 160 };
-
-// Revisa un archivo importado: forma, tamaño e instrumentos conocidos. Devuelve la valoración saneada o los errores.
-export function validarImportacion(datos, escalasPorId) {
-  const errores = [];
-  const avisos = [];
-  if (!esObjeto(datos) || datos.formato !== FORMATO_EXPORTACION) return { ok: false, errores: ['El archivo no es una exportación de Huella.'], avisos };
-  if (datos.version !== VERSION_EXPORTACION) return { ok: false, errores: [`Versión de exportación no compatible (${String(datos.version).slice(0, 10)}).`], avisos };
-  const e = datos.episodio;
-  if (!esObjeto(e) || !Array.isArray(e.resultados)) return { ok: false, errores: ['El archivo no contiene un episodio válido.'], avisos };
-  const resultados = [];
-  let desconocidos = 0;
-  for (const r of e.resultados.slice(0, 500)) {
-    if (!esObjeto(r) || typeof r.escalaId !== 'string') { errores.push('Hay resultados con un formato no válido.'); break; }
-    if (!escalasPorId[r.escalaId]) { desconocidos += 1; continue; }
-    if (r.fecha && !fechaValida(r.fecha)) { errores.push('Hay resultados con fechas no válidas.'); break; }
-    resultados.push(r);
-  }
-  if (desconocidos) avisos.push(`${desconocidos} resultado(s) de instrumentos que esta versión no reconoce se omitirán.`);
-  const paciente = {};
-  if (esObjeto(e.paciente)) for (const [k, max] of Object.entries(PACIENTE)) if (e.paciente[k] != null) paciente[k] = limpio(e.paciente[k], max);
-  if (paciente.contexto) avisos.push('El episodio incluye un contexto clínico en texto libre: revisa que no contenga datos identificables.');
-  if (errores.length) return { ok: false, errores, avisos };
-  const valoracion = {
-    id: typeof e.id === 'string' ? e.id.slice(0, 40) : undefined,
-    creada: Number.isFinite(e.creada) ? e.creada : Date.now(),
-    paciente,
-    resultados,
-    rutas: esObjeto(e.rutas) ? e.rutas : {},
-    medicacion: esObjeto(e.medicacion) ? e.medicacion : undefined,
-    plan: esObjeto(e.plan) ? e.plan : undefined,
-    icope: esObjeto(e.icope) ? e.icope : undefined,
-    episodio: episodioDe(e),
-  };
-  if (!valoracion.episodio.codigo) valoracion.episodio.codigo = codigoEpisodio();
-  return { ok: true, errores, avisos, valoracion, resumen: { codigo: valoracion.episodio.codigo, resultados: resultados.length, fechas: fechasEvaluacion(valoracion) } };
-}
+// La validación de archivos importados está en js/importacion.js.

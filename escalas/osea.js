@@ -25,9 +25,8 @@ export const frax = {
     'Registra las dos probabilidades y si el cálculo incluyó la densidad mineral ósea del cuello femoral.',
   ],
   tiempo: '1 min (registro)',
-  direccionClinica: 'menor_mejor',
-  textoMejoria: 'menor probabilidad estimada',
-  textoEmpeoramiento: 'mayor probabilidad estimada',
+  // Sin dirección clínica: una disminución de FRAX no demuestra por sí sola una reducción del riesgo por una intervención.
+  direccionClinica: 'sin_direccion',
   unidadCambio: 'puntos porcentuales',
   decimalesCambio: 1,
   barra: false,
@@ -43,6 +42,14 @@ export const frax = {
       id: 'dmo', texto: 'Cálculo', textoCorto: 'cálculo', puntua: false,
       opciones: [{ texto: 'Con DMO del cuello femoral', valor: 1 }, { texto: 'Sin DMO (solo con el IMC)', valor: 0 }],
     },
+    {
+      id: 'herramienta', texto: 'Herramienta usada', textoCorto: 'herramienta', puntua: false,
+      opciones: [
+        { texto: 'FRAXplus® (fraxplus.org)', valor: 'fraxplus' },
+        { texto: 'FRAX® (calculadora clásica)', valor: 'frax' },
+        { texto: 'No consta', valor: 'no_consta', detalle: 'Sin este dato, la comparación con otros cálculos no se interpreta.' },
+      ],
+    },
   ],
   validar({ v }) {
     if (Number.isFinite(v.mayor) && Number.isFinite(v.cadera) && v.cadera > v.mayor) return { cadera: 'La probabilidad de fractura de cadera no puede superar la de fractura mayor.' };
@@ -52,22 +59,35 @@ export const frax = {
     { id: 'registrado', rango: 'Probabilidades registradas', etiqueta: 'Probabilidad de fractura registrada', nivel: 'neutro', texto: 'Probabilidades calculadas en la herramienta oficial. Huella no las clasifica: los umbrales de intervención para México dependen de la edad (Clark et al., 2018) y de la guía vigente.' },
   ],
   calcular({ v }) {
-    const lineas = [`Probabilidad a 10 años: fractura osteoporótica mayor ${v.mayor}% y de cadera ${v.cadera}% (modelo ${v.modelo.valor === 1 ? 'de México' : 'de otro país'}, ${v.dmo.valor === 1 ? 'con DMO del cuello femoral' : 'sin DMO'}).`];
+    const lineas = [`Probabilidad a 10 años: fractura osteoporótica mayor ${v.mayor}% y de cadera ${v.cadera}% (modelo ${v.modelo.valor === 1 ? 'de México' : 'de otro país'}, ${v.dmo.valor === 1 ? 'con DMO del cuello femoral' : 'sin DMO'}; ${v.herramienta.valor === 'no_consta' ? 'herramienta no consta' : v.herramienta.texto}).`];
     if (v.modelo.valor === 0) lineas.push('Se usó un modelo de otro país: confirma que corresponde a la población de la persona.');
     if (v.dmo.valor === 0) lineas.push('Calculado sin DMO: si se dispone de densitometría, el cálculo con la DMO del cuello femoral es más preciso.');
     return {
       banda: { ...frax.bandas[0], sugerencias: ['Integrar la probabilidad con los umbrales de intervención por edad del modelo mexicano, las fracturas previas, el riesgo de caídas y las preferencias de la persona.', SUG_CAIDAS] },
       valor: v.mayor, unidad: '%', mostrar: String(v.mayor), sufijo: '% fractura mayor',
-      lineas, lineasNota: lineas, extras: { mayor: v.mayor, cadera: v.cadera, dmo: v.dmo.valor === 1 },
+      lineas, lineasNota: lineas, extras: { mayor: v.mayor, cadera: v.cadera, dmo: v.dmo.valor === 1, modelo: v.modelo.valor === 1 ? 'mexico' : 'otro', herramienta: v.herramienta.valor },
     };
   },
-  comparable: (a, b) => (a.extras?.dmo !== b.extras?.dmo ? { advertencia: 'Una aplicación se calculó con DMO y otra sin ella: no son directamente comparables.' } : null),
+  // Solo se comparan cálculos hechos en condiciones equivalentes: mismo modelo de país, misma herramienta y DMO.
+  comparable: (a, b) => {
+    const ea = a.extras || {};
+    const eb = b.extras || {};
+    const motivos = [];
+    if (!ea.modelo || !eb.modelo || ea.modelo === 'otro' || eb.modelo === 'otro') motivos.push('modelo de país no especificado en alguno');
+    else if (ea.modelo !== eb.modelo) motivos.push('modelos de país distintos');
+    if (ea.dmo !== eb.dmo) motivos.push('uno con DMO y otro sin DMO');
+    if (!ea.herramienta || !eb.herramienta || ea.herramienta === 'no_consta' || eb.herramienta === 'no_consta') motivos.push('herramienta sin registrar');
+    else if (ea.herramienta !== eb.herramienta) motivos.push('herramientas distintas');
+    if (motivos.length) return { textoNoInterpretable: `Comparación longitudinal no interpretable: los resultados proceden de condiciones de cálculo diferentes (${motivos.join('; ')})` };
+    return { advertencia: 'Un cambio de FRAX refleja cambios en los datos de entrada (edad, DMO, factores de riesgo); no demuestra por sí solo el efecto de una intervención.' };
+  },
   resumen: (res) => `FRAX (modelo ${res.lineas[0].includes('de México') ? 'de México' : 'de otro país'}): fractura mayor ${res.extras.mayor}% y cadera ${res.extras.cadera}% a 10 años, ${res.extras.dmo ? 'con' : 'sin'} DMO.`,
   resumenBreve: (res) => `FRAX ${res.extras.mayor}% mayor, ${res.extras.cadera}% cadera`,
   notas: [
     'Huella no reconstruye el algoritmo de FRAX®: solo registra el resultado de la herramienta oficial.',
     'Los umbrales de intervención para México dependen de la edad (de 2.6% a los 40 años a 20.0% a los 90 años para la fractura mayor; Clark et al., 2018); consulta la tabla por edad y la guía vigente. Huella no aplica umbrales de tratamiento.',
     'FRAX no considera las caídas ni la dosis de glucocorticoides o el número de fracturas previas; el juicio clínico ajusta su interpretación.',
+    'En el seguimiento solo se comparan cálculos con el mismo modelo de país, la misma herramienta y el mismo uso de la DMO; un cambio no demuestra por sí solo el efecto de una intervención.',
   ],
   licencia: { texto: 'FRAX® y FRAXplus® son marcas registradas; © Osteoporosis Research Ltd (Reino Unido). Herramienta oficial en fraxplus.org. Huella solo registra el resultado.', enlace: 'https://www.fraxplus.org/calculation-tool' },
   referencias: [
@@ -131,6 +151,17 @@ export const dxa = {
       id: 'fractura', texto: 'Fractura por fragilidad de cadera o vertebral (clínica o morfométrica)', textoCorto: 'fractura por fragilidad', puntua: false,
       opciones: [{ texto: 'Sí', valor: 1 }, { texto: 'No', valor: 0 }, { texto: 'No se sabe', valor: -1, especial: true }],
     },
+    {
+      id: 'dmo_sitio', texto: 'DMO para el seguimiento: sitio', textoCorto: 'sitio de la DMO', puntua: false, grupo: 'Seguimiento (opcional)', opcional: true,
+      ayuda: 'El seguimiento se valora con la DMO en g/cm² del mismo sitio y en el mismo equipo, no con el T-score.',
+      opciones: [...SITIOS.map(([, n]) => ({ texto: n.charAt(0).toUpperCase() + n.slice(1), valor: n })), { texto: 'No registrar', valor: null, especial: true }],
+    },
+    { id: 'dmo_valor', tipo: 'numero', texto: 'DMO en ese sitio', unidad: 'g/cm²', min: 0.2, max: 2.0, decimales: 3, visibleSi: (r) => r.dmo_sitio != null && r.dmo_sitio < SITIOS.length },
+    {
+      id: 'equipo', texto: 'Equipo de densitometría', textoCorto: 'equipo', puntua: false, visibleSi: (r) => r.dmo_sitio != null && r.dmo_sitio < SITIOS.length,
+      opciones: [{ texto: 'Hologic', valor: 'hologic' }, { texto: 'GE Healthcare (Lunar)', valor: 'lunar' }, { texto: 'Otro', valor: 'otro' }, { texto: 'No consta', valor: 'no_consta' }],
+    },
+    { id: 'lsc', tipo: 'numero', texto: 'Cambio mínimo significativo del centro (LSC) para ese sitio', unidad: 'g/cm²', min: 0.005, max: 0.2, decimales: 3, opcional: true, visibleSi: (r) => r.dmo_sitio != null && r.dmo_sitio < SITIOS.length },
   ],
   validar({ v }) {
     const usaT = (v.sexo?.valor === 1 && v.menopausia?.valor === 1) || (v.sexo?.valor === 0 && Number.isFinite(v.edad) && v.edad >= 50);
@@ -148,17 +179,22 @@ export const dxa = {
     const sug = [];
     let banda;
     let valor = null;
+    let sitiosMin = [];
     if (usaT) {
       const medidos = SITIOS.filter(([id]) => Number.isFinite(v[id])).map(([id, n]) => ({ n, t: v[id] }));
       const min = Math.min(...medidos.map((x) => x.t));
       valor = min;
       banda = min >= T_NORMAL ? B_DXA.normal : min > T_OP ? B_DXA.baja : B_DXA.osteoporosis;
-      lineas.push(`T-scores: ${medidos.map((x) => `${x.n} ${x.t}`).join('; ')}. Más bajo: ${min} (${medidos.filter((x) => x.t === min).map((x) => x.n).join(' y ')}).`);
+      sitiosMin = medidos.filter((x) => x.t === min).map((x) => x.n);
+      lineas.push(`T-scores: ${medidos.map((x) => `${x.n} ${x.t}`).join('; ')}. Más bajo: ${min} (${sitiosMin.join(' y ')}).`);
       if (v.t_radio != null && Number.isFinite(v.t_radio) && medidos.length === 1) lineas.push('Solo se registró el radio 33%: la ISCD lo usa cuando la cadera o la columna no pueden medirse o interpretarse.');
     } else {
       valor = v.z_min;
       banda = v.z_min <= -2.0 ? B_DXA.zbaja : B_DXA.zesperada;
       lineas.push(`Z-score más bajo: ${v.z_min}. En esta población no se usan las categorías de T-score de la OMS.`);
+    }
+    if (v.dmo_sitio?.valor && Number.isFinite(v.dmo_valor)) {
+      lineas.push(`DMO para el seguimiento: ${v.dmo_sitio.valor} ${v.dmo_valor} g/cm² (${v.equipo?.valor === 'no_consta' ? 'equipo no consta' : v.equipo?.texto}${Number.isFinite(v.lsc) ? `; cambio mínimo significativo del centro ${v.lsc} g/cm²` : ''}).`);
     }
     if (v.fractura.valor === 1) {
       lineas.push('Fractura por fragilidad de cadera o vertebral: es un criterio clínico de osteoporosis independiente de la DMO; el diagnóstico lo establece el médico.');
@@ -170,10 +206,35 @@ export const dxa = {
     return {
       banda: { ...banda, hallazgo: banda.hallazgo || v.fractura.valor === 1, sugerencias: sug },
       valor, unidad: usaT ? 'T' : 'Z', mostrar: String(valor), sufijo: usaT ? 'T-score más bajo' : 'Z-score más bajo',
-      lineas, lineasNota: lineas, extras: { usaT, valor, fractura: v.fractura.valor },
+      lineas, lineasNota: lineas,
+      extras: {
+        usaT, valor, fractura: v.fractura.valor, sitiosMin,
+        dmo: v.dmo_sitio?.valor && Number.isFinite(v.dmo_valor) ? { sitio: v.dmo_sitio.valor, valor: v.dmo_valor, equipo: v.equipo?.valor || 'no_consta', lsc: Number.isFinite(v.lsc) ? v.lsc : null } : null,
+      },
     };
   },
-  comparable: (a, b) => ({ advertencia: a.extras?.usaT !== b.extras?.usaT ? 'Una aplicación usa T-score y otra Z-score: no son comparables.' : 'Para el seguimiento, la ISCD recomienda comparar la DMO (g/cm²) en el mismo equipo con el cambio mínimo significativo del centro; la diferencia del T-score es solo orientativa.' }),
+  // El seguimiento densitométrico se valora con la DMO (g/cm²) del mismo sitio y equipo frente al cambio mínimo
+  // significativo del centro (ISCD); nunca con diferencias aisladas del T-score, ni entre T-score y Z-score.
+  comparable: (a, b) => {
+    const ea = a.extras || {};
+    const eb = b.extras || {};
+    if (ea.usaT !== eb.usaT) return { noInterpretable: 'una aplicación usa T-score y otra Z-score; son magnitudes distintas y no se comparan' };
+    const da = ea.dmo;
+    const db = eb.dmo;
+    if (da && db && da.sitio === db.sitio) {
+      const dif = db.valor - da.valor;
+      const base = `DMO de ${da.sitio} de ${da.valor} a ${db.valor} g/cm² (${dif >= 0 ? '+' : ''}${dif.toFixed(3)})`;
+      const mismoEquipo = da.equipo === db.equipo && !['otro', 'no_consta'].includes(da.equipo);
+      const lsc = db.lsc ?? da.lsc;
+      if (mismoEquipo && lsc) {
+        const supera = Math.abs(dif) >= lsc;
+        return { noInterpretable: `el seguimiento no se valora con el T-score. ${base}: ${supera ? 'igual o mayor' : 'menor'} que el cambio mínimo significativo del centro (${lsc} g/cm²)${supera ? '; cambio significativo que requiere interpretación clínica' : '; sin cambio significativo'}` };
+      }
+      return { noInterpretable: `el seguimiento no se valora con el T-score. ${base}; sin el mismo equipo y el cambio mínimo significativo del centro, la diferencia no se puede calificar` };
+    }
+    const otrosSitios = (ea.sitiosMin || []).join() !== (eb.sitiosMin || []).join() ? '; además, el valor más bajo corresponde a sitios distintos' : '';
+    return { noInterpretable: `una diferencia aislada del T-score no demuestra un cambio densitométrico${otrosSitios}. Para el seguimiento registra la DMO en g/cm² del mismo sitio, el equipo y el cambio mínimo significativo del centro` };
+  },
   siguientes: [
     { id: 'frax', si: (res) => Boolean(res.banda?.hallazgo), motivo: 'Probabilidad de fractura a 10 años con la DMO del cuello femoral (herramienta oficial).' },
     { id: 'tug', si: (res) => Boolean(res.banda?.hallazgo), motivo: 'Riesgo de caídas: movilidad y marcha.' },
@@ -185,6 +246,7 @@ export const dxa = {
     'Categorías densitométricas de la OMS con el T-score más bajo de columna lumbar, cuello femoral y cadera total (radio 33% si corresponde): normal ≥ −1.0; baja masa ósea entre −1.0 y −2.5; osteoporosis ≤ −2.5.',
     'La osteoporosis densitométrica no es lo mismo que la clínica: una fractura por fragilidad de cadera o vertebral establece el diagnóstico clínico aunque el T-score no llegue a −2.5.',
     'En mujeres premenopáusicas y hombres menores de 50 años se interpreta el Z-score (≤ −2.0: por debajo de lo esperado para la edad).',
+    'Seguimiento: la ISCD recomienda comparar la DMO en g/cm² del mismo sitio, en el mismo equipo, con el cambio mínimo significativo (LSC) del centro. Huella no califica como mejoría o deterioro las diferencias del T-score ni compara T-score con Z-score.',
   ],
   referencias: [
     { texto: 'Kanis JA. Assessment of fracture risk and its application to screening for postmenopausal osteoporosis: synopsis of a WHO report. Osteoporos Int. 1994;4(6):368-81.', doi: '10.1007/BF01622200' },

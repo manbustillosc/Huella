@@ -82,8 +82,9 @@ export function clasificarCambio(escala, antes, despues) {
 
   const regla = escala.comparable ? escala.comparable(antes, despues) : null;
   if (regla?.advertencia) salida.advertencias.push(regla.advertencia);
-  if (regla?.noInterpretable) {
-    return fin({ tipo: 'no_interpretable' }, `cambio no interpretable numéricamente: ${regla.noInterpretable}`, textoCategoria ? `; ${textoCategoria}` : '');
+  if (regla?.noInterpretable || regla?.textoNoInterpretable) {
+    const principal = regla.textoNoInterpretable || `cambio no interpretable numéricamente: ${regla.noInterpretable}`;
+    return fin({ tipo: 'no_interpretable' }, principal, textoCategoria ? `; ${textoCategoria}` : '');
   }
 
   const a = valorComparable(antes);

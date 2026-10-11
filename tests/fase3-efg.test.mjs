@@ -10,9 +10,10 @@ import {
 } from '../js/plan.js';
 import { problemasPlan, sugerenciasDe, significadoClinico, seriesEvolucion, revaloraciones, objetivoVencido, SUGERENCIAS_DOMINIO } from '../js/atencion.js';
 import {
-  codigoEpisodio, episodioDe, asegurarEpisodio, fechasEvaluacion, cerrarEpisodio, reabrirEpisodio, exportarEpisodio, validarImportacion,
+  codigoEpisodio, episodioDe, asegurarEpisodio, fechasEvaluacion, cerrarEpisodio, reabrirEpisodio, exportarEpisodio,
   tieneContenido, FORMATO_EXPORTACION, nombreArchivo,
 } from '../js/episodio.js';
+import { validarImportacion } from '../js/importacion.js';
 import { FORMATOS_INFORME, textoInforme, bloquesInforme, pieInforme } from '../js/informes.js';
 import { CATALOGO_FUTURO } from '../js/vistas/catalogo.js';
 import { clasificarCambio } from '../js/comparacion.js';
@@ -151,7 +152,7 @@ test('archivo local de episodios: cerrar archiva, abrir intercambia, borrar elim
 });
 
 test('exportación e importación local: formato, validación y avisos', () => {
-  const v = valoracion([tug(11, '2026-09-20')], { paciente: { edad: '82', sexo: 'mujer', contexto: 'consulta por caídas', nombre: 'no debe pasar' }, episodio: { codigo: 'EP-ABCDEF', estado: 'cerrado', abierto: '2026-09-20', cerrado: HOY } });
+  const v = valoracion([tug(11, '2026-09-20')], { paciente: { edad: '82', sexo: 'mujer', contexto: 'consulta por caídas' }, episodio: { codigo: 'EP-ABCDEF', estado: 'cerrado', abierto: '2026-09-20', cerrado: HOY } });
   const x = exportarEpisodio(v, '2.0.0', new Date('2026-10-10T18:00:00Z'));
   assert.equal(x.formato, FORMATO_EXPORTACION);
   assert.equal(x.version, 1);
@@ -168,18 +169,20 @@ test('exportación e importación local: formato, validación y avisos', () => {
   assert.equal(validarImportacion({ formato: 'otro' }, porId).ok, false);
   assert.equal(validarImportacion({ ...x, version: 99 }, porId).ok, false);
   assert.equal(validarImportacion({ ...x, episodio: { resultados: 'x' } }, porId).ok, false);
+  // Fase 3.1: un instrumento desconocido o un campo de identificación rechazan el archivo completo
   const desconocido = { ...x, episodio: { ...x.episodio, resultados: [...x.episodio.resultados, { escalaId: 'no-existe', fecha: HOY }] } };
   const r2 = validarImportacion(desconocido, porId);
-  assert.equal(r2.ok, true);
-  assert.equal(r2.valoracion.resultados.length, 1);
-  assert.ok(r2.avisos.some((a) => /no reconoce/.test(a)));
+  assert.equal(r2.ok, false);
+  assert.ok(r2.errores.some((a) => /no reconocido/.test(a)));
+  const conNombre = { ...x, episodio: { ...x.episodio, paciente: { ...x.episodio.paciente, nombre: 'no debe pasar' } } };
+  assert.equal(validarImportacion(conNombre, porId).ok, false);
   const fechaMala = { ...x, episodio: { ...x.episodio, resultados: [{ escalaId: 'tug', fecha: '10/10/2026' }] } };
   assert.equal(validarImportacion(fechaMala, porId).ok, false);
   // La importación se agrega al archivo y no reemplaza la valoración en curso
   almacen.borrarTodo();
   const actual = almacen.valoracion().id;
   const imp = almacen.importarEpisodio(r.valoracion);
-  assert.ok(imp);
+  assert.ok(imp.ok);
   assert.equal(almacen.valoracion().id, actual);
   assert.equal(almacen.episodios().length, 1);
   almacen.borrarTodo();
