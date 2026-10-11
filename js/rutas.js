@@ -74,6 +74,8 @@ export const RUTAS = [
       { id: 'soledad3', nota: 'Soledad percibida, distinta del aislamiento.' },
       { id: 'maltrato', nota: 'Si hay sospecha de maltrato: escala oficial aplicada en privado.' },
       { id: 'dolorint', nota: 'Intensidad del dolor referida por la persona.' },
+      { id: 'mos', nota: 'Tipos de apoyo social disponibles (emocional, instrumental, de interacción y afectivo).' },
+      { id: 'gohai', nota: 'Autopercepción de la salud bucal (registro del total).' },
     ],
     herramientas: [{ id: 'medicacion', nota: 'Medicamentos con STOPP/START v3 y Beers 2023; los posibles problemas y la información pendiente pasan a la nota.' }],
   },
@@ -105,9 +107,10 @@ export const RUTAS = [
       { id: 'charlson', nota: 'Carga de comorbilidad (índice original y combinado con la edad); sin porcentajes de mortalidad.' },
       { id: 'cirsg', nota: 'Carga de enfermedad por sistemas; requiere juicio clínico y la información médica completa.' },
       { id: 'downton', nota: 'Riesgo de caídas durante la hospitalización.' },
-      { id: 'must', nota: 'Riesgo de desnutrición con el IMC, la pérdida de peso y la enfermedad aguda.' },
+      { id: 'must', nota: 'Registro del MUST aplicado con la herramienta oficial de BAPEN.' },
       { id: 'norton', nota: 'Alternativa a Braden para el riesgo de lesiones por presión.' },
       { id: 'dolorint', nota: 'Intensidad del dolor si la persona puede referirlo.' },
+      { id: 'lace', nota: 'Al egreso: riesgo de reingreso o muerte a 30 días; reutiliza el Charlson.' },
     ],
     herramientas: [{ id: 'medicacion', nota: 'Revisión de la medicación al ingreso o al egreso con STOPP/START v3 y Beers 2023.' }],
   },
@@ -134,6 +137,8 @@ export const RUTAS = [
       { id: 'pfeffer', nota: 'Actividades complejas informadas por un familiar: ayuda a distinguir trastorno neurocognitivo leve de mayor.' },
       { id: 'fluencia', nota: 'Fluencia semántica (animales en 1 minuto): memoria semántica y función ejecutiva.' },
       { id: 'gdsr', nota: 'Estadio global del deterioro (Reisberg), complementario de la FAST.' },
+      { id: 'gpcog', nota: 'Tamizaje con la persona y un informante (registro de los totales de la hoja oficial).' },
+      { id: 'isaacs', nota: 'Fluencia en cuatro categorías; útil con baja escolaridad o déficit sensorial.' },
     ],
   },
   {
@@ -160,6 +165,7 @@ export const RUTAS = [
       { id: 'downton', nota: 'Riesgo de caídas en el hospital o en residencias.' },
       { id: 'shortfesi', nota: 'Preocupación por caer (registro del puntaje oficial).' },
       { id: 'ves13', nota: 'Vulnerabilidad: riesgo de muerte o deterioro funcional a 2 años.' },
+      { id: 'g8', nota: 'En personas con cáncer: indica si hace falta una valoración geriátrica integral (registro del total).' },
     ],
   },
   {
@@ -182,6 +188,7 @@ export const RUTAS = [
       { id: 'fried', nota: 'Fenotipo de fragilidad si se dispone de dinamómetro y del recorrido de 4.57 m.' },
       { id: 'charlson', nota: 'Carga de comorbilidad; se informa por separado, no se combina con los riesgos quirúrgicos.' },
       { id: 'asa', nota: 'Estado físico preoperatorio de la ASA; no incluye la edad ni la fragilidad.' },
+      { id: 'caprini', nota: 'Riesgo de tromboembolia venosa y tromboprofilaxis sugerida, sin dosis.' },
     ],
   },
   {
@@ -194,6 +201,9 @@ export const RUTAS = [
       { id: 'cfs', nota: 'Grado de fragilidad.' },
     ],
     complementarios: [
+      { id: 'esasr', nota: 'Intensidad de 9 síntomas (ESAS-r); repítela para seguir la tendencia.' },
+      { id: 'spict', nota: 'Identificar necesidades de cuidados paliativos (registro del resultado de la hoja oficial).' },
+      { id: 'necpal', nota: 'Pregunta sorpresa y criterios NECPAL (registro del resultado).' },
       { id: 'dolorint', nota: 'Intensidad del dolor que refiere la persona (escala numérica o visual analógica).' },
       { id: 'painad', nota: 'Dolor si la persona no puede comunicarlo.' },
       { id: 'karnofsky', nota: 'Estado funcional de Karnofsky, sobre todo en cáncer.' },
@@ -207,16 +217,16 @@ export const RUTAS = [
       { id: 'charlson', nota: 'Carga de comorbilidad, sin porcentajes de mortalidad.' },
     ],
     herramientas: [{ id: 'medicacion', nota: 'Revisión de la medicación con STOPP/START v3 y Beers 2023, según los objetivos de cuidado.' }],
-    planes: ['ESAS-r', 'IPOS', 'SPICT', 'NECPAL (registro)'],
+    planes: ['IPOS'],
   },
   {
     id: 'calculadoras', nombre: 'Calculadoras clínicas', icono: 'calculadoras',
-    descripcion: 'Función renal: la TFG estimada clasifica la enfermedad renal; la depuración de creatinina se usa para dosificar.',
+    descripcion: 'Función renal (la TFG estimada clasifica la enfermedad renal; la depuración de creatinina se usa para dosificar) y carga de opioides en equivalentes de morfina.',
     pasos: [
       { id: 'ckdepi', grupo: 'Función renal', nota: 'TFG estimada indexada (mL/min/1.73 m²): categoría KDIGO; no confirma enfermedad renal crónica por sí sola.' },
       { id: 'cockcroft', grupo: 'Función renal', nota: 'Depuración de creatinina (mL/min): la estimación que piden muchas fichas técnicas para dosificar.' },
+      { id: 'mme', grupo: 'Opioides', nota: 'Carga total de opioides en MME/día (CDC 2022); no calcula dosis para cambiar de opioide.' },
     ],
-    planes: ['Equianalgesia de opioides'],
   },
 ];
 

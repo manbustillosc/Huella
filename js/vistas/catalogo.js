@@ -4,20 +4,11 @@ import { DOMINIOS, RUTAS } from '../datos.js';
 import { esc, icono } from '../ui.js';
 
 export const CATALOGO_FUTURO = [
-  { nombre: 'G8', dominio: 'Oncogeriatría', uso: 'Tamizaje de vulnerabilidad geriátrica en personas con cáncer.', estado: 'Por confirmar: incluye reactivos derivados del MNA, cuyo titular es Nestlé; no hay condiciones públicas para integrarlo en una app.' },
-  { nombre: 'EQ-5D', dominio: 'Calidad de vida', uso: 'Calidad de vida relacionada con la salud.', estado: 'Requiere registro y consentimiento escrito de EuroQol. Gratuito para uso no comercial; las versiones digitales se solicitan con un registro propio. El uso comercial tiene tarifa.' },
+  { nombre: 'EQ-5D', dominio: 'Calidad de vida', uso: 'Calidad de vida relacionada con la salud.', estado: 'Requiere registro y consentimiento escrito de EuroQol. Gratuito para uso no comercial tras el registro, también en versión digital (vía «Fast Track – Digital»). El uso comercial tiene tarifa.' },
   { nombre: 'WHOQOL-OLD', dominio: 'Calidad de vida', uso: 'Calidad de vida en personas mayores (módulo de la OMS).', estado: 'Permiso por estudio del centro WHOQOL de cada idioma o de la OMS; orientado a investigación, con posible tarifa si hay financiamiento comercial. Poco adecuado para una app clínica.' },
-  { nombre: 'SPICT', dominio: 'Paliativos', uso: 'Identificar a personas que podrían beneficiarse de cuidados paliativos.', estado: 'Descarga gratuita, pero no puede reproducirse en otro formato ni modificarse sin permiso del equipo SPICT: requiere permiso para integrarlo.' },
-  { nombre: 'NECPAL', dominio: 'Paliativos', uso: 'Identificar necesidades de atención paliativa en enfermedades crónicas avanzadas.', estado: 'Sin condiciones de uso públicas; la app oficial exige un curso de formación (SECPAL y UVic). Requiere permiso del Observatorio QUALY del ICO.' },
-  { nombre: 'ESAS-r', dominio: 'Paliativos', uso: 'Intensidad de síntomas frecuentes en cuidados paliativos.', estado: 'Uso libre con reconocimiento de la fuente; no puede modificarse sin consentimiento de los autores y se pide llenar un formulario de solicitud para registrar su uso.' },
   { nombre: 'IPOS', dominio: 'Paliativos', uso: 'Resultados centrados en la persona en cuidados paliativos.', estado: 'Licencia gratuita con registro en pos-pal.org; no se puede cambiar la redacción ni cobrar por su uso, y cada usuario debe registrarse.' },
-  { nombre: 'GPCOG', dominio: 'Cognitivo', uso: 'Tamizaje cognitivo con la persona y un informante para atención primaria.', estado: 'Titular: University of New South Wales. Falta confirmar si permite integrarlo en una app y elegir una versión en español validada.' },
-  { nombre: 'Prueba de Isaacs', dominio: 'Cognitivo', uso: 'Fluencia por cuatro categorías.', estado: 'Sin titular identificado; falta verificar el punto de corte y la versión en español (Carnero-Pardo) antes de integrarla.' },
-  { nombre: 'GOHAI', dominio: 'Salud oral', uso: 'Calidad de vida relacionada con la salud bucal.', estado: 'Falta verificar la versión en español validada y sus puntos de corte.' },
-  { nombre: 'Caprini', dominio: 'Prequirúrgica', uso: 'Riesgo de tromboembolia venosa en cirugía.', estado: 'Varias versiones con puntajes distintos; falta elegir y verificar la versión de referencia.' },
-  { nombre: 'Carga anticolinérgica (ACB)', dominio: 'Polifarmacia', uso: 'Suma del efecto anticolinérgico de la medicación.', estado: 'Requiere una lista actualizada de fármacos y su puntaje; mientras tanto, la revisión de medicamentos incluye la tabla 7 de Beers 2023.' },
-  { nombre: 'MOS de apoyo social', dominio: 'Social', uso: 'Apoyo social percibido (19 reactivos).', estado: 'RAND, uso libre; falta verificar la versión en español y los puntos de corte.' },
-  { nombre: 'Equianalgesia de opioides', dominio: 'Calculadoras', uso: 'Conversión entre opioides.', estado: 'Las tablas de conversión varían entre guías y el error tiene consecuencias graves; no se integrará sin una fuente única verificada y advertencias de reducción de dosis.' },
+  { nombre: 'Carga anticolinérgica (ACB)', dominio: 'Polifarmacia', uso: 'Suma del efecto anticolinérgico de la medicación.', estado: 'La escala ACB (actualización 2012) es © Regenstrief Institute y solo puede usarse según sus términos: falta su permiso (acb@agingbraincare.org). Mientras tanto, la revisión de medicamentos incluye la tabla 7 de Beers 2023.' },
+  { nombre: 'Rotación de opioides', dominio: 'Calculadoras', uso: 'Dosis del nuevo opioide al cambiar de uno a otro.', estado: 'No se integrará: las tablas varían entre guías y el error tiene consecuencias graves. Huella calcula la carga total en MME/día (CDC 2022), que los CDC indican no usar para convertir dosis.' },
 ];
 
 export function renderCatalogo() {

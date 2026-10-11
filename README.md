@@ -127,10 +127,17 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **MoCA por secciones**: el médico aplica la hoja oficial y Huella va sección por sección (visuoespacial y ejecutiva, identificación, atención, lenguaje, abstracción, recuerdo diferido y orientación) con las reglas de puntuación explicadas con redacción propia, suma, agrega el punto por escolaridad y muestra los subtotales por dominio. También acepta solo el puntaje total, y los resultados guardados antes siguen calculando.
 - **MMSE**: registro por dominio (orientación, fijación, atención y cálculo, recuerdo, lenguaje y praxis) con reglas de puntuación propias; punto de corte de la guía del IMSS según escolaridad (22 con 0 a 4 años, 24 con 5 o más) y gravedad leve, moderada y grave. No reproduce preguntas, palabras, frase, órdenes ni dibujo.
 - **Prueba del reloj** (Cacho et al., 1999): esfera, números y manecillas a la orden, a la copia o ambas, con criterios detallados; cortes ≤6 a la orden, ≤8 a la copia y ≤15 la suma; signos cualitativos.
-- **Nuevas**: FAQ de Pfeffer, GDS de Reisberg, fluencia semántica, GAD-7, CES-D 7, soledad (3 reactivos), Downton, Short FES-I, MUST, Norton, intensidad del dolor (EN/EVA), Karnofsky, PPI (reutiliza la PPS), ASA, Lubben LSNS-6, escala de maltrato (EGM, registro) y VES-13. Total: 88 instrumentos.
+- **Nuevas**: FAQ de Pfeffer, GDS de Reisberg, fluencia semántica, GAD-7, CES-D 7, soledad (3 reactivos), Downton, Short FES-I, MUST (registro), Norton, intensidad del dolor (EN/EVA), Karnofsky, PPI (reutiliza la PPS), ASA, Lubben LSNS-6, escala de maltrato (EGM, registro) y VES-13.
 - **Hoja oficial del médico**: en MoCA, MMSE y los demás instrumentos con titular, «Tu hoja oficial» guarda una copia en PDF o imagen (hasta 15 MB) que el médico obtuvo de forma legítima, para abrirla en otra pestaña o verla dentro del instrumento. Se guarda solo en ese navegador (IndexedDB `huella-documentos`): no se publica, no se sube a ningún servidor y no se incluye al exportar.
 - **Inicio**: búsqueda, favoritas y usadas con frecuencia arriba; luego la valoración en curso, resultados recientes, rutas y, más abajo, ICOPE.
 - **Paleta «Salvia clínica»** (verde salvia y terracota) para modo claro y oscuro.
+
+## Escalas sin permiso ni pago (versión 2.3)
+
+- **Cognitivas**: prueba de Isaacs (corte 27 en personas mayores) y GPCOG (registro de los totales de la persona y del informante, con el algoritmo oficial).
+- **Otras**: GOHAI (registro), MOS de apoyo social (traducción propia; cortes de De la Revilla, 2005), Caprini (versión de 2005 de la AHRQ; profilaxis sin dosis), LACE (reutiliza el Charlson; advierte su validez limitada en personas mayores), G8 (registro), ESAS-r, SPICT y NECPAL (registro del resultado) y dosis equivalente de morfina oral (MME/día, factores de los CDC 2022; no calcula dosis de rotación).
+- **MUST pasa a registro**: BAPEN cobra licencia por calcularlo dentro de apps usadas fuera del Reino Unido.
+- Total: 99 instrumentos. Siguen pendientes EQ-5D e IPOS (registro gratuito del médico), ACB (permiso de Regenstrief) y WHOQOL-OLD (no recomendado). Ver `LICENCIAS.md`.
 
 ## Pruebas y publicación
 

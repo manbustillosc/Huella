@@ -23,7 +23,7 @@ test('módulo B: 17 instrumentos en cuatro dominios nuevos o ampliados', () => {
   const plan = (d) => DOMINIOS.find((x) => x.id === d).planeadas;
   assert.ok(!plan('nutricion').some((p) => /EAT-10/.test(p)), 'EAT-10 ya no está como planeado');
   assert.ok(!plan('afectivo').some((p) => /Atenas/.test(p)));
-  assert.ok(plan('sensorial').includes('GOHAI (registro)'), 'GOHAI pendiente de verificar sus puntos de corte');
+  assert.ok(!plan('sensorial').length && porId.gohai?.registro, 'GOHAI implementado como registro con los cortes de Atchison y Dolan');
 });
 
 test('instrumentos con titular de derechos: solo registro del resultado oficial, sin reactivos', () => {

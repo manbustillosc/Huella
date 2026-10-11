@@ -225,14 +225,18 @@ test('informes: seis formatos, encabezado con el episodio, sin firma ni certific
 test('inicio y catálogo: valoración paliativa y futuras herramientas sin implementar', () => {
   const pal = RUTAS.find((r) => r.id === 'paliativa');
   assert.ok(pal);
-  assert.ok(pal.planes.includes('ESAS-r') && pal.planes.includes('IPOS'));
+  assert.deepEqual(pal.planes, ['IPOS']);
   assert.match(pal.descripcion, /La supervivencia solo se estima si eliges el PPI/);
-  assert.ok([...pal.pasos, ...pal.complementarios].some((x) => x.id === 'ppi'), 'PPI en la ruta paliativa');
+  const ids = [...pal.pasos, ...pal.complementarios].map((x) => x.id);
+  for (const id of ['ppi', 'esasr', 'spict', 'necpal']) assert.ok(ids.includes(id), `${id} en la ruta paliativa`);
   const nombres = CATALOGO_FUTURO.map((x) => x.nombre);
-  assert.ok(!nombres.includes('VES-13'), 'VES-13 ya está implementado');
-  assert.ok(Object.values(porId).some((e) => e.corto === 'VES-13'), 'VES-13 implementado');
-  for (const n of ['G8', 'EQ-5D', 'WHOQOL-OLD', 'SPICT', 'NECPAL', 'ESAS-r', 'IPOS']) {
+  for (const n of ['VES-13', 'G8', 'SPICT', 'NECPAL', 'ESAS-r']) {
+    assert.ok(!nombres.includes(n), `${n} ya no está en el catálogo`);
+    assert.ok(Object.values(porId).some((e) => e.corto === n), `${n} implementado`);
+  }
+  for (const n of ['EQ-5D', 'WHOQOL-OLD', 'IPOS', 'Carga anticolinérgica (ACB)']) {
     assert.ok(nombres.includes(n), n);
     assert.ok(!Object.values(porId).some((e) => e.corto === n), `${n} no está implementado`);
   }
+  for (const id of ['spict', 'necpal', 'g8', 'gpcog', 'gohai', 'must']) assert.ok(porId[id].registro, `${id} solo registra el resultado`);
 });

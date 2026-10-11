@@ -10,7 +10,7 @@ export const DOMINIOS = [
     id: 'cognitivo', nombre: 'Cognitivo',
     descripcion: 'Tamizaje, evaluación y estadificación del deterioro cognitivo.',
     problemas: ['memoria', 'demencia', 'olvidos'],
-    planeadas: ['GPCOG', 'Prueba de Isaacs'],
+    planeadas: [],
   },
   {
     id: 'afectivo', nombre: 'Afectivo',
@@ -58,7 +58,7 @@ export const DOMINIOS = [
     id: 'sensorial', nombre: 'Salud sensorial y oral',
     descripcion: 'Visión, audición y salud bucodental.',
     problemas: ['visión', 'audición', 'sordera', 'lentes', 'audífonos', 'boca', 'dientes'],
-    planeadas: ['GOHAI (registro)'],
+    planeadas: [],
   },
   {
     id: 'continencia', nombre: 'Continencia y eliminación',
@@ -86,15 +86,15 @@ export const DOMINIOS = [
   },
   {
     id: 'comorbilidad', nombre: 'Comorbilidad y riesgo hospitalario',
-    descripcion: 'Carga de comorbilidad (Charlson, CIRS-G) y alerta temprana de deterioro clínico (NEWS2). Sin porcentajes de mortalidad.',
+    descripcion: 'Carga de comorbilidad (Charlson, CIRS-G), alerta temprana de deterioro clínico (NEWS2) y riesgo de reingreso (LACE). Sin porcentajes de mortalidad.',
     problemas: ['comorbilidad', 'multimorbilidad', 'deterioro clínico', 'signos vitales', 'reingreso'],
-    planeadas: ['LACE (en evaluación: validez limitada en personas mayores)'],
+    planeadas: [],
   },
   {
     id: 'prequirurgica', nombre: 'Prequirúrgica',
-    descripcion: 'Riesgo cardiaco y pulmonar, capacidad funcional y vulnerabilidad geriátrica antes de la cirugía.',
+    descripcion: 'Riesgo cardiaco, pulmonar y trombótico, capacidad funcional y vulnerabilidad geriátrica antes de la cirugía.',
     problemas: ['cirugía', 'preoperatorio'],
-    planeadas: ['Caprini'],
+    planeadas: [],
   },
   {
     id: 'polifarmacia', nombre: 'Polifarmacia',
@@ -106,18 +106,18 @@ export const DOMINIOS = [
     id: 'social', nombre: 'Social y cuidador',
     descripcion: 'Riesgo social, red de apoyo, sobrecarga del cuidador y maltrato.',
     problemas: ['cuidador', 'aislamiento', 'red de apoyo', 'maltrato'],
-    planeadas: ['Cuestionario MOS de apoyo social'],
+    planeadas: [],
   },
   {
     id: 'paliativos', nombre: 'Paliativos y pronóstico',
     descripcion: 'Funcionalidad, síntomas y necesidades paliativas.',
     problemas: ['cuidados paliativos', 'pronóstico', 'fin de vida'],
-    planeadas: ['NECPAL (registro)', 'G8'],
+    planeadas: ['IPOS'],
   },
   {
     id: 'calculadoras', nombre: 'Calculadoras',
-    descripcion: 'Función renal y conversiones.',
+    descripcion: 'Función renal y carga de opioides en equivalentes de morfina.',
     problemas: ['riñón', 'dosis', 'creatinina'],
-    planeadas: ['Equianalgesia de opioides'],
+    planeadas: [],
   },
 ];

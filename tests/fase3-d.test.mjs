@@ -11,18 +11,18 @@ import { porId, resp, calc, guardado, EJEMPLOS } from './ayuda.mjs';
 const NO_CH = { iam: 'No', icc: 'No', vascular: 'No', cerebro: 'No', demencia: 'No', pulmonar: 'No', conectivo: 'No', ulcera: 'No', higado: 'No', diabetes: 'No', hemiplejia: 'No', renal: 'No', tumor: 'No', leucemia: 'No', linfoma: 'No', sida: 'No' };
 const ch = (m, edad = 75) => calc('charlson', { edad, ...NO_CH, ...m });
 
-test('módulo D: dominio de comorbilidad y riesgo hospitalario, rutas y LACE pendiente', () => {
+test('módulo D: dominio de comorbilidad y riesgo hospitalario, rutas y LACE con advertencia en personas mayores', () => {
   for (const id of ['charlson', 'cirsg', 'news2']) {
     assert.ok(porId[id] && EJEMPLOS[id], id);
     assert.equal(porId[id].dominio, 'comorbilidad');
   }
   const dom = DOMINIOS.find((d) => d.id === 'comorbilidad');
   assert.equal(dom.nombre, 'Comorbilidad y riesgo hospitalario');
-  assert.ok(dom.planeadas.some((p) => /LACE/.test(p) && /evaluación/.test(p)), 'LACE documentado como pendiente');
-  assert.ok(!porId.lace, 'LACE no se implementa');
+  assert.ok(porId.lace && porId.lace.dominio === 'comorbilidad', 'LACE implementado en comorbilidad');
+  assert.match(porId.lace.notas.join(' '), /discriminación fue pobre \(Cotter, 2012\)/);
   assert.ok(!DOMINIOS.find((d) => d.id === 'paliativos').planeadas.includes('Índice de Charlson'));
   const hosp = RUTAS.find((r) => r.id === 'hospital').complementarios.map((p) => p.id);
-  for (const id of ['news2', 'charlson', 'cirsg']) assert.ok(hosp.includes(id), id);
+  for (const id of ['news2', 'charlson', 'cirsg', 'lace']) assert.ok(hosp.includes(id), id);
 });
 
 test('Charlson: pesos originales, jerarquías y edad aparte; sin porcentajes de mortalidad', () => {

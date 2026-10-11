@@ -44,7 +44,9 @@ test('el catálogo de futuras herramientas resume las condiciones verificadas', 
   const de = (n) => CATALOGO_FUTURO.find((x) => x.nombre === n).estado;
   assert.ok(!CATALOGO_FUTURO.some((x) => x.nombre === 'VES-13'), 'VES-13 ya está implementado');
   assert.match(de('EQ-5D'), /registro y consentimiento escrito de EuroQol/);
-  assert.match(de('SPICT'), /requiere permiso/);
   assert.match(de('IPOS'), /registro en pos-pal\.org/);
-  assert.match(de('ESAS-r'), /no puede modificarse sin consentimiento/);
+  assert.match(de('Carga anticolinérgica (ACB)'), /Regenstrief/);
+  assert.match(porId.spict.licencia.texto, /no se reproduce en otro formato sin permiso/);
+  assert.match(porId.esasr.licencia.texto, /formulario de solicitud/);
+  assert.match(porId.must.licencia.texto, /no reproduce la herramienta ni calcula el puntaje/);
 });

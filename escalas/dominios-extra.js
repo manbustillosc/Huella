@@ -12,55 +12,34 @@ export const must = {
   corto: 'MUST',
   dominio: 'nutricion',
   tipo: 'tamizaje',
-  aliases: ['Malnutrition Universal Screening Tool', 'BAPEN', 'desnutrición', 'riesgo nutricional', 'IMC'],
+  registro: true,
+  aliases: ['Malnutrition Universal Screening Tool', 'BAPEN', 'desnutrición', 'riesgo nutricional'],
   problemas: ['desnutrición', 'pérdida de peso', 'riesgo nutricional', 'hospitalización'],
-  descripcion: 'IMC, pérdida de peso no intencionada en 3 a 6 meses y efecto de la enfermedad aguda: riesgo bajo, medio o alto (0 a 6).',
+  descripcion: 'Registro del puntaje obtenido con la herramienta oficial de BAPEN: riesgo bajo, medio o alto de desnutrición (0 a 6).',
   objetivo: 'Identificar desnutrición o riesgo de desnutrición en adultos en el hospital, residencias y la comunidad.',
   poblacion: 'Adultos en cualquier ámbito (BAPEN, 2003). En personas mayores, el MNA-SF es la herramienta específica.',
   aplicacion: [
-    'Mide peso y talla para el IMC. Si no se pueden medir, usa datos recientes documentados o referidos, o la circunferencia del brazo según la guía oficial de BAPEN.',
-    'Pérdida de peso: (peso previo − peso actual) ÷ peso previo × 100, en los últimos 3 a 6 meses y sin intención.',
-    'Efecto de la enfermedad aguda: solo si está gravemente enferma y no ha comido o probablemente no comerá durante más de 5 días.',
+    'Aplica el MUST con la herramienta oficial de BAPEN (descarga o calculadora en línea, gratuitas para profesionales). Huella solo registra el puntaje total y su categoría.',
+    'Puedes guardar tu copia de la herramienta oficial en «Tu hoja oficial».',
   ],
   tiempo: '3 a 5 min',
   direccionClinica: 'menor_mejor',
   textoMejoria: 'menor riesgo nutricional',
   textoEmpeoramiento: 'mayor riesgo nutricional',
-  barra: false,
   min: 0,
   max: 6,
-  campos: [
-    { id: 'peso', tipo: 'numero', texto: 'Peso actual', unidad: 'kg', min: 20, max: 300, decimales: 1 },
-    { id: 'talla', tipo: 'numero', texto: 'Talla', unidad: 'cm', min: 100, max: 220, decimales: 0 },
-    {
-      id: 'perdida', texto: 'Pérdida de peso no intencionada en los últimos 3 a 6 meses', textoCorto: 'pérdida de peso',
-      opciones: [{ texto: 'Menos de 5 %', valor: 0 }, { texto: '5 a 10 %', valor: 1 }, { texto: 'Más de 10 %', valor: 2 }],
-    },
-    {
-      id: 'aguda', texto: '¿Enfermedad aguda con ingesta nula durante más de 5 días (o previsible)?', textoCorto: 'efecto de la enfermedad aguda',
-      opciones: [{ texto: 'No', valor: 0 }, { texto: 'Sí', valor: 2 }],
-    },
-  ],
+  campos: [{ id: 'puntaje', tipo: 'numero', texto: 'Puntaje MUST total (0 a 6)', unidad: 'puntos', min: 0, max: 6, entero: true }],
   bandas: [
-    { id: 'bajo', min: 0, max: 0, etiqueta: 'Riesgo bajo de desnutrición', nivel: 'bien', texto: 'MUST 0: atención habitual y repetir el cribado (en el hospital cada semana; en residencias cada mes; en la comunidad cada año en grupos de riesgo, como mayores de 75 años).', sugerencias: [] },
+    { id: 'bajo', min: 0, max: 0, etiqueta: 'Riesgo bajo de desnutrición', nivel: 'bien', texto: 'MUST 0: atención habitual y repetir el cribado según el ámbito (hospital cada semana, residencias cada mes, comunidad cada año en grupos de riesgo).', sugerencias: [] },
     { id: 'medio', min: 1, max: 1, etiqueta: 'Riesgo medio de desnutrición', nivel: 'leve', hallazgo: true, texto: 'MUST 1: observar; registrar la ingesta durante 3 días y repetir el cribado.', sugerencias: ['Registrar la ingesta de 3 días; si es insuficiente, intervenir según la política local.', SUG.nutricion] },
     { id: 'alto', min: 2, max: 6, etiqueta: 'Riesgo alto de desnutrición', nivel: 'moderado', hallazgo: true, texto: 'MUST 2 o más: tratar. Referir a nutrición, mejorar y aumentar la ingesta y vigilar el plan.', sugerencias: ['Referir a nutrición; fijar metas de energía y proteína y vigilar el peso.', SUG.nutricion] },
   ],
-  calcular({ v }) {
-    const imc = v.peso / (v.talla / 100) ** 2;
-    const pImc = imc < 18.5 ? 2 : imc <= 20 ? 1 : 0;
-    const puntaje = pImc + v.perdida.valor + v.aguda.valor;
-    const lineas = [
-      `IMC ${imc.toFixed(1)} kg/m² (${pImc}); pérdida de peso ${v.perdida.texto.toLowerCase()} (${v.perdida.valor}); enfermedad aguda con ingesta nula ${v.aguda.valor ? 'sí' : 'no'} (${v.aguda.valor}).`,
-    ];
-    if (imc > 30) lineas.push('IMC mayor de 30: obesidad. La obesidad no excluye la desnutrición ni la sarcopenia.');
-    return { puntaje, lineas, lineasNota: lineas, extras: { imc: Number(imc.toFixed(1)) } };
-  },
+  calcular: ({ v }) => ({ puntaje: v.puntaje }),
   notas: [
-    'Puntos del IMC: más de 20, 0; 18.5 a 20, 1; menos de 18.5, 2. Pérdida de peso: menos de 5 %, 0; 5 a 10 %, 1; más de 10 %, 2. Enfermedad aguda con ingesta nula más de 5 días: 2.',
-    'Riesgo: 0 bajo, 1 medio, 2 o más alto (BAPEN).',
+    'Categorías de BAPEN: 0 riesgo bajo, 1 medio, 2 o más alto.',
+    'BAPEN cobra licencia por integrar el cálculo del MUST en apps usadas fuera del Reino Unido; por eso Huella no lo calcula y solo registra el resultado, como en un expediente clínico.',
   ],
-  licencia: { texto: '«MUST» © BAPEN (British Association for Parenteral and Enteral Nutrition). Huella aplica sus criterios publicados con redacción propia; la guía oficial está en el sitio de BAPEN.', enlace: 'https://www.bapen.org.uk/must-and-self-screening/must/' },
+  licencia: { texto: '«MUST» © BAPEN (British Association for Parenteral and Enteral Nutrition). Huella no reproduce la herramienta ni calcula el puntaje: registra el resultado obtenido con la versión oficial.', enlace: 'https://www.bapen.org.uk/must-and-self-screening/must/' },
   referencias: [
     { texto: 'Elia M. The «MUST» report. Nutritional screening of adults: a multidisciplinary responsibility. Redditch: BAPEN; 2003.', enlace: 'https://www.bapen.org.uk' },
     { texto: 'Stratton RJ, Hackston A, Longmore D, et al. Malnutrition in hospital outpatients and inpatients: prevalence, concurrent validity and ease of use of the «malnutrition universal screening tool» («MUST») for adults. Br J Nutr. 2004;92(5):799-808.', doi: '10.1079/bjn20041258' },

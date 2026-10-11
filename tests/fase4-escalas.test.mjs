@@ -166,15 +166,13 @@ test('Downton: «otros medicamentos» no suma y el corte es 3', () => {
   assert.equal(banda('downton', { ...base, caidas: 'Sí', deficits: ['visual'], mental: 'Confuso' }), 'Riesgo alto de caídas');
 });
 
-test('MUST: puntos por IMC, pérdida de peso y enfermedad aguda', () => {
-  const m = (peso, perdida, aguda = 'No') => calc('must', { peso, talla: 160, perdida, aguda });
-  assert.equal(m(53, 'Menos de 5 %').puntaje, 0); // IMC 20.7
-  assert.equal(m(50, 'Menos de 5 %').puntaje, 1); // IMC 19.5
-  assert.equal(m(46, 'Menos de 5 %').puntaje, 2); // IMC 18.0
-  assert.equal(m(53, 'Más de 10 %').puntaje, 2);
-  const alto = m(46, 'Más de 10 %', 'Sí');
-  assert.equal(alto.puntaje, 6);
-  assert.equal(alto.banda.id, 'alto');
+test('MUST: solo registro del puntaje (BAPEN cobra licencia por calcularlo en apps fuera del Reino Unido)', () => {
+  assert.ok(porId.must.registro);
+  assert.deepEqual(porId.must.campos.map((c) => c.id), ['puntaje']);
+  assert.equal(calc('must', { puntaje: 0 }).banda.id, 'bajo');
+  assert.equal(calc('must', { puntaje: 1 }).banda.id, 'medio');
+  assert.equal(calc('must', { puntaje: 2 }).banda.id, 'alto');
+  assert.match(porId.must.notas.join(' '), /no lo calcula/);
 });
 
 test('Short FES-I, Norton, LSNS-6, soledad, VES-13, PPI y fluencia: límites de bandas', () => {

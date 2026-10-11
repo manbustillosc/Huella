@@ -8,7 +8,7 @@ import { escalas, porId, resp, guardado, calc, EJEMPLOS } from './ayuda.mjs';
 const CLAVES_VINCULO = new Set(['id', 'escala', 'titulo', 'disponible', 'describir', 'aplicar', 'campos', 'advertencia']);
 
 test('estructura: los vínculos solo usan propiedades conocidas y apuntan a instrumentos registrados', () => {
-  assert.equal(escalas.length, 88);
+  assert.equal(escalas.length, 99);
   for (const e of escalas) {
     for (const v of e.vinculos || []) {
       for (const k of Object.keys(v)) assert.ok(CLAVES_VINCULO.has(k), `${e.id}: vínculo ${v.id} con propiedad desconocida «${k}»`);

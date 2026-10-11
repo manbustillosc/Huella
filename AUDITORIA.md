@@ -48,8 +48,23 @@ Revisión del 11 de octubre de 2026 sobre las 69 herramientas registradas en `es
 | FAQ de Pfeffer, GDS de Reisberg, fluencia semántica | Pfeffer, 1982; Reisberg, 1982; cortes de uso clínico | Fluencia ≤10 animales en 1 minuto es orientativo y depende de la escolaridad. |
 | GAD-7, CES-D 7, soledad (3 reactivos), LSNS-6 | Spitzer, 2006; Salinas-Rodríguez, 2014; Hughes, 2004; Lubben, 2006 | Cortes publicados. Traducción propia en soledad y LSNS-6 (por confirmar con los autores). |
 | Downton, Short FES-I | Downton, 1993; Delbaere, 2010 | Corte ≥3; 7 a 8, 9 a 13 y 14 a 28. |
-| MUST, Norton | BAPEN; Norton, 1962 | IMC, pérdida de peso y enfermedad aguda; Norton con cuatro niveles de riesgo. |
+| MUST, Norton | BAPEN; Norton, 1962 | MUST cambiado a solo registro (BAPEN cobra licencia por calcularlo en apps fuera del Reino Unido). Norton con cuatro niveles de riesgo. |
 | Intensidad del dolor, Karnofsky, PPI, ASA | Escalas de dominio público; Morita, 1999; ASA, 2020 | PPI >6: <3 semanas; >4: <6 semanas. ASA sin dirección clínica automática. |
 | Maltrato (EGM), VES-13 | Giraldo-Rodríguez, 2013; Saliba, 2001 | EGM solo registro (≥1 respuesta afirmativa); VES-13 ≥3 vulnerable. |
 
-Pendientes de esta fase: confirmar por escrito las condiciones de MUST (BAPEN), ASA, LSNS-6 y la escala breve de soledad; elegir versiones en español validadas de GPCOG, GOHAI y MOS antes de integrarlas.
+Pendientes de esta fase: confirmar por escrito las condiciones de ASA, LSNS-6 y la escala breve de soledad.
+
+## Fase 5 (versión 2.3): escalas sin permiso ni pago, 11/10/2026
+
+| Instrumento | Fuente | Revisión |
+|---|---|---|
+| Isaacs | Isaacs y Akhtar, 1972; protocolo del SAS (validación de Pascual, 1990) | 1 minuto o 10 palabras por categoría; corte ≤27 en personas mayores (≤29 en adultos). |
+| GPCOG | Brodaty, 2002 | Registro; algoritmo 9 / 5 a 8 con informante (0 a 3 alterado) / 0 a 4. |
+| GOHAI | Atchison y Dolan, 1990; Sánchez-García, 2010 | Registro; ≤50 baja, 51 a 56 moderada, 57 a 60 alta. |
+| MOS apoyo social | Sherbourne y Stewart, 1991; De la Revilla, 2005 | Global <57; emocional <24; instrumental <12; interacción <12; afectivo <9. Traducción propia (RAND permite traducir). |
+| Caprini | Caprini, 2005 (AHRQ, apéndice B.10); Gould, 2012 | Edad 41 a 60 = 1, 61 a 74 = 2, ≥75 = 3; categorías 0, 1 a 2, 3 a 4, ≥5. Sin dosis. |
+| LACE | van Walraven, 2010; Cotter, 2012 | Puntos verificados; alto riesgo ≥10; advertencia de discriminación pobre en personas mayores. |
+| G8 | Bellera, 2012 | Registro; ≤14 anormal. |
+| ESAS-r | Watanabe, 2011; manual de AHS | 9 síntomas 0 a 10; categoría por el síntoma más intenso (1 a 3, 4 a 6, 7 a 10). |
+| SPICT, NECPAL | Highet, 2014; Gómez-Batiste, 2013 | Solo registro del resultado. |
+| Equivalente de morfina | CDC, 2022 | Factores: codeína 0.15, tramadol 0.2, tapentadol 0.4, morfina 1, hidrocodona 1, oxicodona 1.5, oximorfona 3, metadona 4.7, hidromorfona 5, fentanilo TD 2.4 por mcg/h. No convierte dosis. |

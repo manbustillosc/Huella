@@ -99,7 +99,7 @@ Estados:
 | Soledad 3 reactivos | Reactivos con traducción propia | Hughes et al. (2004), derivada de la escala UCLA (Russell) | Cumple, confirmar |
 | Downton | Factores y puntuación publicados | Downton, 1993; sin titular de licencias identificado | Cumple |
 | Short FES-I | Registro del total | Prevention of Falls Network Europe y Universidad de Manchester; versiones oficiales gratuitas en su sitio | Cumple (solo registro) |
-| MUST | Criterios publicados con redacción propia; no reproduce el folleto ni las tablas de BAPEN | © BAPEN | Cumple, confirmar |
+| MUST | Registro del puntaje total; no reproduce la herramienta ni calcula el puntaje | © BAPEN. Integrar el MUST en una app usada fuera del Reino Unido requiere licencia (£20,000 + IVA por país, BAPEN 2025); el uso en expedientes para atención directa es gratuito donde el expediente no tiene costo | Cumple (solo registro; cambiado el 11/10/2026) |
 | Norton | Categorías y puntuación publicadas | Norton, McLaren y Exton-Smith, 1962; sin titular de licencias identificado | Cumple |
 | Intensidad del dolor | Escala numérica y visual analógica | Dominio público | Cumple |
 | Karnofsky | Niveles parafraseados | Karnofsky y Burchenal, 1949; dominio público | Cumple |
@@ -108,6 +108,17 @@ Estados:
 | Lubben LSNS-6 | Reactivos con traducción propia | © J. Lubben | Cumple, confirmar |
 | Maltrato (EGM) | Registro de respuestas afirmativas por tipo; no reproduce reactivos | Giraldo-Rodríguez y Rosas-Carrasco (2013), INCMNSZ | Cumple (solo registro) |
 | VES-13 | Reactivos con traducción propia | © RAND: uso no comercial sin costo ni permiso, con reconocimiento a RAND y cita de Saliba et al. (2001) | Cumple |
+| Isaacs | Consigna y cortes publicados | Isaacs y Akhtar, 1972; sin titular de derechos identificado | Cumple |
+| GPCOG | Registro de los totales y algoritmo publicado; no reproduce reactivos | © University of New South Wales; hoja oficial gratuita para uso individual no comercial | Cumple (solo registro) |
+| GOHAI | Registro del total | Atchison y Dolan, 1990; versión mexicana de Sánchez-García (2010) | Cumple (solo registro) |
+| MOS apoyo social | Reactivos con traducción propia | © RAND: uso no comercial libre, sin costo ni permiso, con cita; traducir no requiere permiso | Cumple |
+| Caprini | Factores y puntos de la versión de 2005 publicada por la AHRQ; redacción propia | Caprini, 2005; AHRQ | Cumple, confirmar |
+| LACE | Puntos publicados | van Walraven et al., 2010 (CMAJ) | Cumple |
+| G8 | Registro del total | Bellera et al., 2012; incluye reactivos derivados del MNA (Nestlé) | Cumple (solo registro) |
+| ESAS-r | Los 9 síntomas con escala de 0 a 10, sin modificar la forma | Alberta Health Services y Covenant Health: dominio público, uso libre citando la fuente; se pide un formulario de registro | Cumple; llenar el formulario (gratuito) |
+| SPICT | Registro del resultado y de las condiciones presentes; no reproduce indicadores | © University of Edinburgh; descarga gratuita; no se reproduce en otro formato sin permiso | Cumple (solo registro) |
+| NECPAL | Registro de la pregunta sorpresa y del resultado; no reproduce criterios | NECPAL CCOMS-ICO© (Institut Català d’Oncologia) | Cumple (solo registro) |
+| Equivalente de morfina | Factores de conversión de los CDC (2022) | Dominio público (gobierno de EE. UU.) | Cumple |
 | Beers 2023 | No se reproducen las tablas | American Geriatrics Society | Cumple |
 
 ## Pendiente principal: versiones en español del INGER
@@ -126,7 +137,6 @@ Huella usa las versiones en español de la *Guía de instrumentos de evaluación
 | STOP-Bang | El desarrollador pide permiso para usar el cuestionario. Huella solo registra el puntaje | Dra. Frances Chung, University Health Network (stopbang.ca) |
 | PPS | Victoria Hospice pide permiso para integrarla en software. Huella solo registra el nivel | Victoria Hospice Society |
 | CIRS-G | No hay condiciones publicadas | Departamento de Psiquiatría, University of Pittsburgh (autores del manual) |
-| MUST | BAPEN es titular; Huella aplica los criterios con redacción propia | BAPEN (bapen.org.uk) |
 | ASA | La ASA es titular de la clasificación; Huella la resume con redacción propia | American Society of Anesthesiologists |
 | Lubben LSNS-6 | Traducción propia; sin condiciones publicadas | J. Lubben (Boston College) |
 | Soledad 3 reactivos | Traducción propia de una escala derivada de UCLA | Autores de la escala (Hughes et al.) |
@@ -152,20 +162,13 @@ Hoy esos instrumentos son solo de registro. Mostrar sus reactivos requeriría:
 
 | Herramienta | Condiciones encontradas | Qué haría falta |
 |---|---|---|
-| G8 | Incluye reactivos derivados del MNA (Nestlé); sin condiciones públicas para apps | Confirmar con los autores y con Nestlé |
-| EQ-5D | Registro y consentimiento escrito de EuroQol; gratuito para uso no comercial; versiones digitales con registro propio; uso comercial con tarifa | Registro no comercial en euroqol.org |
+| EQ-5D | Registro y consentimiento escrito de EuroQol; gratuito para uso no comercial tras el registro, también en versión digital; uso comercial con tarifa | Registro no comercial en euroqol.org |
 | WHOQOL-OLD | Permiso por estudio del centro WHOQOL de cada idioma o de la OMS; orientado a investigación | No recomendado para una app clínica |
-| SPICT | Descarga gratuita; no puede reproducirse en otro formato ni modificarse sin permiso | Permiso del equipo SPICT |
-| NECPAL | Sin condiciones públicas; la app oficial exige un curso (SECPAL y UVic) | Permiso del Observatorio QUALY del ICO |
-| ESAS-r | Libre con reconocimiento de la fuente; sin modificaciones; formulario de solicitud para registrar el uso | Llenar el formulario de la University of Alberta o AHS |
-| IPOS | Licencia gratuita con registro en pos-pal.org; sin cambiar la redacción ni cobrar; cada usuario debe registrarse | Registro; revisar si es viable en una app pública |
-| GPCOG | Titular: University of New South Wales; sin condiciones verificadas para apps | Confirmar con UNSW y elegir una versión en español validada |
-| Prueba de Isaacs | Sin titular identificado | Verificar el punto de corte y la versión en español |
-| GOHAI | Sin condiciones verificadas | Verificar la versión en español validada y sus cortes |
-| Caprini | Varias versiones con puntajes distintos | Elegir y verificar la versión de referencia |
-| Carga anticolinérgica (ACB) | Lista de fármacos que cambia con el tiempo | Fuente actualizada y mantenida |
-| MOS de apoyo social | RAND, uso libre | Verificar la versión en español y los cortes |
-| Equianalgesia de opioides | Las tablas varían entre guías; el error es grave | Fuente única verificada y advertencias de reducción de dosis |
+| IPOS | Licencia gratuita con registro en pos-pal.org; sin cambiar la redacción ni cobrar; cada usuario debe registrarse | Registro y revisar sus términos para uso electrónico |
+| Carga anticolinérgica (ACB) | © Regenstrief Institute (2008, 2012); uso solo según sus términos | Permiso por escrito (acb@agingbraincare.org) |
+| Rotación de opioides | Las tablas varían entre guías; el error es grave | No se integrará; Huella calcula la carga en MME/día (CDC 2022) |
+
+Versiones completas (hoy solo registro): GPCOG (UNSW), G8 (autores y Nestlé), SPICT (equipo SPICT) y NECPAL (ICO) requieren permiso para mostrar sus reactivos o criterios dentro de Huella. MUST: BAPEN cobra licencia por calcularlo en apps fuera del Reino Unido; no se solicitará.
 
 ## Borradores de solicitud
 
