@@ -74,6 +74,7 @@ export default {
     'No diagnostica delirium. Con RASS −3 a +4 puede aplicarse el CAM-ICU; con −4 o −5 el delirium no es evaluable.',
     'Descriptores redactados para Huella a partir de la publicación original; consulta la escala completa en la publicación.',
   ],
+  licencia: { texto: 'RASS © Virginia Commonwealth University (registro de derechos de 2012). Uso clínico gratuito; la licencia solo se exige a la industria farmacéutica para ensayos clínicos.' },
   referencias: [
     { texto: 'Sessler CN, Gosnell MS, Grap MJ, et al. The Richmond Agitation-Sedation Scale: validity and reliability in adult intensive care unit patients. Am J Respir Crit Care Med. 2002;166(10):1338-44.', doi: '10.1164/rccm.2107138' },
     { texto: 'Ely EW, Truman B, Shintani A, et al. Monitoring sedation status over time in ICU patients: reliability and validity of the Richmond Agitation-Sedation Scale (RASS). JAMA. 2003;289(22):2983-91.', doi: '10.1001/jama.289.22.2983' },

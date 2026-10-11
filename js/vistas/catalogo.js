@@ -4,14 +4,14 @@ import { DOMINIOS, RUTAS } from '../datos.js';
 import { esc, icono } from '../ui.js';
 
 export const CATALOGO_FUTURO = [
-  { nombre: 'G8', dominio: 'Oncogeriatría', uso: 'Tamizaje de vulnerabilidad geriátrica en personas con cáncer.', estado: 'Licencia por verificar; incluye reactivos derivados del MNA, cuyo titular es Nestlé.' },
-  { nombre: 'VES-13', dominio: 'Fragilidad y pronóstico', uso: 'Vulnerabilidad en personas mayores que viven en la comunidad.', estado: 'Licencia y versión en español por verificar.' },
-  { nombre: 'EQ-5D', dominio: 'Calidad de vida', uso: 'Calidad de vida relacionada con la salud.', estado: 'Requiere registro y licencia de la EuroQol Research Foundation; puede tener costo según el uso.' },
-  { nombre: 'WHOQOL-OLD', dominio: 'Calidad de vida', uso: 'Calidad de vida en personas mayores (módulo de la OMS).', estado: 'Requiere autorización de la OMS; versión en español por verificar.' },
-  { nombre: 'SPICT', dominio: 'Paliativos', uso: 'Identificar a personas que podrían beneficiarse de cuidados paliativos.', estado: 'Condiciones de uso y versión en español por verificar.' },
-  { nombre: 'NECPAL', dominio: 'Paliativos', uso: 'Identificar necesidades de atención paliativa en enfermedades crónicas avanzadas.', estado: 'Solo registro del resultado; condiciones de uso por verificar.' },
-  { nombre: 'ESAS-r', dominio: 'Paliativos', uso: 'Intensidad de síntomas frecuentes en cuidados paliativos.', estado: 'Condiciones de uso y versión en español por verificar.' },
-  { nombre: 'IPOS', dominio: 'Paliativos', uso: 'Resultados centrados en la persona en cuidados paliativos.', estado: 'Requiere registro con sus autores; condiciones de uso por verificar.' },
+  { nombre: 'G8', dominio: 'Oncogeriatría', uso: 'Tamizaje de vulnerabilidad geriátrica en personas con cáncer.', estado: 'Por confirmar: incluye reactivos derivados del MNA, cuyo titular es Nestlé; no hay condiciones públicas para integrarlo en una app.' },
+  { nombre: 'VES-13', dominio: 'Fragilidad y pronóstico', uso: 'Vulnerabilidad en personas mayores que viven en la comunidad.', estado: 'RAND no cobra ni pide permiso para uso no comercial; exige reconocer a RAND y citar a Saliba et al. (2001). Falta elegir una versión en español validada.' },
+  { nombre: 'EQ-5D', dominio: 'Calidad de vida', uso: 'Calidad de vida relacionada con la salud.', estado: 'Requiere registro y consentimiento escrito de EuroQol. Gratuito para uso no comercial; las versiones digitales se solicitan con un registro propio. El uso comercial tiene tarifa.' },
+  { nombre: 'WHOQOL-OLD', dominio: 'Calidad de vida', uso: 'Calidad de vida en personas mayores (módulo de la OMS).', estado: 'Permiso por estudio del centro WHOQOL de cada idioma o de la OMS; orientado a investigación, con posible tarifa si hay financiamiento comercial. Poco adecuado para una app clínica.' },
+  { nombre: 'SPICT', dominio: 'Paliativos', uso: 'Identificar a personas que podrían beneficiarse de cuidados paliativos.', estado: 'Descarga gratuita, pero no puede reproducirse en otro formato ni modificarse sin permiso del equipo SPICT: requiere permiso para integrarlo.' },
+  { nombre: 'NECPAL', dominio: 'Paliativos', uso: 'Identificar necesidades de atención paliativa en enfermedades crónicas avanzadas.', estado: 'Sin condiciones de uso públicas; la app oficial exige un curso de formación (SECPAL y UVic). Requiere permiso del Observatorio QUALY del ICO.' },
+  { nombre: 'ESAS-r', dominio: 'Paliativos', uso: 'Intensidad de síntomas frecuentes en cuidados paliativos.', estado: 'Uso libre con reconocimiento de la fuente; no puede modificarse sin consentimiento de los autores y se pide llenar un formulario de solicitud para registrar su uso.' },
+  { nombre: 'IPOS', dominio: 'Paliativos', uso: 'Resultados centrados en la persona en cuidados paliativos.', estado: 'Licencia gratuita con registro en pos-pal.org; no se puede cambiar la redacción ni cobrar por su uso, y cada usuario debe registrarse.' },
 ];
 
 export function renderCatalogo() {

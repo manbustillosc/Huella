@@ -63,7 +63,7 @@ export default {
     'No se usa para diagnosticar ni para estadificar; tampoco es útil en delirium activo.',
     'Mini-Cog™ © S. Borson. Uso clínico y educativo; no puede modificarse. Las listas de palabras no se reproducen en Huella.',
   ],
-  licencia: { texto: 'Mini-Cog™ © S. Borson. Reproducción solo con fines clínicos y educativos.', enlace: 'https://mini-cog.com' },
+  licencia: { texto: 'Mini-Cog™ © S. Borson, todos los derechos reservados. Uso permitido con fines clínicos y educativos; no puede modificarse ni usarse con fines comerciales, de mercadotecnia o de investigación sin permiso de la autora. Huella no reproduce las series de palabras ni la hoja oficial.', enlace: 'https://mini-cog.com' },
   referencias: [
     { texto: 'Borson S, Scanlan J, Brush M, Vitaliano P, Dokmak A. The Mini-Cog: a cognitive "vital signs" measure for dementia screening in multi-lingual elderly. Int J Geriatr Psychiatry. 2000;15(11):1021-7.', doi: '10.1002/1099-1166(200011)15:11<1021::aid-gps234>3.0.co;2-6' },
     { texto: 'Carnero-Pardo C, Cruz-Orduña I, Espejo-Martínez B, et al. Utility of the Mini-Cog for detection of cognitive impairment in primary care: data from two Spanish studies. Int J Alzheimers Dis. 2013;2013:285462.', doi: '10.1155/2013/285462' },

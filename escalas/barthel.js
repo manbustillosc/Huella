@@ -122,6 +122,7 @@ export default {
     'Efecto techo: poco sensible a cambios en personas con buena funcionalidad. Complementar con Lawton-Brody o con pruebas de desempeño (SPPB).',
     'Desplazamiento: usar andadera corresponde a 10 puntos, como en la versión original y en la del INGER.',
   ],
+  licencia: { texto: 'Índice de Barthel © Maryland State Medical Society. Se requiere permiso para modificarlo o usarlo con fines comerciales; Huella lo usa sin fines de lucro, con la versión en español de la guía del INGER y sin cambiar sus reactivos ni su puntuación.' },
   referencias: [
     { texto: 'Mahoney FI, Barthel DW. Functional evaluation: the Barthel Index. Md State Med J. 1965;14:61-5.' },
     { texto: 'Shah S, Vanclay F, Cooper B. Improving the sensitivity of the Barthel Index for stroke rehabilitation. J Clin Epidemiol. 1989;42(8):703-9.', doi: '10.1016/0895-4356(89)90065-6' },

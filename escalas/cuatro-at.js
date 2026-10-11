@@ -94,6 +94,10 @@ export default {
     'Un puntaje de 1 a 3 puede reflejar deterioro cognitivo previo; conocer el estado basal ayuda a interpretarlo.',
     'Uso libre; versión original y traducciones en the4AT.com.',
   ],
+  licencia: {
+    texto: 'Adaptado del 4AT © 2011–2014 Alasdair MacLullich, Tracy Ryan y Helen Cash, con licencia CC BY 4.0 (creativecommons.org/licenses/by/4.0). Esta versión fue modificada. Cambios: redacción en español propia de Huella y formato digital interactivo; los puntos y la interpretación no cambian. No debe asumirse que la evidencia de validación publicada del 4AT oficial aplica a esta versión modificada; la versión validada en español es el 4AT-ES. Sin garantía de exactitud ni de idoneidad para un fin determinado.',
+    enlace: 'https://www.the4at.com/4at-espanol',
+  },
   referencias: [
     { texto: 'Bellelli G, Morandi A, Davis DH, et al. Validation of the 4AT, a new instrument for rapid delirium screening: a study in 234 hospitalised older people. Age Ageing. 2014;43(4):496-502.', doi: '10.1093/ageing/afu021' },
     { texto: 'Tieges Z, Maclullich AMJ, Anand A, et al. Diagnostic accuracy of the 4AT for delirium detection in older adults: systematic review and meta-analysis. Age Ageing. 2021;50(3):733-43.', doi: '10.1093/ageing/afaa224' },

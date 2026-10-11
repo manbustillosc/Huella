@@ -69,7 +69,7 @@ export default {
     'El resultado positivo indica que se cumple el algoritmo; la confirmación del diagnóstico y de su causa es clínica.',
     'Los rasgos se describen aquí de forma resumida. El instrumento completo (con su entrevista estructurada) está disponible en la red NIDUS y en el Hospital Elder Life Program.',
   ],
-  licencia: { texto: 'Algoritmo publicado por Inouye et al. (1990). Instrumento estandarizado de NIDUS bajo licencia CC BY-NC-SA 4.0.', enlace: 'https://deliriumnetwork.org' },
+  licencia: { texto: 'Adaptado del CAM: algoritmo de Inouye et al. (1990); versión estandarizada creada por el NIDUS Measurement and Harmonization Core (NIDUS – Network for Investigation of Delirium: Unifying Scientists), con licencia CC BY-NC-SA 4.0. Cambios: redacción en español propia de Huella y formato digital. Esta adaptación se comparte bajo la misma licencia (CC BY-NC-SA 4.0), sin fines comerciales.', enlace: 'https://deliriumnetwork.org' },
   referencias: [
     { texto: 'Inouye SK, van Dyck CH, Alessi CA, et al. Clarifying confusion: the confusion assessment method. A new method for detection of delirium. Ann Intern Med. 1990;113(12):941-8.', doi: '10.7326/0003-4819-113-12-941' },
     { texto: 'NIDUS – Network for Investigation of Delirium: Unifying Scientists. Confusion Assessment Method (CAM), versión estandarizada.', enlace: 'https://deliriumnetwork.org' },

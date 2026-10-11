@@ -64,6 +64,7 @@ export default {
     'Pierde fiabilidad en deterioro cognitivo moderado o grave y en afasia; en esos casos considera la escala de Cornell.',
     NOTA_INGER,
   ],
+  licencia: { texto: 'La escala original de Yesavage está en el dominio público porque se desarrolló en parte con apoyo federal de EE. UU.', enlace: 'https://web.stanford.edu/~yesavage/GDS.html' },
   referencias: [
     { texto: 'Yesavage JA, Brink TL, Rose TL, et al. Development and validation of a geriatric depression screening scale: a preliminary report. J Psychiatr Res. 1982;17(1):37-49.', doi: '10.1016/0022-3956(82)90033-4' },
     { texto: 'Sheikh JI, Yesavage JA. Geriatric Depression Scale (GDS): recent evidence and development of a shorter version. Clin Gerontol. 1986;5(1-2):165-73.', doi: '10.1300/J018v05n01_09' },

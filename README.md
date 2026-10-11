@@ -31,6 +31,7 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `js/app.js`, `js/vistas/` | Pantallas y navegación. |
 | `css/app.css` | Diseño con los colores y tipografías de la marca. |
 | `sw.js` | Copia sin conexión. |
+| `LICENCIAS.md` | Licencia, permisos y atribución de cada instrumento y material de terceros; pendientes y borradores de solicitud. |
 | `tests/` | Pruebas de escalas, comparaciones, nota, almacenamiento y rutas (`node --test tests/*.test.mjs`). `referencia-renal.json` contiene valores de una implementación independiente de CKD-EPI 2021 y Cockcroft-Gault. |
 
 ## Texto para el expediente
@@ -129,4 +130,4 @@ Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algun
 - Íconos: [Lucide](https://lucide.dev), licencia ISC (`assets/LICENSE-Lucide.txt`).
 - Tipografías: Fraunces e Inter Tight, SIL Open Font License 1.1 (`assets/fonts/`).
 
-© 2026 Manuel Bustillos. Todos los derechos reservados.
+© 2026 Manuel Bustillos. Todos los derechos reservados sobre el código y los textos propios. Los materiales de terceros conservan su licencia: las adaptaciones de ICOPE (CC BY-NC-SA 3.0 IGO), CAM (CC BY-NC-SA 4.0) e IDDSI (CC BY-SA 4.0) se comparten bajo la misma licencia que su obra original. El registro completo de licencias, permisos y atribuciones está en [LICENCIAS.md](LICENCIAS.md).

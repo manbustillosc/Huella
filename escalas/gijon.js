@@ -1,5 +1,5 @@
-// Adaptación mexicana de la escala de Gijón de valoración sociofamiliar (guía del INGER, 2022; licencia Creative Commons
-// para fines asistenciales sin ánimo de lucro, citando la fuente).
+// Adaptación mexicana de la escala de Gijón de valoración sociofamiliar (guía del INGER, 2022), usada sin fines de lucro
+// y citando la fuente. La licencia de la guía está pendiente de confirmar: ver LICENCIAS.md.
 import { REF_INGER_2022, NOTA_INGER } from './_comun.js';
 
 const area = (id, letra, nombre, textoCorto, opciones) => ({

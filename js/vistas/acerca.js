@@ -6,7 +6,7 @@ import { $, $$, icono, aviso, confirmarEnDosToques } from '../ui.js';
 export function renderAcerca() {
   const t = almacen.tema();
   const opcionTema = (valor, texto) => `<label><input type="radio" name="tema" value="${valor}"${t === valor ? ' checked' : ''}> ${texto}</label>`;
-  const conLicencia = escalas.filter((e) => e.licencia).map((e) => e.corto).join(', ');
+  const conLicencia = escalas.filter((e) => e.registro).map((e) => e.corto).join(', ');
   return `
     <section class="vista acerca">
       <header class="cabecera">
@@ -53,6 +53,7 @@ export function renderAcerca() {
 
         <h2>Fuentes y créditos</h2>
         <p class="discreto">La valoración ICOPE es una adaptación del Manual de atención integrada para las personas mayores, 2.ª ed. (Organización Panamericana de la Salud, 2025; <a href="https://doi.org/10.37774/9789275330319" target="_blank" rel="noopener">doi:10.37774/9789275330319</a>), licencia CC BY-NC-SA 3.0 IGO; las partes adaptadas se comparten bajo la misma licencia. Esta publicación es una adaptación de una obra original de la Organización Panamericana de la Salud (OPS). Las opiniones expresadas en esta adaptación son responsabilidad exclusiva de los autores y no representan necesariamente los criterios de la OPS. Huella no usa el logotipo de la OPS ni de la OMS, y no reproduce la tabla optométrica.</p>
+        <p class="discreto">Cada instrumento muestra su licencia y su atribución en «Referencias y licencia». El registro completo de licencias, permisos y atribuciones está en el archivo LICENCIAS.md del repositorio.</p>
         <p class="discreto">FRAX® y FRAXplus® son marcas registradas (© Osteoporosis Research Ltd.); Huella solo registra el resultado de la herramienta oficial y no reconstruye su algoritmo. Valores de la silla en 30 s y del equilibrio en 4 etapas: CDC STEADI.</p>
         <p class="discreto">NEWS2: reproducido de Royal College of Physicians. National Early Warning Score (NEWS) 2: Standardising the assessment of acute-illness severity in the NHS. London: RCP, 2017. La redacción de esta traducción no ha sido aprobada específicamente por el Royal College of Physicians; consulta la versión original en inglés antes de su uso clínico.</p>
         <p class="discreto">Versiones en español conforme a la Guía de instrumentos de evaluación de la capacidad funcional del Instituto Nacional de Geriatría (2022) cuando aplica, citando la fuente, con fines asistenciales sin ánimo de lucro. Íconos: Lucide (licencia ISC). Tipografías: Fraunces e Inter Tight (SIL Open Font License 1.1).</p>

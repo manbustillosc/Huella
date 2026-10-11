@@ -1659,3 +1659,7 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
   body[data-vista="informe"] .informe-doc .inf-seccion { color: #000; }
   .form-problema, .icope-form-obj, .icope-form-int, .exportar, .lista-episodios, #form-cambio, .plan-valoracion, .icope-prioridad, .plan-pie { display: none !important; }
 }
+
+/* Botones de acción con etiquetas largas (p. ej., «Actualizar la aplicación del 11/10/2026 y continuar»): se ajustan en
+   varias líneas en lugar de ensanchar la página en pantallas de 320 px. */
+.acciones .btn { white-space: normal; text-align: center; line-height: 20px; padding-top: 6px; padding-bottom: 6px; }
