@@ -59,6 +59,10 @@ import pps from './pps.js';
 import {
   icopeCognicion, icopeLocomotora, icopeVitalidad, icopeVision, icopeAudicion, icopePsicologica, icopeFactores,
 } from './icope.js';
+import { iciq, sintomasUrinarios, diarioMiccional, funcionIntestinal } from './continencia.js';
+import { isi, epworth, stopbang, suenoClinico } from './sueno.js';
+import { agudezaVisual, audiometria, hhies, ohat, saludBucal } from './sensorial.js';
+import { eat10, fois, degluObs, iddsi } from './deglucion.js';
 
 export const ESCALAS = [
   barthel, katz, lawton,
@@ -68,7 +72,10 @@ export const ESCALAS = [
   frail, cfs, fried, sarcf, sppb, vivifrail,
   icopeLocomotora, tug, velocidad, tinetti,
   icopeVitalidad, mnasf,
-  icopeVision, icopeAudicion,
+  icopeVision, agudezaVisual, icopeAudicion, audiometria, hhies, ohat, saludBucal,
+  eat10, degluObs, fois, iddsi,
+  sintomasUrinarios, iciq, diarioMiccional, funcionIntestinal,
+  suenoClinico, isi, epworth, stopbang,
   braden,
   painad,
   rcri, ariscat, dasi,

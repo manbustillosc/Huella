@@ -61,7 +61,11 @@ export const DOMINIOS_ICOPE = [
     detallada: {
       texto: 'Evalúa el estado nutricional sin análisis de sangre; el manual cita MNA, MUST, SCREEN II y SNAQ65+.',
       elegir: ['mnasf'],
-      complementarios: [{ id: 'sarcf', nota: 'Si hay debilidad o pérdida de fuerza: tamizaje de sarcopenia.' }],
+      complementarios: [
+        { id: 'sarcf', nota: 'Si hay debilidad o pérdida de fuerza: tamizaje de sarcopenia.' },
+        { id: 'bucal', nota: 'Problemas para masticar, dolor o prótesis: revisión bucal.' },
+        { id: 'eat10', nota: 'Si hay síntomas al tragar: tamizaje de disfagia.' },
+      ],
       planeadas: ['MUST'],
     },
     intervenciones: [
@@ -76,8 +80,8 @@ export const DOMINIOS_ICOPE = [
   {
     id: 'vision', nombre: 'Visión', corto: 'Visión', escala: 'icope-vis', icono: 'delirium', meses: 12, mesesMax: 24,
     detallada: {
-      texto: 'La evaluación detallada es una evaluación integral visual y ocular por personal capacitado. Registra aquí su resultado cuando lo tengas.',
-      elegir: [],
+      texto: 'La evaluación detallada es una evaluación integral visual y ocular por personal capacitado. Huella registra la agudeza visual con las categorías de la OMS; el examen ocular se registra aquí cuando lo tengas.',
+      elegir: ['agudeza'],
       externo: 'Evaluación integral visual y ocular',
       planeadas: [],
     },
@@ -92,8 +96,9 @@ export const DOMINIOS_ICOPE = [
   {
     id: 'audicion', nombre: 'Audición', corto: 'Audición', escala: 'icope-aud', icono: 'oido', meses: 12, mesesMax: 24,
     detallada: {
-      texto: 'La evaluación detallada incluye otoscopia (tratar el tapón de cerumen y repetir la prueba) y audiometría diagnóstica. Registra aquí su resultado cuando lo tengas.',
-      elegir: [],
+      texto: 'La evaluación detallada incluye otoscopia (tratar el tapón de cerumen y repetir la prueba) y audiometría diagnóstica. Huella clasifica la audiometría con los grados de la OMS; el HHIE-S mide la discapacidad percibida.',
+      elegir: ['audiometria'],
+      complementarios: [{ id: 'hhies', nota: 'Discapacidad auditiva percibida; complementa, no sustituye, a la audiometría.' }],
       externo: 'Otoscopia y audiometría diagnóstica',
       planeadas: [],
     },
@@ -133,6 +138,8 @@ export const FACTORES = {
     { id: 'tinetti', tema: 'Riesgo de caídas', nota: 'Equilibrio y marcha.' },
     { id: 'gijon', tema: 'Riesgo social', nota: 'Familia, economía, vivienda, relaciones y apoyo.' },
     { id: 'zarit', tema: 'Persona a cargo del cuidado', nota: 'Sobrecarga de quien cuida.' },
+    { id: 'urinarios', tema: 'Incontinencia urinaria', nota: 'Síntomas urinarios y datos de alarma.' },
+    { id: 'iciq', tema: 'Incontinencia urinaria', nota: 'Gravedad y repercusión de la incontinencia.' },
   ],
   intervenciones: [
     { categoria: 'social', texto: 'Referencia a Trabajo Social o a servicios comunitarios (prescripción social).' },

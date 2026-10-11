@@ -15,8 +15,8 @@ export const DOMINIOS = [
   {
     id: 'afectivo', nombre: 'Afectivo',
     descripcion: 'Síntomas depresivos, ansiedad y soledad.',
-    problemas: ['depresión', 'ansiedad', 'tristeza', 'insomnio'],
-    planeadas: ['CES-D 7', 'GAD-7', 'Escala de soledad de 3 ítems', 'Escala Atenas de insomnio'],
+    problemas: ['depresión', 'ansiedad', 'tristeza'],
+    planeadas: ['CES-D 7', 'GAD-7', 'Escala de soledad de 3 ítems'],
   },
   {
     id: 'delirium', nombre: 'Delirium y conducta',
@@ -38,14 +38,32 @@ export const DOMINIOS = [
   },
   {
     id: 'nutricion', nombre: 'Nutrición',
-    descripcion: 'Tamizaje de desnutrición y deglución.',
+    descripcion: 'Tamizaje de desnutrición y pérdida de peso.',
     problemas: ['desnutrición', 'peso', 'apetito'],
-    planeadas: ['MUST', 'EAT-10 (registro)'],
+    planeadas: ['MUST'],
+  },
+  {
+    id: 'deglucion', nombre: 'Deglución y disfagia',
+    descripcion: 'Tamizaje de disfagia, ingesta oral y textura indicada; la evaluación la hace personal capacitado.',
+    problemas: ['disfagia', 'atragantamiento', 'aspiración', 'sonda'],
+    planeadas: [],
   },
   {
     id: 'sensorial', nombre: 'Salud sensorial y oral',
     descripcion: 'Visión, audición y salud bucodental.',
     problemas: ['visión', 'audición', 'sordera', 'lentes', 'audífonos', 'boca', 'dientes'],
+    planeadas: ['GOHAI (registro)'],
+  },
+  {
+    id: 'continencia', nombre: 'Continencia y eliminación',
+    descripcion: 'Incontinencia urinaria, diario miccional y función intestinal.',
+    problemas: ['incontinencia', 'nicturia', 'estreñimiento', 'impactación fecal', 'incontinencia fecal'],
+    planeadas: [],
+  },
+  {
+    id: 'sueno', nombre: 'Sueño',
+    descripcion: 'Insomnio, somnolencia diurna y riesgo de apnea del sueño.',
+    problemas: ['insomnio', 'somnolencia', 'apnea', 'ronquido', 'hipnóticos'],
     planeadas: [],
   },
   {

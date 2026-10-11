@@ -775,7 +775,7 @@ export function renderResultado(params) {
             ${e.bandas.map((x) => `<span class="seg nivel-${x.nivel}"></span>`).join('')}
             <span class="marcador" style="left:${(pos * 100).toFixed(2)}%" aria-hidden="true">${esc(res.mostrar)}</span>
           </div>` : ''}
-        ${!res.noEvaluable && e.bandas?.length ? `
+        ${!res.noEvaluable && e.bandas?.length > 1 ? `
           <ul class="lista-bandas${barra ? '' : ' sin-barra'}">
             ${e.bandas.map((x) => {
               const act = esActual(x, b);

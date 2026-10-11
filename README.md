@@ -74,6 +74,13 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - Paso 4: estado de objetivos e intervenciones, fechas de revaloración, evolución entre aplicaciones y bitácora de cambios del plan.
 - La prueba de la silla del SPPB puede reutilizarse en la evaluación básica de la movilidad, con confirmación.
 
+## Continencia, sueño, salud sensorial y oral, deglución
+
+- Continencia y eliminación: ICIQ-UI SF (registro, gravedad de Klovning), síntomas urinarios con datos de alarma, diario miccional de 1 a 3 días (promedios e índice de poliuria nocturna de la ICS; un campo vacío no cuenta como cero) y función intestinal con la escala de Bristol en texto (sin imágenes). Ningún formulario asigna el tipo de incontinencia.
+- Sueño: ISI, Epworth y STOP-Bang como registro del resultado oficial, y registro clínico del sueño. Huella no sugiere hipnóticos.
+- Salud sensorial y oral: agudeza visual (CIE-11), audiometría (grados de la OMS 2021), HHIE-S y OHAT como registro, y revisión bucal breve.
+- Deglución: EAT-10 (registro), FOIS, observación clínica y registro de la textura IDDSI indicada por personal capacitado. Un tamizaje positivo se deriva; Huella no indica dietas ni pruebas con agua.
+
 ## Agregar una escala
 
 1. Crear `escalas/<nombre>.js` con el mismo formato que las existentes.
@@ -84,7 +91,7 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 
 ## Aviso
 
-Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algunas escalas tienen titular de derechos (por ejemplo MoCA, MNA, Zarit, CFS, Braden, RUDAS, CDR, Cornell, NPI-Q); para esas se captura solo el resultado y los puntos de corte publicados, salvo permiso del titular.
+Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algunas escalas tienen titular de derechos (por ejemplo MoCA, MNA, Zarit, CFS, Braden, RUDAS, CDR, Cornell, NPI-Q, ICIQ-UI SF, ISI, Epworth, STOP-Bang, HHIE-S, OHAT y EAT-10); para esas se captura solo el resultado y los puntos de corte publicados, salvo permiso del titular.
 
 ## Créditos
 
