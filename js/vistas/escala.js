@@ -11,9 +11,10 @@ import {
 import { valorGuardado } from '../nota.js';
 import {
   $, $$, esc, icono, plural, aviso, copiar, botonEstrella, selectorFormato, alCambiarFormato,
-  ETIQUETA_COPIAR, movimientoReducido, hoyISO, chipTipo,
+  ETIQUETA_COPIAR, movimientoReducido, hoyISO, chipTipo, confirmarEnDosToques,
 } from '../ui.js';
 import { pasosConEstado, siguientePendiente, urlPaso } from './rutas-estado.js';
+import { hojaDe, guardarHoja, quitarHoja, tamanoLegible, TIPOS_HOJA } from '../documentos.js';
 
 /* ---------- Contexto y direcciones ---------- */
 
@@ -37,6 +38,7 @@ function precargar(e, r) {
     if (c.prefill === 'edad' && p.edad) v = String(p.edad);
     if (c.prefill === 'sexo' && p.sexo) { const i = c.opciones.findIndex((o) => o.clave === p.sexo); if (i >= 0) v = i; }
     if (c.prefill === 'escolaridad12' && p.escolaridad !== '' && p.escolaridad != null) v = Number(p.escolaridad) <= 12 ? 0 : 1;
+    if (c.prefill === 'escolaridadRango' && p.escolaridad !== '' && p.escolaridad != null) { const i = c.opciones.findIndex((o) => Number(p.escolaridad) <= o.hasta); if (i >= 0) v = i; }
     if (v !== undefined) { r[c.id] = v; cambio = true; }
   }
   return cambio;
@@ -365,6 +367,7 @@ export function renderEscala(params) {
         ${botonEstrella(e.id)}
       </header>
       ${fichaEscala(e)}
+      ${e.hojaOficial || e.registro ? '<section class="hoja-oficial tarjeta" id="hoja-oficial" aria-live="polite"><p class="discreto">Buscando tu hoja oficial…</p></section>' : ''}
       ${e.momentos ? selectorMomento(ctx) : ''}
       ${datosAplicacion(e, r, ctx.momento)}
       ${avisoGuardados(ctx, r)}
@@ -381,10 +384,73 @@ function errorFechas(r) {
   return '';
 }
 
+/* ---------- Hoja oficial del médico (solo en este dispositivo) ---------- */
+
+async function pintarHoja(e) {
+  const caja = $('#hoja-oficial');
+  if (!caja) return;
+  const h = await hojaDe(e.id);
+  if (!caja.isConnected) return;
+  const entrada = '<input id="hoja-archivo" class="sr" type="file" accept="application/pdf,image/png,image/jpeg,image/webp">';
+  const privacidad = 'Se queda solo en este dispositivo: no se publica, no se sube a ningún servidor y no se incluye al exportar.';
+  caja.innerHTML = h
+    ? `<p class="titulo-tarjeta">${icono('documento')} Tu hoja oficial</p>
+      <p class="hoja-meta">${esc(h.nombre)} · ${esc(TIPOS_HOJA[h.tipo] || 'archivo')} · ${esc(tamanoLegible(h.tamano))} · agregada el ${esc(fechaCorta(new Date(h.fecha)))}</p>
+      <div class="acciones dos">
+        <button class="btn btn-primario" type="button" id="hoja-abrir">${icono('documento')} Abrir</button>
+        <button class="btn" type="button" id="hoja-ver" aria-expanded="false" aria-controls="hoja-visor">${icono('info')} Ver aquí</button>
+      </div>
+      <div class="acciones dos">
+        <label class="btn" for="hoja-archivo">${icono('subir')} Reemplazar</label>
+        <button class="btn" type="button" id="hoja-quitar">${icono('borrar')} Quitar</button>
+      </div>
+      ${entrada}
+      <div class="hoja-visor" id="hoja-visor" hidden></div>
+      <p class="discreto">${privacidad}</p>`
+    : `<p class="titulo-tarjeta">${icono('documento')} Tu hoja oficial</p>
+      <p class="discreto">Guarda aquí tu copia de la hoja oficial (PDF o imagen) para abrirla mientras aplicas la prueba. ${privacidad} Usa una copia que tengas derecho a usar.</p>
+      <div class="acciones"><label class="btn ancho" for="hoja-archivo">${icono('subir')} Agregar hoja oficial</label></div>
+      ${entrada}`;
+  $('#hoja-archivo', caja).addEventListener('change', async (ev) => {
+    const archivo = ev.target.files?.[0];
+    if (!archivo) return;
+    const r = await guardarHoja(e.id, archivo);
+    aviso(r.ok ? 'Hoja oficial guardada en este dispositivo' : r.error);
+    pintarHoja(e);
+  });
+  if (!h) return;
+  let url = null;
+  const enlace = () => { if (!url) url = URL.createObjectURL(h.blob); return url; };
+  $('#hoja-abrir', caja).addEventListener('click', () => {
+    const w = window.open(enlace(), '_blank');
+    if (!w) aviso('El navegador bloqueó la ventana: usa «Ver aquí».');
+  });
+  $('#hoja-ver', caja).addEventListener('click', (ev) => {
+    const visor = $('#hoja-visor', caja);
+    const abrirVisor = visor.hidden;
+    visor.hidden = !abrirVisor;
+    ev.currentTarget.setAttribute('aria-expanded', String(abrirVisor));
+    if (abrirVisor && !visor.childElementCount) {
+      visor.innerHTML = h.tipo === 'application/pdf'
+        ? `<object data="${enlace()}" type="application/pdf" aria-label="Hoja oficial"><p class="discreto">Este navegador no muestra el PDF aquí: usa «Abrir».</p></object>`
+        : `<img src="${enlace()}" alt="Hoja oficial">`;
+    }
+  });
+  confirmarEnDosToques($('#hoja-quitar', caja), {
+    texto: `${icono('alerta')} Toca otra vez para quitarla`,
+    accion: async () => {
+      if (url) URL.revokeObjectURL(url);
+      aviso((await quitarHoja(e.id)) ? 'Hoja oficial quitada de este dispositivo' : 'No se pudo quitar la hoja');
+      pintarHoja(e);
+    },
+  });
+}
+
 export function montarEscala(params, rerender) {
   const ctx = contexto(params);
   const { e } = ctx;
   almacen.registrarUso(e.id);
+  if (e.hojaOficial || e.registro) pintarHoja(e);
   const form = $('#form-escala');
   const pie = $('#pie-escala');
   let r = respuestasDe(ctx);

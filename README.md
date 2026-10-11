@@ -122,7 +122,15 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **ICOPE.** Una evaluación detallada solo cuenta si es de la fecha del tamizaje alterado o posterior, y del episodio; una anterior requiere que el médico confirme que sigue vigente (la confirmación vale solo para ese tamizaje). Estados: vigente, previa confirmada, previa por confirmar, no realizable y pendiente. No hay un plazo de validez uniforme.
 - **Pendientes** (`#/pendientes`): instrumentos sin terminar en esta sesión, no evaluables, evaluaciones pendientes (ICOPE y rutas), objetivos abiertos, revaloraciones vencidas y resultados por revisar su vigencia. Solo enlaza; no cambia nada.
 - **Vigencia de los resultados.** Reciente (la aplicación más reciente, del episodio y de los últimos 90 días), aplicación anterior, requiere confirmación (anterior a la apertura del episodio) y posiblemente desactualizado (más de 90 días, periodo de referencia de Huella y no criterio de validez del instrumento, o un estado momentáneo —RASS, CAM-ICU, CAM, 4AT, NEWS2— de otro día).
-- **Inicio rápido**: resultados recientes e instrumentos más usados.
+## Escalas cognitivas guiadas y escalas nuevas (versión 2.2)
+
+- **MoCA por secciones**: el médico aplica la hoja oficial y Huella va sección por sección (visuoespacial y ejecutiva, identificación, atención, lenguaje, abstracción, recuerdo diferido y orientación) con las reglas de puntuación explicadas con redacción propia, suma, agrega el punto por escolaridad y muestra los subtotales por dominio. También acepta solo el puntaje total, y los resultados guardados antes siguen calculando.
+- **MMSE**: registro por dominio (orientación, fijación, atención y cálculo, recuerdo, lenguaje y praxis) con reglas de puntuación propias; punto de corte de la guía del IMSS según escolaridad (22 con 0 a 4 años, 24 con 5 o más) y gravedad leve, moderada y grave. No reproduce preguntas, palabras, frase, órdenes ni dibujo.
+- **Prueba del reloj** (Cacho et al., 1999): esfera, números y manecillas a la orden, a la copia o ambas, con criterios detallados; cortes ≤6 a la orden, ≤8 a la copia y ≤15 la suma; signos cualitativos.
+- **Nuevas**: FAQ de Pfeffer, GDS de Reisberg, fluencia semántica, GAD-7, CES-D 7, soledad (3 reactivos), Downton, Short FES-I, MUST, Norton, intensidad del dolor (EN/EVA), Karnofsky, PPI (reutiliza la PPS), ASA, Lubben LSNS-6, escala de maltrato (EGM, registro) y VES-13. Total: 88 instrumentos.
+- **Hoja oficial del médico**: en MoCA, MMSE y los demás instrumentos con titular, «Tu hoja oficial» guarda una copia en PDF o imagen (hasta 15 MB) que el médico obtuvo de forma legítima, para abrirla en otra pestaña o verla dentro del instrumento. Se guarda solo en ese navegador (IndexedDB `huella-documentos`): no se publica, no se sube a ningún servidor y no se incluye al exportar.
+- **Inicio**: búsqueda, favoritas y usadas con frecuencia arriba; luego la valoración en curso, resultados recientes, rutas y, más abajo, ICOPE.
+- **Paleta «Salvia clínica»** (verde salvia y terracota) para modo claro y oscuro.
 
 ## Pruebas y publicación
 

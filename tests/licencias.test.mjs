@@ -42,7 +42,7 @@ test('los instrumentos con titular de derechos solo registran el resultado', () 
 
 test('el catálogo de futuras herramientas resume las condiciones verificadas', () => {
   const de = (n) => CATALOGO_FUTURO.find((x) => x.nombre === n).estado;
-  assert.match(de('VES-13'), /RAND no cobra ni pide permiso para uso no comercial/);
+  assert.ok(!CATALOGO_FUTURO.some((x) => x.nombre === 'VES-13'), 'VES-13 ya está implementado');
   assert.match(de('EQ-5D'), /registro y consentimiento escrito de EuroQol/);
   assert.match(de('SPICT'), /requiere permiso/);
   assert.match(de('IPOS'), /registro en pos-pal\.org/);

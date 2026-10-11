@@ -226,9 +226,12 @@ test('inicio y catálogo: valoración paliativa y futuras herramientas sin imple
   const pal = RUTAS.find((r) => r.id === 'paliativa');
   assert.ok(pal);
   assert.ok(pal.planes.includes('ESAS-r') && pal.planes.includes('IPOS'));
-  assert.match(pal.descripcion, /No estima la supervivencia/);
+  assert.match(pal.descripcion, /La supervivencia solo se estima si eliges el PPI/);
+  assert.ok([...pal.pasos, ...pal.complementarios].some((x) => x.id === 'ppi'), 'PPI en la ruta paliativa');
   const nombres = CATALOGO_FUTURO.map((x) => x.nombre);
-  for (const n of ['G8', 'VES-13', 'EQ-5D', 'WHOQOL-OLD', 'SPICT', 'NECPAL', 'ESAS-r', 'IPOS']) {
+  assert.ok(!nombres.includes('VES-13'), 'VES-13 ya está implementado');
+  assert.ok(Object.values(porId).some((e) => e.corto === 'VES-13'), 'VES-13 implementado');
+  for (const n of ['G8', 'EQ-5D', 'WHOQOL-OLD', 'SPICT', 'NECPAL', 'ESAS-r', 'IPOS']) {
     assert.ok(nombres.includes(n), n);
     assert.ok(!Object.values(porId).some((e) => e.corto === n), `${n} no está implementado`);
   }

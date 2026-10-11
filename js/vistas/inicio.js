@@ -70,19 +70,28 @@ function seccionAtencion(val, dias) {
     </section>`;
 }
 
-// Inicio rápido: últimos resultados guardados e instrumentos más usados en este dispositivo.
-function seccionRapida(val, frec) {
-  const recientes = resultadosRecientes(val, porId, 3);
-  if (!recientes.length && !frec.length) return '';
+// Favoritas y más usadas, arriba de todo (fase 4): el acceso más rápido a los instrumentos de cada día.
+function seccionFavoritas(favs, frec) {
   return `
-    <section class="inicio-rapido" aria-labelledby="rapido-t">
-      <h2 class="seccion" id="rapido-t">Inicio rápido</h2>
-      ${recientes.length ? `
-        <p class="ceja">Resultados recientes</p>
-        <ul class="lista-recientes">${recientes.map(({ r, href }) => `<li><a href="${href}"><strong>${esc(porId[r.escalaId].corto)}</strong> <span>${esc(valorGuardado(r))}</span><span class="discreto">${esc(etiquetaAplicacion(r) || fechaCorta(r.fecha))}</span></a></li>`).join('')}</ul>` : ''}
+    <section class="inicio-favoritas" aria-labelledby="favoritas-t">
+      <h2 class="seccion" id="favoritas-t">Favoritas</h2>
+      ${favs.length
+        ? `<div class="lista-escalas">${favs.map((id) => filaFav(id)).join('')}</div>`
+        : `<p class="discreto favoritas-vacio">${icono('estrella')} Toca la estrella de cualquier escala para tenerla aquí.</p>`}
       ${frec.length ? `
-        <p class="ceja">Usadas con frecuencia</p>
+        <h2 class="seccion">Usadas con frecuencia</h2>
         <div class="lista-escalas">${frec.map((e) => filaEscala(e, { conDominio: true })).join('')}</div>` : ''}
+    </section>`;
+}
+
+// Últimos resultados guardados de la valoración en curso.
+function seccionRecientes(val) {
+  const recientes = resultadosRecientes(val, porId, 3);
+  if (!recientes.length) return '';
+  return `
+    <section class="inicio-rapido" aria-labelledby="recientes-t">
+      <h2 class="seccion" id="recientes-t">Resultados recientes</h2>
+      <ul class="lista-recientes">${recientes.map(({ r, href }) => `<li><a href="${href}"><strong>${esc(porId[r.escalaId].corto)}</strong> <span>${esc(valorGuardado(r))}</span><span class="discreto">${esc(etiquetaAplicacion(r) || fechaCorta(r.fecha))}</span></a></li>`).join('')}</ul>
     </section>`;
 }
 
@@ -108,11 +117,12 @@ export function renderInicio() {
       </label>
       <div id="busqueda" hidden></div>
       <div id="contenido-inicio">
+        ${seccionFavoritas(favs, frec)}
         ${enCurso ? atencion : ''}
-        ${seccionRapida(val, frec)}
+        ${seccionRecientes(val)}
         <h2 class="seccion">Valoraciones</h2>
-        ${tarjetaInicioIcope()}
         <div class="rejilla-rutas">${valoraciones.map(tarjetaRuta).join('')}</div>
+        ${tarjetaInicioIcope()}
         ${enCurso ? '' : atencion}
         <h2 class="seccion">Herramientas</h2>
         <div class="rejilla-rutas herramientas-inicio">
@@ -127,9 +137,6 @@ export function renderInicio() {
             <span class="ruta-texto"><span class="ruta-nombre">Futuras herramientas</span><span class="ruta-desc">Instrumentos por agregar y el estado de su licencia.</span></span>
           </a>
         </div>
-        ${favs.length ? `
-          <h2 class="seccion">Favoritas</h2>
-          <div class="lista-escalas">${favs.map((id) => filaFav(id)).join('')}</div>` : ''}
         <h2 class="seccion">Dominios</h2>
         <div class="rejilla-dominios">${DOMINIOS.map(tarjetaDominio).join('')}</div>
       </div>

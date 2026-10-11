@@ -271,7 +271,7 @@ function aplicarTema() {
   if (t === 'claro') raiz.dataset.theme = 'light';
   else if (t === 'oscuro') raiz.dataset.theme = 'dark';
   else delete raiz.dataset.theme;
-  $('meta[name="theme-color"]').setAttribute('content', temaOscuro() ? '#111a16' : '#fbf6ec');
+  $('meta[name="theme-color"]').setAttribute('content', temaOscuro() ? '#0f1714' : '#f7f9f7');
 }
 
 /* ---------- Arranque ---------- */

@@ -36,33 +36,34 @@
 }
 
 /* ---------- Tokens ---------- */
+/* Paleta «Salvia clínica» (elegida el 11/10/2026): el verde de la huella como color principal y terracota de acento. */
 :root {
-  --surface-100: #fbf6ec;
-  --surface-200: #f4e8d0;
-  --surface-300: #eadbc0;
-  --line: #e0cfb3;
-  --ink: #2b1f1a;
-  --ink-muted: #6b564b;
+  --surface-100: #f7f9f7;
+  --surface-200: #edf2ee;
+  --surface-300: #e1e9e3;
+  --line: #d5dfd8;
+  --ink: #17241e;
+  --ink-muted: #52635a;
   --terracotta: #a55f54;
-  --terracotta-deep: #7d3f35;
-  --on-terracotta: #fbf6ec;
+  --terracotta-deep: #8a4337;
+  --on-terracotta: #ffffff;
   --orange: #d97943;
-  --orange-deep: #aa4f2b;
+  --orange-deep: #9a4a26;
   --beige: #eeb687;
   --green: #6b8d7a;
-  --green-deep: #4a6b5a;
-  --on-accent: #2b1f1a;
-  --acento: #7d3f35;
-  --on-acento: #fbf6ec;
-  --acento-borde: #a55f54;
+  --green-deep: #3f6b57;
+  --on-accent: #17241e;
+  --acento: #3f6b57;
+  --on-acento: #ffffff;
+  --acento-borde: #6b8d7a;
   --focus: var(--acento);
-  --shadow-soft: 0 1px 2px rgba(43, 31, 26, 0.06), 0 4px 16px rgba(43, 31, 26, 0.06);
+  --shadow-soft: 0 1px 2px rgba(23, 36, 30, 0.06), 0 4px 16px rgba(23, 36, 30, 0.06);
 
-  --lateral-bg: #7d3f35;
-  --lateral-ink: #fbf6ec;
-  --lateral-muted: rgba(251, 246, 236, 0.74);
-  --lateral-line: rgba(251, 246, 236, 0.2);
-  --lateral-activo: rgba(251, 246, 236, 0.14);
+  --lateral-bg: #2f5444;
+  --lateral-ink: #f3f7f4;
+  --lateral-muted: rgba(243, 247, 244, 0.76);
+  --lateral-line: rgba(243, 247, 244, 0.2);
+  --lateral-activo: rgba(243, 247, 244, 0.14);
 
   --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-sans: 'Inter Tight', 'Inter', system-ui, -apple-system, sans-serif;
@@ -87,58 +88,58 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --surface-100: #111a16;
-    --surface-200: #17231e;
-    --surface-300: #1f2e27;
-    --line: #2c3d35;
-    --ink: #f1e8d6;
-    --ink-muted: #b3c2b9;
-    --terracotta: #e09a8e;
-    --terracotta-deep: #eeb5aa;
-    --on-terracotta: #111a16;
+    --surface-100: #0f1714;
+    --surface-200: #17211c;
+    --surface-300: #1e2a24;
+    --line: #2a3a32;
+    --ink: #e8f0eb;
+    --ink-muted: #a9bcb1;
+    --terracotta: #e2a193;
+    --terracotta-deep: #edb2a6;
+    --on-terracotta: #0f1714;
     --orange: #e89a6e;
-    --orange-deep: #f0b48f;
+    --orange-deep: #f0b08a;
     --beige: #d4ad86;
     --green: #8fb9a2;
-    --green-deep: #b7d6c4;
-    --on-accent: #0f1c16;
-    --acento: #9cc3ad;
-    --on-acento: #0f1c16;
-    --acento-borde: #6b8d7a;
+    --green-deep: #a9d5bf;
+    --on-accent: #0f1714;
+    --acento: #8fc2a8;
+    --on-acento: #0f1714;
+    --acento-borde: #4f7a66;
     --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
-    --lateral-bg: #173027;
-    --lateral-ink: #f1e8d6;
-    --lateral-muted: rgba(241, 232, 214, 0.72);
-    --lateral-line: rgba(241, 232, 214, 0.16);
-    --lateral-activo: rgba(156, 195, 173, 0.16);
+    --lateral-bg: #142019;
+    --lateral-ink: #e8f0eb;
+    --lateral-muted: rgba(232, 240, 235, 0.72);
+    --lateral-line: rgba(232, 240, 235, 0.14);
+    --lateral-activo: rgba(143, 194, 168, 0.16);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --surface-100: #111a16;
-  --surface-200: #17231e;
-  --surface-300: #1f2e27;
-  --line: #2c3d35;
-  --ink: #f1e8d6;
-  --ink-muted: #b3c2b9;
-  --terracotta: #e09a8e;
-  --terracotta-deep: #eeb5aa;
-  --on-terracotta: #111a16;
+  --surface-100: #0f1714;
+  --surface-200: #17211c;
+  --surface-300: #1e2a24;
+  --line: #2a3a32;
+  --ink: #e8f0eb;
+  --ink-muted: #a9bcb1;
+  --terracotta: #e2a193;
+  --terracotta-deep: #edb2a6;
+  --on-terracotta: #0f1714;
   --orange: #e89a6e;
-  --orange-deep: #f0b48f;
+  --orange-deep: #f0b08a;
   --beige: #d4ad86;
   --green: #8fb9a2;
-  --green-deep: #b7d6c4;
-  --on-accent: #0f1c16;
-  --acento: #9cc3ad;
-  --on-acento: #0f1c16;
-  --acento-borde: #6b8d7a;
+  --green-deep: #a9d5bf;
+  --on-accent: #0f1714;
+  --acento: #8fc2a8;
+  --on-acento: #0f1714;
+  --acento-borde: #4f7a66;
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
-  --lateral-bg: #173027;
-  --lateral-ink: #f1e8d6;
-  --lateral-muted: rgba(241, 232, 214, 0.72);
-  --lateral-line: rgba(241, 232, 214, 0.16);
-  --lateral-activo: rgba(156, 195, 173, 0.16);
+  --lateral-bg: #142019;
+  --lateral-ink: #e8f0eb;
+  --lateral-muted: rgba(232, 240, 235, 0.72);
+  --lateral-line: rgba(232, 240, 235, 0.14);
+  --lateral-activo: rgba(143, 194, 168, 0.16);
   color-scheme: dark;
 }
 
@@ -1098,11 +1099,16 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .opcion.especial { border-style: dashed; }
 .opcion.especial .op-titulo { color: var(--ink-muted); }
 .reactivo.numerico .opciones { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.reactivo.numerico .opcion { justify-content: center; align-items: center; padding: var(--space-3); }
-.reactivo.numerico .op-texto { flex: none; }
-.reactivo.numerico .op-titulo { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Botones numéricos: sin círculo visible (el botón entero se rellena al elegirlo) para que quepan «100 %» o «5» en 320 px. */
+.reactivo.numerico .opcion { position: relative; justify-content: center; align-items: center; gap: 0; padding: var(--space-3) var(--space-1); }
+.reactivo.numerico .opcion input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border: 0; border-radius: inherit; opacity: 0; }
+.reactivo.numerico .opcion:has(input:checked) { background: var(--acento); border-color: var(--acento); }
+.reactivo.numerico .opcion:has(input:checked) .op-titulo { color: var(--on-acento); }
+.reactivo.numerico .opcion:has(input:focus-visible) { outline: 2px solid var(--acento); outline-offset: 2px; }
+.reactivo.numerico .op-texto { flex: none; min-width: 0; }
+.reactivo.numerico .op-titulo { font-size: clamp(15px, 4.6vw, 18px); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 @media (min-width: 640px) {
-  .reactivo.numerico { display: grid; grid-template-columns: minmax(0, 1fr) 280px; column-gap: var(--space-4); align-items: center; }
+  .reactivo.numerico { display: grid; grid-template-columns: minmax(0, 1fr) 320px; column-gap: var(--space-4); align-items: center; }
   .reactivo.numerico .opciones { margin-top: 0; }
 }
 .entrada-numero { display: flex; align-items: stretch; gap: var(--space-2); margin-top: var(--space-3); max-width: 340px; }
@@ -1708,3 +1714,16 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .lista-recientes a:hover { border-color: var(--acento-borde); }
 .lista-recientes .discreto { margin: 0; font-size: 12px; }
 @media print { .fr-vigencia { display: none; } }
+.favoritas-vacio { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-2) 0 var(--space-4); }
+.favoritas-vacio .ico { width: 18px; height: 18px; flex: none; }
+.inicio .icope-inicio { margin-top: var(--space-6); }
+
+/* ---------- Fase 4: hoja oficial del médico (solo en este dispositivo) ---------- */
+.hoja-oficial { margin: var(--space-3) 0; }
+.hoja-oficial .acciones { margin-top: var(--space-2); }
+.hoja-meta { margin: var(--space-1) 0 var(--space-2); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.hoja-visor { margin-top: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; background: var(--surface-100); }
+.hoja-visor object { display: block; width: 100%; height: 70vh; min-height: 420px; border: 0; }
+.hoja-visor img { display: block; width: 100%; height: auto; }
+.hoja-visor p { padding: var(--space-3); }
+@media print { .hoja-oficial { display: none !important; } }

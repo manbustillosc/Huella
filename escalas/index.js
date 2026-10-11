@@ -9,7 +9,8 @@
 //   registro: true si el instrumento tiene titular de derechos y solo se captura su resultado (sin reproducir reactivos)
 //   descripcion, objetivo, poblacion, aplicacion[], tiempo, aliases[], problemas[]
 //   campos[]: { id, texto, tipo: 'opciones' | 'sino' | 'numero' | 'checklist' (con «Ninguno de los anteriores» obligatorio), opciones[], unidad, unidades[], min, max,
-//               opcional, visibleSi(r), anotaA, puntua, prefill: 'edad' | 'sexo' | 'escolaridad12' }
+//               opcional, visibleSi(r), anotaA, puntua, prefill: 'edad' | 'sexo' | 'escolaridad12' | 'escolaridadRango' (opciones con «hasta» años) }
+//   hojaOficial: true si el médico puede guardar en su dispositivo su copia de la hoja oficial y abrirla desde el instrumento
 //   min, max, bandas[{ min, max, rango, etiqueta, nivel, texto, hallazgo, sugerencias[] }]
 //   calcular({ v, r, base, ctx }) para cálculo propio; resumen(res), resumenBreve(res)
 //   momentos (basal/ingreso/actual/egreso), fuente, barra, notas[], licencia, referencias[]
@@ -25,6 +26,8 @@ import katz from './katz.js';
 import lawton from './lawton.js';
 import minicog from './minicog.js';
 import moca from './moca.js';
+import mmse from './mmse.js';
+import reloj from './reloj.js';
 import gds15 from './gds15.js';
 import cuatroAt from './cuatro-at.js';
 import cam from './cam.js';
@@ -66,25 +69,29 @@ import { eat10, fois, degluObs, iddsi } from './deglucion.js';
 import { frax, dxa } from './osea.js';
 import { silla30, equilibrio4, dinamometria, ewgsop2 } from './movilidad.js';
 import { charlson, cirsg, news2 } from './comorbilidad.js';
+import { pfeffer, gdsReisberg, fluencia } from './cognitivas-extra.js';
+import { gad7, cesd7, soledad3 } from './afectivas-extra.js';
+import { downton, shortFesi } from './caidas-extra.js';
+import { must, norton, dolorIntensidad, karnofsky, ppi, asa, lsns6, maltrato, ves13 } from './dominios-extra.js';
 
 export const ESCALAS = [
-  barthel, katz, lawton,
-  icopeCognicion, minicog, moca, rudas, cdr, fast,
-  icopePsicologica, gds15, phq9, cornell,
+  barthel, katz, lawton, pfeffer,
+  icopeCognicion, minicog, moca, mmse, reloj, fluencia, rudas, cdr, gdsReisberg, fast,
+  icopePsicologica, gds15, phq9, cesd7, gad7, cornell,
   cuatroAt, cam, rass, camicu, npiq,
-  frail, cfs, fried, sarcf, dinamometria, ewgsop2, sppb, vivifrail,
-  icopeLocomotora, tug, velocidad, tinetti, silla30, equilibrio4,
+  frail, cfs, fried, sarcf, dinamometria, ewgsop2, sppb, vivifrail, ves13,
+  icopeLocomotora, tug, velocidad, tinetti, silla30, equilibrio4, downton, shortFesi,
   dxa, frax,
-  icopeVitalidad, mnasf,
+  icopeVitalidad, mnasf, must,
   icopeVision, agudezaVisual, icopeAudicion, audiometria, hhies, ohat, saludBucal,
   eat10, degluObs, fois, iddsi,
   sintomasUrinarios, iciq, diarioMiccional, funcionIntestinal,
   suenoClinico, isi, epworth, stopbang,
-  braden,
-  painad,
+  braden, norton,
+  painad, dolorIntensidad,
   charlson, cirsg, news2,
-  rcri, ariscat, dasi,
-  pps,
-  icopeFactores, zarit, gijon,
+  rcri, ariscat, dasi, asa,
+  pps, karnofsky, ppi,
+  icopeFactores, zarit, gijon, lsns6, soledad3, maltrato,
   ckdepi, cockcroft,
 ];

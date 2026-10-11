@@ -37,3 +37,19 @@ Revisión del 11 de octubre de 2026 sobre las 69 herramientas registradas en `es
 - **STOPP/START v3:** la redacción en español es condensada y propia; conviene que un segundo clínico la coteje criterio por criterio con el apéndice del artículo.
 - **Puntos de corte de masa muscular (EWGSOP2) y de fuerza (Fried):** derivados en poblaciones no mexicanas; Huella lo advierte, pero su aplicación local es una decisión clínica.
 - **Gijón:** la propia guía del INGER señala que la validez de sus puntos de corte no está establecida.
+
+## Fase 4 (versión 2.2): escalas añadidas el 11/10/2026
+
+| Instrumento | Fuente del punto de corte | Revisión |
+|---|---|---|
+| MoCA por secciones | Nasreddine, 2005; Aguilar-Navarro, 2018 (México) | Máximos por sección (5, 3, 6, 3, 2, 5, 6) y +1 por escolaridad ≤12 años solo si el total es menor de 30. Reglas con redacción propia; no reproduce láminas, palabras ni frases. |
+| MMSE | Guía IMSS-144-08; Reyes de Beaman, 2004; Franco-Marina, 2010 | Corte 24 (≥5 años) o 22 (0 a 4 años); gravedad 19 a 23, 14 a 18 y <14. Solo registro por dominio. |
+| Prueba del reloj | Cacho et al., 1999 | Orden ≤6, copia ≤8, suma ≤15. Criterios de números y manecillas resumidos; ante dudas de puntuación, consultar el artículo. |
+| FAQ de Pfeffer, GDS de Reisberg, fluencia semántica | Pfeffer, 1982; Reisberg, 1982; cortes de uso clínico | Fluencia ≤10 animales en 1 minuto es orientativo y depende de la escolaridad. |
+| GAD-7, CES-D 7, soledad (3 reactivos), LSNS-6 | Spitzer, 2006; Salinas-Rodríguez, 2014; Hughes, 2004; Lubben, 2006 | Cortes publicados. Traducción propia en soledad y LSNS-6 (por confirmar con los autores). |
+| Downton, Short FES-I | Downton, 1993; Delbaere, 2010 | Corte ≥3; 7 a 8, 9 a 13 y 14 a 28. |
+| MUST, Norton | BAPEN; Norton, 1962 | IMC, pérdida de peso y enfermedad aguda; Norton con cuatro niveles de riesgo. |
+| Intensidad del dolor, Karnofsky, PPI, ASA | Escalas de dominio público; Morita, 1999; ASA, 2020 | PPI >6: <3 semanas; >4: <6 semanas. ASA sin dirección clínica automática. |
+| Maltrato (EGM), VES-13 | Giraldo-Rodríguez, 2013; Saliba, 2001 | EGM solo registro (≥1 respuesta afirmativa); VES-13 ≥3 vulnerable. |
+
+Pendientes de esta fase: confirmar por escrito las condiciones de MUST (BAPEN), ASA, LSNS-6 y la escala breve de soledad; elegir versiones en español validadas de GPCOG, GOHAI y MOS antes de integrarlas.

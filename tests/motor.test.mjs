@@ -19,8 +19,8 @@ const REF = JSON.parse(readFileSync(new URL('./referencia-renal.json', import.me
 
 /* ---------- Estructura ---------- */
 
-test('los 69 instrumentos están disponibles y bien definidos', () => {
-  assert.equal(ESCALAS.length, 69);
+test('los 88 instrumentos están disponibles y bien definidos', () => {
+  assert.equal(ESCALAS.length, 88);
   for (const e of ESCALAS) assert.deepEqual(validarEscala(e), [], e.id);
 });
 
@@ -131,7 +131,8 @@ test('checklist: vacía queda pendiente; «Ninguno» confirma; positiva cuenta; 
 test('todas las listas de verificación exigen confirmación explícita', () => {
   for (const e of escalas) {
     for (const c of e.campos.filter((x) => x.tipo === 'checklist' && !x.opcional)) {
-      const r = calcular(e, { [c.id]: [] });
+      // Una lista que solo aparece con otra respuesta (p. ej., la orientación del MoCA guiado) se prueba con esa respuesta.
+      const r = calcular(e, { ...(e.id === 'moca' ? { modo: 0 } : {}), [c.id]: [] });
       assert.ok(r.faltan.includes(c.id), `${e.id}.${c.id}: una lista vacía no debe contar como respondida`);
     }
   }
