@@ -2,7 +2,8 @@
 import { almacen } from '../almacen.js';
 import { escalas, porId, DOMINIOS, RUTAS, dominioDe, escalasDe } from '../datos.js';
 import { TIPOS, CLASES, claseDe, TEXTO_REGISTRO } from '../motor.js';
-import { $, esc, icono, plural, sinAcentos, filaEscala, tarjetaDominio } from '../ui.js';
+import { $, esc, icono, plural, sinAcentos, filaEscala, filaHerramienta, tarjetaDominio } from '../ui.js';
+import { HERRAMIENTAS, herramientaDe, herramientasDe } from '../herramientas.js';
 import { progresoRuta, tiempoRuta } from './rutas-estado.js';
 import { diasDesde } from './valoracion.js';
 
@@ -31,7 +32,7 @@ function frecuentes() {
 
 export function renderInicio() {
   const val = almacen.valoracion();
-  const favs = almacen.favoritas().filter((id) => porId[id]);
+  const favs = almacen.favoritas().filter((id) => porId[id] || herramientaDe(id));
   const frec = frecuentes().filter((e) => !favs.includes(e.id));
   const n = val.resultados.length;
   const dias = diasDesde(val.creada);
@@ -57,7 +58,7 @@ export function renderInicio() {
         <div class="rejilla-rutas">${RUTAS.map(tarjetaRuta).join('')}</div>
         ${favs.length ? `
           <h2 class="seccion">Favoritas</h2>
-          <div class="lista-escalas">${favs.map((id) => filaEscala(porId[id], { conDominio: true })).join('')}</div>` : ''}
+          <div class="lista-escalas">${favs.map((id) => filaFav(id)).join('')}</div>` : ''}
         ${frec.length ? `
           <h2 class="seccion">Usadas con frecuencia</h2>
           <div class="lista-escalas">${frec.map((e) => filaEscala(e, { conDominio: true })).join('')}</div>` : ''}
@@ -66,6 +67,8 @@ export function renderInicio() {
       </div>
     </section>`;
 }
+
+const filaFav = (id) => (porId[id] ? filaEscala(porId[id], { conDominio: true }) : filaHerramienta(herramientaDe(id), { conDominio: true }));
 
 function textoBusqueda(e) {
   const d = dominioDe(e.dominio);
@@ -76,15 +79,16 @@ export function resultadosBusqueda(q) {
   const terminos = sinAcentos(q.trim()).split(/\s+/).filter(Boolean);
   const coincide = (t) => terminos.every((x) => t.includes(x));
   const disponibles = escalas.filter((e) => coincide(textoBusqueda(e)));
+  const herramientas = HERRAMIENTAS.filter((h) => coincide(textoBusqueda(h)));
   const rutas = RUTAS.filter((r) => coincide(sinAcentos(`${r.nombre} ${r.descripcion}`)));
   const planeadas = DOMINIOS.flatMap((d) => d.planeadas.map((nombre) => ({ nombre, d })))
     .filter(({ nombre, d }) => coincide(sinAcentos(`${nombre} ${d.nombre}`)));
-  if (!disponibles.length && !planeadas.length && !rutas.length) {
+  if (!disponibles.length && !herramientas.length && !planeadas.length && !rutas.length) {
     return `<p class="busqueda-vacia">No hay instrumentos que coincidan con «${esc(q)}».</p>`;
   }
   return `
     ${rutas.length ? `<h2 class="seccion">Rutas</h2><div class="rejilla-rutas">${rutas.map(tarjetaRuta).join('')}</div>` : ''}
-    ${disponibles.length ? `<h2 class="seccion">Instrumentos</h2><div class="lista-escalas">${disponibles.map((e) => filaEscala(e, { conDominio: true })).join('')}</div>` : ''}
+    ${disponibles.length || herramientas.length ? `<h2 class="seccion">Instrumentos</h2><div class="lista-escalas">${herramientas.map((h) => filaHerramienta(h, { conDominio: true })).join('')}${disponibles.map((e) => filaEscala(e, { conDominio: true })).join('')}</div>` : ''}
     ${planeadas.length ? `
       <h2 class="seccion">Próximamente</h2>
       <div class="lista-escalas">${planeadas.map(({ nombre, d }) => `<div class="prox-fila"><span>${esc(nombre)}</span><span>${esc(d.nombre)}</span></div>`).join('')}</div>` : ''}`;
@@ -114,8 +118,9 @@ function masUsadosDe(dominioId) {
 export function renderDominio({ id }) {
   const d = dominioDe(id);
   const lista = escalasDe(id);
+  const hs = herramientasDe(id);
   const usados = lista.length > 3 ? masUsadosDe(id) : [];
-  const clases = [...new Set(lista.map(claseDe))];
+  const clases = [...new Set([...hs, ...lista].map(claseDe))];
   const aplicados = lista.filter((e) => almacen.resultadosDe(e.id).length).length;
   return `
     <section class="vista dominio">
@@ -128,14 +133,14 @@ export function renderDominio({ id }) {
           <p class="entradilla">${esc(d.descripcion)}</p>
         </div>
       </header>
-      ${lista.length ? `
-        <p class="dominio-resumen">${plural(lista.length, 'instrumento disponible', 'instrumentos disponibles')}${aplicados ? ` · ${aplicados} en la valoración en curso` : ''}</p>
+      ${lista.length || hs.length ? `
+        <p class="dominio-resumen">${plural(lista.length + hs.length, 'instrumento disponible', 'instrumentos disponibles')}${aplicados ? ` · ${aplicados} en la valoración en curso` : ''}</p>
         ${clases.length > 1 ? `<ul class="leyenda-clases" aria-label="Tipos de instrumento">${clases.map((c) => `<li><span class="chip-tipo clase-${c}"><span class="chip-marca" aria-hidden="true"></span>${esc(CLASES[c].nombre)}</span><span>${esc(CLASES[c].ayuda)}</span></li>`).join('')}</ul>` : ''}
         ${usados.length ? `
           <h2 class="seccion">Más usados aquí</h2>
           <div class="lista-escalas">${usados.map((e) => filaEscala(e, { detalle: true })).join('')}</div>
           <h2 class="seccion">Todos</h2>` : ''}
-        <div class="lista-escalas">${lista.map((e) => filaEscala(e, { detalle: true })).join('')}</div>`
+        <div class="lista-escalas">${hs.map((h) => filaHerramienta(h)).join('')}${lista.map((e) => filaEscala(e, { detalle: true })).join('')}</div>`
         : '<p class="vacio-texto">Aún no hay instrumentos en este dominio.</p>'}
       ${d.planeadas.length ? `
         <h2 class="seccion">Próximamente</h2>
@@ -144,7 +149,7 @@ export function renderDominio({ id }) {
 }
 
 export function renderFavoritas() {
-  const favs = almacen.favoritas().filter((id) => porId[id]);
+  const favs = almacen.favoritas().filter((id) => porId[id] || herramientaDe(id));
   return `
     <section class="vista favoritas">
       <header class="cabecera">
@@ -152,7 +157,7 @@ export function renderFavoritas() {
         <h1>Favoritas</h1>
       </header>
       ${favs.length
-        ? `<div class="lista-escalas">${favs.map((id) => filaEscala(porId[id], { conDominio: true })).join('')}</div>`
+        ? `<div class="lista-escalas">${favs.map((id) => filaFav(id)).join('')}</div>`
         : `<div class="vacio-estado">
             ${icono('estrella')}
             <p>Sin favoritas todavía</p>

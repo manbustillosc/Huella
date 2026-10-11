@@ -5,6 +5,8 @@ import { porId, dominioDe, escalasDe } from './datos.js';
 import { TIPOS, CLASES, claseDe, TEXTO_REGISTRO } from './motor.js';
 import { valorGuardado } from './nota.js';
 import { vigenteDe, etiquetaAplicacion, fechaCorta } from './comparacion.js';
+import { herramientaDe, herramientasDe } from './herramientas.js';
+import { medicacionDe, resumenMedicacion } from './medicacion.js';
 
 export { icono };
 export const $ = (sel, raiz = document) => raiz.querySelector(sel);
@@ -39,9 +41,11 @@ export function alCambiarFormato(raiz, actualizar) {
     }));
 }
 
+export const nombreCorto = (id) => porId[id]?.corto || herramientaDe(id)?.corto || id;
+
 export function botonEstrella(id) {
   const fav = almacen.favoritas().includes(id);
-  const nombre = porId[id].corto;
+  const nombre = nombreCorto(id);
   return `<button class="btn-icono btn-estrella" type="button" data-fav="${id}" aria-pressed="${fav}" aria-label="${fav ? 'Quitar de' : 'Agregar a'} favoritas: ${esc(nombre)}">${icono('estrella')}</button>`;
 }
 
@@ -82,8 +86,37 @@ export function filaEscala(e, { conDominio = false, detalle = false, estado = tr
     </div>`;
 }
 
+// Estado de una herramienta en la valoración en curso.
+export function estadoHerramienta(h) {
+  if (h.id !== 'medicacion') return null;
+  const r = resumenMedicacion(medicacionDe(almacen.valoracion()));
+  if (!r.hayContenido) return { hecho: false, texto: 'Sin registrar en esta valoración' };
+  const rev = r.revisados.stopp + r.revisados.start;
+  return { hecho: true, texto: `${plural(r.m.meds.length, 'medicamento', 'medicamentos')} · ${rev} de 190 criterios revisados · ${plural(r.problemas.length, 'posible problema', 'posibles problemas')}` };
+}
+
+export function filaHerramienta(h, { conDominio = false } = {}) {
+  const st = estadoHerramienta(h);
+  const meta = [conDominio ? dominioDe(h.dominio).nombre : null, h.tiempo].filter(Boolean).join(' · ');
+  return `
+    <div class="fila-escala herramienta">
+      <a class="fila-enlace" href="${h.href}">
+        <span class="fila-texto">
+          <span class="fila-nombre">${esc(h.nombre)}</span>
+          <span class="fila-desc">${esc(h.descripcion)}</span>
+          <span class="fila-etiquetas">${chipTipo(h)}<span class="fila-meta">${esc(meta)}</span></span>
+          ${st ? `<span class="fila-estado${st.hecho ? ' hecho' : ''}">${icono(st.hecho ? 'completo' : 'pendiente')} ${esc(st.texto)}</span>` : ''}
+        </span>
+        <span class="fila-aplicar" aria-hidden="true">Abrir</span>
+      </a>
+      ${botonEstrella(h.id)}
+    </div>`;
+}
+
+export const cuentaDominio = (id) => escalasDe(id).length + herramientasDe(id).length;
+
 export function tarjetaDominio(d) {
-  const n = escalasDe(d.id).length;
+  const n = cuentaDominio(d.id);
   return `
     <a class="tarjeta-dominio${n ? '' : ' vacio'}" href="#/d/${d.id}">
       <span class="ico-dominio">${icono(d.id)}</span>

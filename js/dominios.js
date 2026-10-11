@@ -62,9 +62,9 @@ export const DOMINIOS = [
   },
   {
     id: 'polifarmacia', nombre: 'Polifarmacia',
-    descripcion: 'Carga anticolinérgica y prescripción potencialmente inapropiada.',
+    descripcion: 'Registro de la medicación y revisión de prescripción potencialmente inapropiada y omisiones.',
     problemas: ['medicamentos', 'fármacos', 'deprescripción'],
-    planeadas: ['Carga anticolinérgica (ACB)', 'STOPP/START', 'Criterios de Beers'],
+    planeadas: ['Carga anticolinérgica (ACB)'],
   },
   {
     id: 'social', nombre: 'Social y cuidador',

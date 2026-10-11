@@ -4,7 +4,8 @@ import { rutaDe } from '../datos.js';
 import { momentoDe } from '../motor.js';
 import { valorGuardado } from '../nota.js';
 import { etiquetaAplicacion } from '../comparacion.js';
-import { $$, esc, icono, plural, aviso } from '../ui.js';
+import { $$, esc, icono, plural, aviso, estadoHerramienta } from '../ui.js';
+import { herramientaDe } from '../herramientas.js';
 import { progresoRuta, siguientePendiente, urlPaso, tiempoRuta, momentoDeRuta } from './rutas-estado.js';
 
 const ESTADOS = {
@@ -100,6 +101,24 @@ export function renderRuta({ id }) {
         <h2 class="seccion">Complementarias</h2>
         <p class="discreto">Opcionales: aplícalas según los hallazgos. No cuentan para el progreso.</p>
         <ol class="pasos">${listaPasos(ruta, p.complementarios)}</ol>` : ''}
+      ${(ruta.herramientas || []).length ? `
+        <h2 class="seccion">Herramientas</h2>
+        <ol class="pasos">${ruta.herramientas.map((x) => {
+          const h = herramientaDe(x.id);
+          const st = estadoHerramienta(h);
+          return `
+            <li class="paso complementario ${st?.hecho ? 'completo' : 'pendiente'}">
+              <a class="paso-enlace" href="${h.href}">
+                <span class="paso-num" aria-hidden="true">+</span>
+                <span class="paso-texto">
+                  <span class="paso-nombre">${esc(h.corto)}</span>
+                  ${x.nota ? `<span class="paso-nota">${esc(x.nota)}</span>` : ''}
+                  ${st?.hecho ? `<span class="paso-desc">${esc(st.texto)}</span>` : ''}
+                </span>
+                <span class="estado estado-${st?.hecho ? 'completo' : 'pendiente'}">${icono(st?.hecho ? 'completo' : 'pendiente')} ${st?.hecho ? 'En curso' : 'Pendiente'}</span>
+              </a>
+            </li>`;
+        }).join('')}</ol>` : ''}
       ${planes.length ? `
         <h2 class="seccion">Próximamente</h2>
         <ul class="chips">${planes.map((x) => `<li>${esc(x.plan)}</li>`).join('')}</ul>

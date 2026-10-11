@@ -1,6 +1,7 @@
 // Rutas clínicas guiadas.
 // pasos: núcleo de la ruta (cuenta para el progreso). complementarios: opcionales, según hallazgos.
 // planes: instrumentos aún no disponibles (se muestran como «Próximamente», sin simularlos).
+// herramientas: pantallas propias (p. ej., revisión de medicamentos) que se ofrecen como complementarias.
 // Cada paso puede llevar nota (finalidad o cuándo aplicarlo), momento y grupo.
 // Un paso sin momento usa el de la ruta; en «hospital» el médico elige ingreso, actual o egreso.
 export const RUTAS = [
@@ -43,7 +44,7 @@ export const RUTAS = [
       { id: 'tinetti', nota: 'Equilibrio y marcha por separado si hay caídas o inestabilidad.' },
       { id: 'vivifrail', nota: 'Prescripción de ejercicio a partir del SPPB.' },
     ],
-    planes: ['STOPP/START'],
+    herramientas: [{ id: 'medicacion', nota: 'Medicamentos con STOPP/START v3 y Beers 2023; los posibles problemas y la información pendiente pasan a la nota.' }],
   },
   {
     id: 'hospital', nombre: 'Valoración hospitalaria', icono: 'hospital',
@@ -68,6 +69,7 @@ export const RUTAS = [
       { id: 'rass', nota: 'Nivel de agitación o sedación; en UCI es el paso previo del CAM-ICU.' },
       { id: 'camicu', nota: 'Solo en UCI o con ventilación mecánica; no es intercambiable con el CAM.' },
     ],
+    herramientas: [{ id: 'medicacion', nota: 'Revisión de la medicación al ingreso o al egreso con STOPP/START v3 y Beers 2023.' }],
   },
   {
     id: 'cognitiva', nombre: 'Evaluación cognitiva', icono: 'cognitivo',

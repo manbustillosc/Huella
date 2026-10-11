@@ -19,7 +19,7 @@ export function renderAcerca() {
         <h2 id="privacidad">${icono('escudo')} Qué se guarda y dónde</h2>
         <p>Todo se calcula en este navegador. Huella no tiene servidor y no envía datos a ningún lugar.</p>
         <ul>
-          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, y respuestas): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio: inicia una nueva para no mezclar resultados de episodios distintos.</li>
+          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, respuestas, y la lista de medicamentos con su revisión STOPP/START y Beers): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio: inicia una nueva para no mezclar resultados de episodios distintos.</li>
           <li><strong>Respuestas en edición</strong>: en el almacenamiento de la pestaña; se borran al cerrarla y nunca se mezclan con otra valoración.</li>
           <li><strong>Preferencias</strong> (favoritas, tema, formato de la nota, instrumentos más usados): en el almacenamiento local.</li>
         </ul>

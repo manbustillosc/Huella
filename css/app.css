@@ -1355,6 +1355,64 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .siguientes li a .chev { width: 16px; height: 16px; }
 .sig-hecho { color: var(--green-deep); font-size: 13px; }
 
+/* Revisión de medicamentos */
+.medicacion .tarjeta { margin-bottom: var(--space-4); }
+.medicacion .titulo-tarjeta { font-size: 16px; margin-top: 0; }
+.pestanas-med { display: flex; flex-wrap: wrap; gap: var(--space-1); margin: 0 0 var(--space-6); padding: 4px; border-radius: var(--radius-md); background: var(--surface-200); min-width: 0; }
+.pestanas-med a { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 var(--space-3); border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--ink-muted); text-decoration: none; white-space: nowrap; }
+.pestanas-med a.activo { background: var(--surface-100); color: var(--acento); box-shadow: 0 0 0 1px var(--line); }
+.pestanas-med a:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.pest-cuenta { font-size: 12px; font-weight: 700; color: var(--ink-muted); }
+.vinculos-lista { list-style: none; margin: 0 0 var(--space-3); padding: 0; display: grid; gap: var(--space-2); }
+.renal-manual summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--acento); min-height: 32px; }
+.renal-manual .campos { margin: var(--space-2) 0 var(--space-3); }
+.renal-actual { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: var(--space-3) 0 0; font-size: 14px; color: var(--ink); }
+.renal-actual .ico { width: 16px; height: 16px; color: var(--acento); }
+.enlace { padding: 0; border: 0; background: none; color: var(--acento); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; min-height: 32px; }
+.campos-med { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.acciones-form { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.lista-meds { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.med { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3) var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-100); }
+.med-texto { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.med-nombre { font-weight: 600; overflow-wrap: anywhere; }
+.med-comercial { font-weight: 400; color: var(--ink-muted); }
+.med-pauta, .med-indicacion, .med-obs { font-size: 14px; line-height: 20px; color: var(--ink-muted); overflow-wrap: anywhere; }
+.med-indicacion.falta { color: var(--orange-deep); }
+.med-acciones { display: flex; gap: 2px; flex: none; }
+.intro-crit { margin-bottom: var(--space-4); font-size: 15px; line-height: 22px; }
+.intro-crit p { margin: 0 0 var(--space-2); }
+.seccion-crit { margin-bottom: var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-100); }
+.seccion-crit > summary { display: grid; grid-template-columns: 32px minmax(0, 1fr); column-gap: var(--space-2); align-items: center; padding: var(--space-3) var(--space-4); cursor: pointer; list-style: none; }
+.seccion-crit > summary::-webkit-details-marker { display: none; }
+.seccion-crit > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--radius-md); }
+.sec-letra { grid-row: span 2; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-300); font-weight: 700; color: var(--ink); }
+.sec-titulo { font-weight: 600; }
+.sec-cuenta { font-size: 13px; color: var(--ink-muted); }
+.seccion-crit[open] > summary { border-bottom: 1px solid var(--line); }
+.seccion-crit > .btn { width: auto; max-width: calc(100% - 2 * var(--space-4)); margin: var(--space-3) var(--space-4) 0; white-space: normal; text-align: left; }
+.criterios { list-style: none; margin: 0; padding: var(--space-2) var(--space-4) var(--space-4); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+.criterio { padding: var(--space-3); border-radius: var(--radius-sm); background: var(--surface-200); border-left: 4px solid var(--line); }
+.criterio.est-cumple { border-left-color: var(--terracotta-deep); }
+.criterio.est-no { border-left-color: var(--green); }
+.criterio.est-ne { border-left-color: var(--orange); }
+.crit-texto { margin: 0 0 var(--space-2); font-size: 15px; line-height: 22px; }
+.crit-codigo { display: inline-block; margin-right: 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--acento); white-space: nowrap; }
+.estados-crit { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.est-op { position: relative; display: inline-flex; align-items: center; min-height: 36px; padding: 0 var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface-100); font-size: 13px; font-weight: 600; color: var(--ink-muted); cursor: pointer; }
+.est-op input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.est-op:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 1px; }
+.est-op:has(input:checked) { color: var(--ink); border-color: var(--acento); box-shadow: inset 0 0 0 1px var(--acento); }
+.est-op.op-cumple:has(input:checked) { border-color: var(--terracotta-deep); box-shadow: inset 0 0 0 1px var(--terracotta-deep); color: var(--terracotta-deep); }
+.est-op.op-hallazgo:has(input:checked) { border-color: var(--terracotta-deep); box-shadow: inset 0 0 0 1px var(--terracotta-deep); color: var(--terracotta-deep); }
+.crit-med { display: grid; gap: var(--space-1); margin-top: var(--space-2); font-size: 13px; font-weight: 500; color: var(--ink-muted); }
+.crit-med select { width: 100%; min-width: 0; min-height: 40px; padding: 0 var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-100); color: var(--ink); font-size: 15px; }
+.beers-cat .titulo-tarjeta { font-size: 15px; line-height: 21px; }
+.beers-nota { margin-top: var(--space-3); }
+.beers-nota textarea { width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-100); color: var(--ink); font: inherit; font-size: 16px; resize: vertical; }
+.medicacion .tarjeta ul { margin: 0; padding-left: var(--space-6); display: grid; gap: var(--space-1); font-size: 15px; line-height: 22px; }
+.tarjeta-med { margin-bottom: var(--space-4); }
+@media (max-width: 560px) { .campos-med { grid-template-columns: minmax(0, 1fr); } }
+
 @media print {
   .tira-ruta, .segmentado, .ficha, .aplicacion, .no-evaluable, .vinculos { display: none !important; }
 }

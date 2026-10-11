@@ -1,0 +1,332 @@
+// Criterios STOPP/START versión 3 (O'Mahony et al., Eur Geriatr Med 2023; licencia CC BY 4.0).
+// Redacción condensada en español elaborada para Huella a partir del apéndice 1 del artículo:
+// no es una traducción oficial. Ante cualquier duda, consulta el texto original del criterio.
+
+export const STOPP = [
+  {
+    letra: 'A', titulo: 'Indicación del medicamento',
+    criterios: [
+      'Cualquier fármaco sin indicación clínica.',
+      'Cualquier fármaco más allá de la duración recomendada, cuando la duración del tratamiento está bien definida.',
+      'Duplicidad de clase para uso diario regular (no a demanda): p. ej., dos AINE, ISRS, diuréticos de asa, IECA, anticoagulantes, antipsicóticos u opioides. Optimizar primero la monoterapia.',
+    ],
+  },
+  {
+    letra: 'B', titulo: 'Sistema cardiovascular',
+    criterios: [
+      'Digoxina en insuficiencia cardiaca con función sistólica normal (sin beneficio claro).',
+      'Verapamilo o diltiazem en insuficiencia cardiaca NYHA III–IV (puede empeorar la IC con fracción de expulsión reducida).',
+      'Betabloqueador combinado con verapamilo o diltiazem (riesgo de bloqueo cardiaco).',
+      'Fármacos que reducen la frecuencia ventricular (betabloqueador, verapamilo, diltiazem, digoxina) con bradicardia <50/min, bloqueo AV de segundo grado tipo II o bloqueo completo.',
+      'Betabloqueador en monoterapia para hipertensión no complicada, sin angina, aneurisma aórtico u otra indicación de betabloqueo.',
+      'Amiodarona como antiarrítmico de primera línea en taquiarritmias supraventriculares (más efectos adversos graves que betabloqueadores, digoxina, verapamilo o diltiazem).',
+      'Diurético de asa como primera línea para hipertensión, salvo insuficiencia cardiaca que requiera diurético.',
+      'Diurético de asa para edema maleolar declive sin datos clínicos, bioquímicos o radiológicos de insuficiencia cardiaca, hepática, renal o síndrome nefrótico (suele bastar elevar las piernas o medias de compresión).',
+      'Tiazida con hipopotasemia significativa (K+ <3.0 mmol/L), hiponatremia (Na+ <130 mmol/L), hipercalcemia (calcio corregido >2.65 mmol/L) o antecedente de gota.',
+      'Diurético de asa para hipertensión en presencia de incontinencia urinaria (puede empeorarla).',
+      'Antihipertensivos de acción central (metildopa, clonidina, moxonidina, rilmenidina, guanfacina): peor tolerados en personas mayores.',
+      'IECA o ARA II con hiperpotasemia (K+ >5.5 mmol/L).',
+      'Antagonistas de aldosterona (espironolactona, eplerenona) con otros fármacos ahorradores de potasio (IECA, ARA II, amilorida, triamtereno) sin vigilancia del potasio sérico al menos cada 6 meses (riesgo de K+ >6.0 mmol/L).',
+      'Inhibidores de la fosfodiesterasa 5 (sildenafil, tadalafil, vardenafil) en insuficiencia cardiaca grave con hipotensión (PAS <90 mmHg) o con nitratos para angina (riesgo de colapso cardiovascular).',
+      'Fármacos que prolongan el QTc en personas con QTc prolongado (>450 ms en hombres, >470 ms en mujeres): p. ej., quinolonas, macrólidos, ondansetrón, citalopram >20 mg/día, escitalopram >10 mg/día, tricíclicos, litio, haloperidol, digoxina, antiarrítmicos IA y III, tizanidina, fenotiazinas, mirabegrón.',
+      'Estatinas en prevención cardiovascular primaria en personas de 85 años o más con fragilidad establecida y esperanza de vida probablemente menor de 3 años.',
+      'AINE sistémicos a largo plazo con antecedente de enfermedad vascular coronaria, cerebral o periférica (riesgo de trombosis).',
+      'Antipsicóticos a largo plazo con antecedente de enfermedad vascular coronaria, cerebral o periférica (riesgo de trombosis).',
+      'AINE o corticoides sistémicos en insuficiencia cardiaca que requiere diurético de asa (riesgo de descompensación).',
+      'Antihipertensivos en estenosis aórtica grave sintomática (riesgo de hipotensión grave y síncope).',
+      'Digoxina como primera línea para el control de frecuencia a largo plazo (>3 meses) en fibrilación auricular (en general son preferibles los betabloqueadores cardioselectivos).',
+    ],
+  },
+  {
+    letra: 'C', titulo: 'Coagulación',
+    criterios: [
+      'Ácido acetilsalicílico a largo plazo a dosis mayores de 100 mg/día (más sangrado, sin más eficacia).',
+      'Antiagregantes, antagonistas de la vitamina K, inhibidores directos de la trombina o del factor Xa con riesgo significativo de sangrado mayor (hipertensión grave no controlada, diátesis hemorrágica, sangrado espontáneo reciente no trivial).',
+      'Ácido acetilsalicílico más clopidogrel como prevención secundaria de ictus a largo plazo (>4 semanas), salvo stent coronario en los 12 meses previos, síndrome coronario agudo o estenosis carotídea sintomática de alto grado.',
+      'Antiagregantes junto con anticoagulante (AVK, inhibidor directo de trombina o de factor Xa) en fibrilación auricular crónica, salvo stent coronario o estenosis coronaria angiográfica de alto grado (>50 %).',
+      'Antiagregantes junto con anticoagulante en enfermedad coronaria, cerebrovascular o arterial periférica estable (sin beneficio añadido de la terapia doble).',
+      'Ticlopidina en cualquier circunstancia.',
+      'Antiagregantes como alternativa a la anticoagulación para prevenir ictus en fibrilación auricular crónica (sin eficacia demostrada).',
+      'Anticoagulante por más de 6 meses tras una primera trombosis venosa profunda sin factores provocadores persistentes (p. ej., trombofilia).',
+      'Anticoagulante por más de 12 meses tras una primera embolia pulmonar sin factores provocadores persistentes.',
+      'AINE combinado con anticoagulante (AVK, inhibidor directo de trombina o de factor Xa): riesgo de sangrado gastrointestinal mayor.',
+      'Antagonista de la vitamina K como anticoagulante de primera línea en fibrilación auricular, salvo válvula mecánica, estenosis mitral moderada a grave o TFGe <15 mL/min/1.73 m².',
+      'ISRS combinado con anticoagulante en personas con antecedente de hemorragia mayor.',
+      'Inhibidor directo de la trombina (p. ej., dabigatrán) con diltiazem o verapamilo (más riesgo de sangrado).',
+      'Apixabán, dabigatrán, edoxabán o rivaroxabán con inhibidores de la glucoproteína P (p. ej., amiodarona, azitromicina, carvedilol, ciclosporina, dronedarona, itraconazol, ketoconazol sistémico, macrólidos, quinina, ranolazina, tamoxifeno, ticagrelor, verapamilo).',
+      'Estrógenos o andrógenos sistémicos con antecedente de tromboembolia venosa.',
+      'Ácido acetilsalicílico en prevención cardiovascular primaria.',
+    ],
+  },
+  {
+    letra: 'D', titulo: 'Sistema nervioso central',
+    criterios: [
+      'Antidepresivos tricíclicos con demencia, glaucoma de ángulo estrecho, alteraciones de la conducción cardiaca, prostatismo, estreñimiento crónico, caídas recientes, antecedente de retención urinaria o hipotensión ortostática.',
+      'Inicio de un antidepresivo tricíclico como primera línea para depresión mayor (más reacciones adversas que ISRS o IRSN).',
+      'IRSN (venlafaxina, duloxetina) con hipertensión grave (PAS >180 mmHg con o sin PAD >105 mmHg).',
+      'Antipsicóticos con efecto antimuscarínico moderado a marcado (p. ej., clorpromazina, clozapina, flupentixol, flufenazina, levomepromazina, olanzapina, tioridazina) con síntomas urinarios por hiperplasia prostática o retención urinaria previa.',
+      'Antipsicóticos para síntomas conductuales y psicológicos de la demencia con la misma dosis por más de 3 meses sin revisión de la medicación.',
+      'ISRS con hiponatremia significativa actual o reciente (Na+ <130 mmol/L).',
+      'ISRS con sangrado significativo actual o reciente.',
+      'Benzodiacepinas por 4 semanas o más (sedación prolongada, confusión, caídas; retirarlas de forma gradual si se tomaron más de 4 semanas).',
+      'Benzodiacepinas para agitación o síntomas psicóticos de la demencia (sin eficacia demostrada).',
+      'Benzodiacepinas para insomnio por 2 semanas o más.',
+      'Fármacos Z (zolpidem, zopiclona, zaleplón) para insomnio por 2 semanas o más.',
+      'Antipsicóticos (excepto clozapina o quetiapina) en parkinsonismo o demencia por cuerpos de Lewy.',
+      'Anticolinérgicos (biperideno, orfenadrina, prociclidina, trihexifenidilo) para tratar efectos extrapiramidales de los antipsicóticos.',
+      'Fármacos con efecto anticolinérgico potente (p. ej., tricíclicos, clorpromazina, clozapina, antihistamínicos de primera generación, oxibutinina, tolterodina, hioscina, tizanidina) con delirium o demencia.',
+      'Antipsicóticos para síntomas conductuales y psicológicos de la demencia por más de 12 semanas, salvo síntomas graves con fracaso de medidas no farmacológicas.',
+      'Antipsicóticos como hipnóticos, salvo que el trastorno del sueño se deba a psicosis o a síntomas de la demencia.',
+      'Inhibidores de la acetilcolinesterasa con bradicardia persistente (<60/min), bloqueo cardiaco o síncope recurrente inexplicado.',
+      'Inhibidores de la acetilcolinesterasa junto con fármacos que causan bradicardia persistente (betabloqueadores, digoxina, diltiazem, verapamilo).',
+      'Memantina con trastorno convulsivo actual o previo.',
+      'Nootrópicos en demencia (p. ej., ginkgo biloba, piracetam, fosfatidilserina, modafinilo, ácidos grasos omega 3, ginseng): sin eficacia demostrada.',
+      'Fenotiazinas como primera línea para psicosis o síntomas no cognitivos de la demencia (excepto proclorperazina para náusea o vértigo, clorpromazina para hipo persistente y levomepromazina como antiemético en cuidados paliativos).',
+      'Levodopa o agonistas dopaminérgicos para temblor esencial benigno.',
+      'Levodopa o agonistas dopaminérgicos para efectos extrapiramidales de antipsicóticos u otro parkinsonismo por fármacos (cascada de prescripción).',
+      'Antihistamínicos de primera generación como primera línea para alergia o prurito.',
+      'Antihistamínicos de primera generación para insomnio.',
+    ],
+  },
+  {
+    letra: 'E', titulo: 'Sistema renal (según la TFG estimada)',
+    criterios: [
+      'Digoxina a dosis de mantenimiento de 125 µg/día o más por más de 90 días con TFGe <30 mL/min/1.73 m² (sin medir niveles).',
+      'Inhibidores directos de la trombina (p. ej., dabigatrán) con TFGe <30 mL/min/1.73 m².',
+      'Inhibidores del factor Xa (rivaroxabán, apixabán, edoxabán) con TFGe <15 mL/min/1.73 m².',
+      'AINE con TFGe <50 mL/min/1.73 m².',
+      'Colchicina con TFGe <10 mL/min/1.73 m².',
+      'Metformina con TFGe <30 mL/min/1.73 m².',
+      'Antagonistas del receptor de mineralocorticoides (espironolactona, eplerenona) con TFGe <30 mL/min/1.73 m².',
+      'Nitrofurantoína con TFGe <45 mL/min/1.73 m².',
+      'Bisfosfonatos con TFGe <30 mL/min/1.73 m².',
+      'Metotrexato con TFGe <30 mL/min/1.73 m².',
+    ],
+  },
+  {
+    letra: 'F', titulo: 'Sistema gastrointestinal',
+    criterios: [
+      'Proclorperazina o metoclopramida con parkinsonismo.',
+      'Inhibidor de la bomba de protones a dosis terapéutica plena por más de 8 semanas para úlcera péptica no complicada.',
+      'Fármacos que estriñen (antimuscarínicos sistémicos, hierro oral, opioides, verapamilo, antiácidos con aluminio) con estreñimiento crónico, si hay alternativas.',
+      'Hierro elemental oral mayor de 200 mg/día (p. ej., fumarato o sulfato ferroso >600 mg/día, gluconato ferroso >1800 mg/día).',
+      'Corticoides con antecedente de úlcera péptica o esofagitis erosiva sin inhibidor de la bomba de protones.',
+      'Antiagregantes o anticoagulantes con antecedente de ectasia vascular antral gástrica («estómago en sandía»).',
+      'Antipsicóticos con disfagia (riesgo de neumonía por aspiración).',
+      'Acetato de megestrol para aumentar el apetito.',
+    ],
+  },
+  {
+    letra: 'G', titulo: 'Sistema respiratorio',
+    criterios: [
+      'Teofilina en monoterapia para EPOC.',
+      'Corticoides sistémicos en lugar de inhalados como mantenimiento en EPOC moderada a grave.',
+      'Antimuscarínicos de acción prolongada (tiotropio, aclidinio, umeclidinio, glicopirronio) con glaucoma de ángulo estrecho u obstrucción del tracto urinario de salida.',
+      'Benzodiacepinas con insuficiencia respiratoria aguda o crónica (pO₂ <8.0 kPa con o sin pCO₂ >6.5 kPa).',
+    ],
+  },
+  {
+    letra: 'H', titulo: 'Sistema musculoesquelético',
+    criterios: [
+      'AINE no selectivos de COX-2 con antecedente de úlcera péptica o sangrado digestivo, sin inhibidor de la bomba de protones ni antagonista H2.',
+      'AINE con hipertensión grave (PAS persistentemente >170 mmHg o PAD >100 mmHg).',
+      'AINE por más de 3 meses para dolor por osteoartritis sin haber probado paracetamol.',
+      'Corticoides por más de 3 meses en monoterapia para artritis reumatoide.',
+      'Corticoides para osteoartritis (excepto infiltración intraarticular periódica en dolor monoarticular).',
+      'AINE o colchicina por más de 3 meses para tratamiento crónico de la gota sin contraindicación para un inhibidor de la xantina oxidasa (alopurinol, febuxostat).',
+      'AINE junto con corticoides para artritis o reumatismo de cualquier tipo.',
+      'Bisfosfonatos orales con enfermedad digestiva alta actual o reciente (disfagia, esofagitis, gastritis, duodenitis, úlcera péptica o sangrado digestivo alto).',
+      'Opioides a largo plazo para osteoartritis.',
+    ],
+  },
+  {
+    letra: 'I', titulo: 'Sistema urogenital',
+    criterios: [
+      'Antimuscarínicos sistémicos (oxibutinina, tolterodina, trospio) con demencia o deterioro cognitivo crónico.',
+      'Antimuscarínicos sistémicos con glaucoma de ángulo estrecho.',
+      'Antimuscarínicos sistémicos para síntomas urinarios con hiperplasia prostática y residuo posmiccional >200 mL.',
+      'Antimuscarínicos sistémicos con estreñimiento.',
+      'Antagonistas alfa-1 distintos de silodosina (alfuzosina, doxazosina, tamsulosina, terazosina) con hipotensión ortostática sintomática o antecedente de síncope.',
+      'Mirabegrón con hipertensión lábil o grave.',
+      'Duloxetina con urgencia urinaria o incontinencia de urgencia (está indicada en incontinencia de esfuerzo).',
+      'Antibióticos para bacteriuria asintomática.',
+    ],
+  },
+  {
+    letra: 'J', titulo: 'Sistema endocrino',
+    criterios: [
+      'Sulfonilureas de vida media larga (glibenclamida, clorpropamida, glimepirida) en diabetes tipo 2 (hipoglucemia prolongada).',
+      'Tiazolidinedionas (rosiglitazona, pioglitazona) con insuficiencia cardiaca.',
+      'Betabloqueadores no selectivos en diabetes con hipoglucemias frecuentes.',
+      'Inhibidores de SGLT2 (canagliflozina, dapagliflozina, empagliflozina, ertugliflozina) con hipotensión sintomática.',
+      'Estrógenos sistémicos con antecedente de cáncer de mama.',
+      'Estrógenos sistémicos con antecedente de tromboembolia venosa.',
+      'Terapia hormonal de la menopausia (estrógeno más progestágeno) con enfermedad arterial estenótica coronaria, cerebral o periférica.',
+      'Estrógenos sistémicos sin progestágeno con útero intacto.',
+      'Levotiroxina en hipotiroidismo subclínico (T4 libre normal y TSH elevada pero <10 mU/L).',
+      'Análogos de vasopresina (desmopresina, vasopresina) para incontinencia o frecuencia urinaria (riesgo de hiponatremia).',
+    ],
+  },
+  {
+    letra: 'K', titulo: 'Fármacos que aumentan el riesgo de caídas',
+    criterios: [
+      'Benzodiacepinas con caídas recurrentes.',
+      'Antipsicóticos con caídas recurrentes.',
+      'Vasodilatadores con caídas recurrentes e hipotensión postural persistente (descenso de PAS ≥20 mmHg o de PAD ≥10 mmHg).',
+      'Fármacos Z (zopiclona, zolpidem, zaleplón) con caídas recurrentes.',
+      'Antiepilépticos con caídas recurrentes.',
+      'Antihistamínicos de primera generación con caídas recurrentes.',
+      'Opioides con caídas recurrentes.',
+      'Antidepresivos con caídas recurrentes.',
+      'Alfabloqueadores como antihipertensivos con caídas recurrentes.',
+      'Alfabloqueadores distintos de silodosina para síntomas prostáticos con caídas recurrentes.',
+      'Antihipertensivos de acción central (pueden alterar el sensorio y causar hipotensión ortostática).',
+      'Antimuscarínicos para vejiga hiperactiva o incontinencia de urgencia.',
+    ],
+  },
+  {
+    letra: 'L', titulo: 'Analgésicos',
+    criterios: [
+      'Opioides potentes orales o transdérmicos (morfina, oxicodona, fentanilo, buprenorfina, metadona, tramadol, petidina, pentazocina) como primera línea para dolor leve.',
+      'Opioides diarios regulares (no a demanda) sin laxante concomitante.',
+      'Opioides de acción prolongada sin opioide de acción corta para el dolor irruptivo moderado o grave.',
+      'Parche de lidocaína tópica para dolor crónico por osteoartritis.',
+      'Gabapentinoides (gabapentina, pregabalina) para dolor no neuropático.',
+      'Paracetamol 3 g/24 h o más con mal estado nutricional (IMC <18) o hepatopatía crónica.',
+    ],
+  },
+  {
+    letra: 'M', titulo: 'Carga antimuscarínica o anticolinérgica',
+    criterios: [
+      'Uso simultáneo de dos o más fármacos con propiedades antimuscarínicas o anticolinérgicas (p. ej., antiespasmódicos vesicales o intestinales, tricíclicos, antihistamínicos de primera generación, antipsicóticos).',
+    ],
+  },
+];
+
+// START: considerar cuando el fármaco se omite sin razón clínica válida, salvo que la persona esté al final de la vida
+// y el tratamiento requiera un enfoque paliativo. Se asume que se revisan las contraindicaciones específicas.
+export const START = [
+  {
+    letra: 'A', titulo: 'Fármacos indicados',
+    criterios: [
+      'Fármaco claramente indicado y apropiado en el contexto clínico, sin contraindicación clara, que no se ha iniciado.',
+    ],
+  },
+  {
+    letra: 'B', titulo: 'Sistema cardiovascular',
+    criterios: [
+      'Antihipertensivo si la PAS >140 mmHg o la PAD >90 mmHg; con fragilidad física moderada o grave establecida, el umbral es PAS 150 mmHg o PAD 90 mmHg.',
+      'Estatina con antecedente documentado de enfermedad vascular coronaria, cerebral o periférica, salvo final de la vida o fragilidad moderada o grave establecida.',
+      'IECA en enfermedad coronaria.',
+      'Betabloqueador en enfermedad coronaria sintomática.',
+      'IECA en insuficiencia cardiaca con fracción de expulsión reducida.',
+      'Betabloqueador cardioselectivo (bisoprolol, nebivolol, metoprolol o carvedilol) en insuficiencia cardiaca estable con fracción de expulsión reducida.',
+      'Antagonista del receptor de mineralocorticoides (espironolactona, eplerenona) en insuficiencia cardiaca sin deterioro renal grave (TFGe >30).',
+      'Inhibidor de SGLT2 en insuficiencia cardiaca sintomática, con o sin fracción de expulsión reducida y con o sin diabetes.',
+      'Sacubitrilo/valsartán en insuficiencia cardiaca con fracción de expulsión reducida y síntomas persistentes pese a dosis óptima de IECA o ARA II (lo sustituye).',
+      'Betabloqueador en fibrilación auricular crónica con frecuencia no controlada.',
+      'Hierro intravenoso en insuficiencia cardiaca sintomática con fracción de expulsión reducida y deficiencia de hierro.',
+    ],
+  },
+  {
+    letra: 'C', titulo: 'Coagulación',
+    criterios: [
+      'Anticoagulante (antagonista de la vitamina K, inhibidor directo de trombina o de factor Xa) en fibrilación auricular crónica o paroxística.',
+      'Antiagregante (ácido acetilsalicílico, clopidogrel, prasugrel o ticagrelor) con antecedente documentado de enfermedad vascular coronaria, cerebral o periférica.',
+    ],
+  },
+  {
+    letra: 'D', titulo: 'Sistema nervioso central',
+    criterios: [
+      'Levodopa o agonista dopaminérgico en enfermedad de Parkinson idiopática con deterioro funcional y discapacidad.',
+      'Antidepresivo no tricíclico para depresión mayor.',
+      'Inhibidor de la acetilcolinesterasa (donepezilo, rivastigmina, galantamina) en demencia por Alzheimer leve a moderada.',
+      'Rivastigmina en demencia por cuerpos de Lewy o demencia de la enfermedad de Parkinson.',
+      'ISRS (o IRSN o pregabalina si el ISRS está contraindicado) para ansiedad grave persistente que afecta la independencia y la calidad de vida.',
+      'Agonista dopaminérgico (ropinirol, pramipexol o rotigotina) para síndrome de piernas inquietas, tras descartar deficiencia de hierro y enfermedad renal crónica grave (TFGe <30).',
+      'Propranolol para temblor esencial con deterioro funcional y discapacidad.',
+    ],
+  },
+  {
+    letra: 'E', titulo: 'Sistema renal',
+    criterios: [
+      'Alfacalcidol o calcitriol en enfermedad renal crónica grave (TFGe <30) con hipocalcemia (calcio corregido <2.10 mmol/L) e hiperparatiroidismo secundario.',
+      'Quelante de fósforo en enfermedad renal crónica grave (TFGe <30) con fósforo sérico persistentemente >1.76 mmol/L (5.5 mg/dL) pese a dieta renal.',
+      'Análogo de eritropoyetina en enfermedad renal crónica grave (TFGe <30) con anemia sintomática no atribuible a deficiencia de hierro u otros hematínicos, para hemoglobina de 10.0 a 12.0 g/dL.',
+      'ARA II o IECA en enfermedad renal crónica con proteinuria (albúmina urinaria >300 mg/24 h).',
+    ],
+  },
+  {
+    letra: 'F', titulo: 'Sistema gastrointestinal',
+    criterios: [
+      'Inhibidor de la bomba de protones en enfermedad por reflujo grave o estenosis esofágica péptica que requiere dilatación.',
+      'Inhibidor de la bomba de protones al iniciar ácido acetilsalicílico a dosis baja con antecedente de úlcera péptica o esofagitis por reflujo.',
+      'Inhibidor de la bomba de protones con AINE, a corto (<2 semanas) o a largo plazo.',
+      'Suplementos de fibra en diverticulosis con antecedente de estreñimiento.',
+      'Laxante osmótico (lactulosa, macrogol, sorbitol) para estreñimiento crónico persistente idiopático o secundario benigno.',
+      'Probióticos junto con antibióticos para prevenir diarrea por Clostridioides difficile en personas no inmunodeprimidas ni gravemente debilitadas.',
+      'Erradicación de Helicobacter pylori en úlcera péptica activa asociada.',
+    ],
+  },
+  {
+    letra: 'G', titulo: 'Sistema respiratorio',
+    criterios: [
+      'Antimuscarínico (LAMA) o agonista beta 2 (LABA) de acción prolongada en EPOC sintomática GOLD 1 o 2 y en asma crónica.',
+      'Corticoide inhalado diario en asma moderada a grave o EPOC GOLD 3 o 4 con FEV1 <50 % del predicho y exacerbaciones repetidas que requieren corticoide oral.',
+      'Oxígeno domiciliario continuo con hipoxemia crónica documentada (pO₂ <8.0 kPa o 60 mmHg, o SaO₂ <89 %).',
+    ],
+  },
+  {
+    letra: 'H', titulo: 'Sistema musculoesquelético',
+    criterios: [
+      'Fármaco modificador de la enfermedad (FARME) en artritis reumatoide crónica, activa e incapacitante.',
+      'Bisfosfonato, vitamina D y calcio con corticoides sistémicos a largo plazo, para prevenir osteoporosis por esteroides.',
+      'Vitamina D con osteoporosis conocida, fractura por fragilidad previa o densitometría con T menor de −2.5.',
+      'Tratamiento antirresortivo o anabólico (bisfosfonato, teriparatida, denosumab) con osteoporosis documentada (T menor de −2.5) o fractura por fragilidad, sin contraindicación como esperanza de vida corta a un año.',
+      'Vitamina D con deficiencia confirmada de 25-hidroxivitamina D (<20 µg/L, <50 nmol/L) en personas confinadas en casa, con caídas u osteopenia (T entre −1.0 y −2.5).',
+      'Tratamiento antirresortivo tras suspender denosumab después de al menos dos dosis (riesgo de rebote y fractura vertebral).',
+      'Tratamiento antirresortivo tras suspender teriparatida o abaloparatida.',
+      'Inhibidor de la xantina oxidasa (alopurinol, febuxostat) con episodios recurrentes de gota.',
+      'Ácido fólico con metotrexato.',
+    ],
+  },
+  {
+    letra: 'I', titulo: 'Sistema urogenital',
+    criterios: [
+      'Bloqueador alfa-1 selectivo (tamsulosina, silodosina) para síntomas urinarios por hiperplasia prostática cuando la prostatectomía no es necesaria, apropiada o segura.',
+      'Inhibidor de la 5-alfa reductasa (finasterida, dutasterida) para síntomas urinarios por hiperplasia prostática cuando la prostatectomía no es necesaria, apropiada o segura.',
+      'Estrógeno vaginal tópico u óvulo para vaginitis atrófica sintomática.',
+      'Estrógeno vaginal tópico u óvulo en mujeres con infecciones urinarias recurrentes.',
+      'Inhibidores de la fosfodiesterasa 5 para disfunción eréctil persistente que causa malestar.',
+    ],
+  },
+  {
+    letra: 'J', titulo: 'Sistema endocrino',
+    criterios: [
+      'IECA (o ARA II si no tolera IECA) en diabetes con enfermedad renal (proteinuria en tira o microalbuminuria >30 mg/24 h), salvo enfermedad renal crónica grave (TFGe <30).',
+    ],
+  },
+  {
+    letra: 'K', titulo: 'Analgésicos',
+    criterios: [
+      'Opioides de alta potencia en dolor no artrítico moderado a grave cuando paracetamol, AINE u opioides de baja potencia no son adecuados o fueron ineficaces.',
+      'Laxantes con opioides regulares (no a demanda).',
+      'Parche de lidocaína al 5 % para dolor neuropático localizado (p. ej., neuralgia posherpética).',
+    ],
+  },
+  {
+    letra: 'L', titulo: 'Vacunas',
+    criterios: [
+      'Vacuna contra la influenza estacional cada año.',
+      'Vacuna antineumocócica al menos una vez, según las guías nacionales.',
+      'Vacuna contra varicela-zóster según las guías nacionales.',
+      'Vacuna contra SARS-CoV-2 según las guías nacionales.',
+    ],
+  },
+];
+
+// Lista plana con códigos: «STOPP B12», «START L1».
+export const CRITERIOS = [
+  ...STOPP.flatMap((s) => s.criterios.map((texto, i) => ({ id: `S-${s.letra}${i + 1}`, codigo: `STOPP ${s.letra}${i + 1}`, tipo: 'stopp', seccion: s.letra, titulo: s.titulo, texto }))),
+  ...START.flatMap((s) => s.criterios.map((texto, i) => ({ id: `T-${s.letra}${i + 1}`, codigo: `START ${s.letra}${i + 1}`, tipo: 'start', seccion: s.letra, titulo: s.titulo, texto }))),
+];

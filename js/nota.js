@@ -6,6 +6,7 @@ import {
   ordenarCronologico, vigenteDe, compararResultados, etiquetaAplicacion, fechaCorta, isoDe,
   textoRespectoA, textoCambio, inconsistenciasCronologicas, amplitudDias,
 } from './comparacion.js';
+import { partesNota } from './medicacion.js';
 
 export { fechaCorta };
 export const FORMATOS_NOTA = ['parrafo', 'lista', 'completa'];
@@ -154,6 +155,13 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
     if (datos.length) partes.push(`Paciente: ${datos.join(', ')}.`);
     if (contexto) partes.push(`Contexto: ${contexto}.`);
     for (const { d, porEscala } of grupos) partes.push(`${d.nombre}: ${porEscala.map((g) => lineaParrafo(g, hoy)).join('; ')}.`);
+    const med = partesNota(valoracion.medicacion);
+    if (med) {
+      if (med.medicamentos.length) partes.push(`Medicamentos (${med.medicamentos.length}): ${med.medicamentos.join('; ')}.`);
+      if (med.renal) partes.push(`Función renal: ${med.renal}.`);
+      partes.push(med.revision);
+      if (med.problemas.length) partes.push(`Posibles problemas de prescripción: ${med.problemas.map((x) => x.split(':')[0]).join(', ')}.`);
+    }
     return partes.join(' ');
   }
 
@@ -173,6 +181,13 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
           l.push(`- ${unir(g.escala.corto, etq)}: ${valor}.`);
         }
       }
+    }
+    const med = partesNota(valoracion.medicacion);
+    if (med) {
+      l.push(`Medicamentos (${med.medicamentos.length}):`);
+      l.push(...(med.medicamentos.length ? med.medicamentos.map((x) => `- ${x}.`) : ['- Sin medicamentos registrados.']));
+      if (med.renal) l.push(`- Función renal para la revisión: ${med.renal}.`);
+      l.push(`- ${med.revision}`);
     }
     const presentes = new Set(grupos.map((x) => x.d.id));
     const faltantes = dominios.filter((d) => DOMINIOS_NUCLEO.includes(d.id) && !presentes.has(d.id)).map((d) => d.nombre.toLowerCase());
@@ -202,13 +217,19 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
     if (alertas.length) l.push(...alertas.map((a) => `- ALERTA: ${a}`));
     if (hallazgos.length) l.push(...hallazgos.map((h) => `- ${h}`));
     else if (aplicados.length && !alertas.length) l.push(`- Sin hallazgos que requieran atención en los instrumentos aplicados (${aplicados.join(', ')}); la conclusión se limita a ellos.`);
-    else l.push('- No hay instrumentos interpretables en esta valoración.');
+    else if (!aplicados.length && !med) l.push('- No hay instrumentos interpretables en esta valoración.');
+    if (med) {
+      if (med.problemas.length) l.push(...med.problemas.map((x) => `- Posible problema de prescripción: ${x}`));
+      else l.push('- Revisión de medicamentos: sin posibles problemas en los criterios revisados; la conclusión se limita a ellos.');
+      if (med.pendientes.length) l.push(...med.pendientes.map((x) => `- Información pendiente: ${x}`));
+    }
     if (noEvaluables.length) l.push(`- Instrumentos no evaluables: ${noEvaluables.join('; ')}.`);
     if (avisos.length) l.push(...avisos.map((a) => `- Verificar: ${a}`));
 
-    if (sugerencias.length) {
+    const todas = [...sugerencias, ...(med ? med.sugerencias.filter((x) => !sugerencias.includes(x)) : [])];
+    if (todas.length) {
       l.push('', '5. SUGERENCIAS ORIENTATIVAS (no son resultados)');
-      l.push(...sugerencias.map((s) => `- ${s}`));
+      l.push(...todas.map((x) => `- ${x}`));
     }
     return l.join('\n');
   }
@@ -232,6 +253,15 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
           : `- ${unir(g.escala.corto, etq)}: ${valorGuardado(r)}.`);
       }
     }
+  }
+  const med = partesNota(valoracion.medicacion);
+  if (med) {
+    lineas.push('', 'MEDICAMENTOS');
+    lineas.push(...(med.medicamentos.length ? med.medicamentos.map((x) => `- ${x}.`) : ['- Sin medicamentos registrados.']));
+    if (med.renal) lineas.push(`Función renal: ${med.renal}.`);
+    lineas.push(med.revision);
+    if (med.problemas.length) lineas.push(...med.problemas.map((x) => `- Posible problema: ${x}`));
+    if (med.pendientes.length) lineas.push(...med.pendientes.map((x) => `- Pendiente: ${x}`));
   }
   return lineas.join('\n');
 }

@@ -2,7 +2,8 @@
 import { almacen } from './almacen.js';
 import { VERSION, escalas, porId, DOMINIOS, RUTAS, escalasDe, dominioDe, rutaDe } from './datos.js';
 import { momentoDe, MOMENTOS } from './motor.js';
-import { $, esc, icono, aviso, botonEstrella } from './ui.js';
+import { $, esc, icono, aviso, botonEstrella, nombreCorto, cuentaDominio } from './ui.js';
+import { renderMedicacion, montarMedicacion } from './vistas/medicacion.js';
 import { renderInicio, montarInicio, renderDominio, renderFavoritas } from './vistas/inicio.js';
 import { renderEscala, montarEscala, renderResultado, montarResultado, contexto } from './vistas/escala.js';
 import { renderRuta, montarRuta } from './vistas/ruta.js';
@@ -33,6 +34,7 @@ function ruta() {
     if (x) return { vista: d === 'resultado' ? 'resultado' : 'escala', ...x, ruta: rutaDe(b) };
     return { vista: 'ruta', id: b };
   }
+  if (a === 'medicacion') return { vista: 'medicacion', pestana: ['medicamentos', 'stopp', 'beers', 'resumen'].includes(b) ? b : 'medicamentos' };
   if (a === 'valoracion') return { vista: 'valoracion' };
   if (a === 'favoritas') return { vista: 'favoritas' };
   if (a === 'acerca') return { vista: 'acerca' };
@@ -55,6 +57,7 @@ function render() {
       escala: renderEscala,
       ruta: renderRuta,
       valoracion: renderValoracion,
+      medicacion: renderMedicacion,
       favoritas: renderFavoritas,
       acerca: renderAcerca,
     }[r.vista](r);
@@ -79,6 +82,7 @@ function montar(r) {
   if (r.vista === 'resultado') montarResultado(r, navegacion);
   if (r.vista === 'ruta') montarRuta(r, render);
   if (r.vista === 'valoracion') montarValoracion(render, navegacion);
+  if (r.vista === 'medicacion') montarMedicacion(r, render, navegacion);
   if (r.vista === 'acerca') montarAcerca(() => { aplicarTema(); navegacion(); }, navegacion);
 }
 
@@ -89,6 +93,7 @@ function titulo(r) {
   if (r.vista === 'resultado') return `${porId[r.id].corto}: resultado · ${base}`;
   if (r.vista === 'ruta') return `${rutaDe(r.id).nombre} · ${base}`;
   if (r.vista === 'valoracion') return `Valoración · ${base}`;
+  if (r.vista === 'medicacion') return `Revisión de medicamentos · ${base}`;
   if (r.vista === 'favoritas') return `Favoritas · ${base}`;
   if (r.vista === 'acerca') return `Acerca de · ${base}`;
   return base;
@@ -124,7 +129,7 @@ function renderNavegacion(r) {
     <nav class="grupo-nav" aria-label="Dominios">
       <p class="etq-nav">Dominios</p>
       ${DOMINIOS.map((d) => {
-        const n = escalasDe(d.id).length;
+        const n = cuentaDominio(d.id);
         return item(`#/d/${d.id}`, d.id, d.nombre, domAct === d.id, `<span class="cuenta">${n || '·'}</span>`, n ? '' : ' vacio');
       }).join('')}
     </nav>
@@ -149,6 +154,7 @@ function renderNavegacion(r) {
     tituloBarra = `${porId[r.id].corto}${r.vista === 'resultado' ? ' · Resultado' : m}`;
   }
   if (r.vista === 'valoracion') tituloBarra = 'Valoración';
+  if (r.vista === 'medicacion') { tituloBarra = 'Medicamentos'; atras = '#/d/polifarmacia'; }
   if (r.vista === 'favoritas') tituloBarra = 'Favoritas';
   if (r.vista === 'acerca') tituloBarra = 'Acerca de';
 
@@ -164,12 +170,12 @@ function renderNavegacion(r) {
        </div>`
     : `<a class="btn-icono" href="${atras}" aria-label="Regresar">${icono('atras')}</a>
        <span class="barra-titulo">${esc(tituloBarra)}</span>
-       ${esEscala ? botonEstrella(r.id) : ''}`;
+       ${esEscala ? botonEstrella(r.id) : r.vista === 'medicacion' ? botonEstrella('medicacion') : ''}`;
 
   const tab = (href, ico, texto, activo, extra = '') =>
     `<a href="${href}"${activo ? ' class="activo" aria-current="page"' : ''}>${icono(ico)}<span>${texto}</span>${extra}</a>`;
   $('#pestanas').innerHTML = `
-    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta'].includes(r.vista))}
+    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion'].includes(r.vista))}
     ${tab('#/favoritas', 'estrella', 'Favoritas', r.vista === 'favoritas')}
     ${tab('#/valoracion', 'valoracion', 'Valoración', r.vista === 'valoracion', nVal ? `<span class="insignia">${nVal}</span>` : '')}`;
 }
@@ -183,7 +189,7 @@ document.addEventListener('click', (ev) => {
     const ahora = almacen.alternarFavorita(id);
     document.querySelectorAll(`[data-fav="${id}"]`).forEach((b) => {
       b.setAttribute('aria-pressed', String(ahora));
-      b.setAttribute('aria-label', `${ahora ? 'Quitar de' : 'Agregar a'} favoritas: ${porId[id].corto}`);
+      b.setAttribute('aria-label', `${ahora ? 'Quitar de' : 'Agregar a'} favoritas: ${nombreCorto(id)}`);
     });
     aviso(ahora ? 'Agregada a favoritas' : 'Quitada de favoritas');
     return;

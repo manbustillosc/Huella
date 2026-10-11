@@ -16,6 +16,9 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `js/rutas.js` | Rutas guiadas («¿Qué deseas valorar?»): núcleo, complementarias, finalidad de cada paso y momento. |
 | `js/motor.js` | Tipos y clases de instrumento, tipos de campo, cálculo, estados (sin responder, no aplica, no evaluable), listas con «Ninguno», validaciones cruzadas, interpretación y texto por escala. |
 | `js/comparacion.js` | Orden cronológico, referencia, resultado vigente y dirección clínica de cada cambio. |
+| `js/medicacion.js`, `js/vistas/medicacion.js` | Revisión de medicamentos: registro, STOPP/START v3 criterio por criterio, revisión manual de Beers 2023 y salidas para la nota. |
+| `escalas/stoppstart-datos.js` | Redacción condensada en español de los 190 criterios STOPP/START v3 (CC BY 4.0, con atribución). |
+| `js/herramientas.js` | Herramientas con pantalla propia (revisión de medicamentos) para dominios, búsqueda, favoritas y rutas. |
 | `js/nota.js` | Nota de la valoración: párrafo, lista y completa (resultados, interpretación, cambios, hallazgos, sugerencias). |
 | `js/almacen.js` | Guardado local: valoración, aplicaciones repetidas, respuestas en curso y preferencias. |
 | `js/app.js`, `js/vistas/` | Pantallas y navegación. |
@@ -50,6 +53,14 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - `vinculos`: datos de otra prueba de la misma valoración (por ejemplo, la RASS en el CAM-ICU). Se muestran con su fecha y solo se usan si el médico toca «Usar este dato»; algunos exigen que el dato sea de hoy.
 - `siguientes`: siguiente paso sugerido según el resultado (por ejemplo, Mini-Cog positivo → MoCA o RUDAS). Solo es un enlace.
 - `alertas`: avisos de seguridad que devuelve `calcular` (por ejemplo, reactivo 9 del PHQ-9). Se destacan en el resultado, se marcan en la valoración y abren los hallazgos de la nota completa.
+
+## Revisión de medicamentos
+
+- Registro de cada medicamento (genérico obligatorio; comercial, dosis, presentación, vía, frecuencia, indicación, duración y observaciones opcionales).
+- Función renal tomada de CKD-EPI o Cockcroft-Gault de la misma valoración solo con confirmación, o capturada a mano con su fecha.
+- STOPP/START v3: 133 + 57 criterios por sistemas, cada uno sin revisar, se cumple, no se cumple o no evaluable. Sin puntaje.
+- Beers 2023: revisión manual de las tablas 2 a 7 con el artículo oficial; Huella no reproduce sus tablas.
+- Salidas: medicamentos, criterios revisados, posibles problemas, información pendiente y sugerencias. Nada se suspende ni se ajusta automáticamente.
 
 ## Agregar una escala
 

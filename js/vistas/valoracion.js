@@ -6,6 +6,7 @@ import { notaValoracion, valorGuardado, hallazgosYSugerencias } from '../nota.js
 import { ordenarCronologico, compararResultados, etiquetaAplicacion, fechaCorta, isoDe, textoCambio, textoRespectoA } from '../comparacion.js';
 import { $, $$, esc, icono, plural, aviso, copiar, selectorFormato, alCambiarFormato, ETIQUETA_COPIAR, confirmarEnDosToques } from '../ui.js';
 import { progresoRuta } from './rutas-estado.js';
+import { medicacionDe, resumenMedicacion } from '../medicacion.js';
 
 export const diasDesde = (ts) => (ts ? Math.max(0, Math.floor((Date.now() - ts) / 86400000)) : 0);
 
@@ -53,6 +54,8 @@ export function renderValoracion() {
   }).join('');
   const enCurso = RUTAS.map((r) => ({ r, p: progresoRuta(r) })).filter((x) => x.p.completos + x.p.omitidos > 0 && x.p.pendientes.length);
   const { avisos } = v.resultados.length ? hallazgosYSugerencias(v, porId) : { avisos: [] };
+  const med = resumenMedicacion(medicacionDe(v));
+  const hayNota = v.resultados.length || med.hayContenido;
   return `
     <section class="vista valoracion">
       <header class="cabecera">
@@ -87,8 +90,14 @@ export function renderValoracion() {
           <p class="titulo-tarjeta">${icono('alerta')} Revisa la cronología</p>
           <ul>${avisos.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>
         </div>` : ''}
-      ${v.resultados.length ? `
-        <div class="resultados-val">${grupos}</div>
+      ${med.hayContenido ? `
+        <a class="en-curso tarjeta-med" href="#/medicacion/resumen">
+          ${icono('polifarmacia')}
+          <span><strong>Revisión de medicamentos</strong><span>${plural(med.m.meds.length, 'medicamento', 'medicamentos')} · ${med.revisados.stopp + med.revisados.start} de 190 criterios STOPP/START · ${plural(med.problemas.length, 'posible problema', 'posibles problemas')}${med.pendientes.length ? ` · ${plural(med.pendientes.length, 'dato pendiente', 'datos pendientes')}` : ''}</span></span>
+          ${icono('adelante', 'chev')}
+        </a>` : ''}
+      ${hayNota ? `
+        ${v.resultados.length ? `<div class="resultados-val">${grupos}</div>` : ''}
         <p class="discreto">Cada instrumento se muestra en orden cronológico; el cambio se compara con el basal o, si no hay, con la primera aplicación. Toca un resultado para revisarlo o corregirlo.</p>
         <div class="cabecera-nota">
           <h2 class="seccion">Nota para el expediente</h2>
