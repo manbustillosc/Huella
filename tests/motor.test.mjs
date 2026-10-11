@@ -19,8 +19,8 @@ const REF = JSON.parse(readFileSync(new URL('./referencia-renal.json', import.me
 
 /* ---------- Estructura ---------- */
 
-test('los 66 instrumentos están disponibles y bien definidos', () => {
-  assert.equal(ESCALAS.length, 66);
+test('los 69 instrumentos están disponibles y bien definidos', () => {
+  assert.equal(ESCALAS.length, 69);
   for (const e of ESCALAS) assert.deepEqual(validarEscala(e), [], e.id);
 });
 

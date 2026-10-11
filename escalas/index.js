@@ -65,6 +65,7 @@ import { agudezaVisual, audiometria, hhies, ohat, saludBucal } from './sensorial
 import { eat10, fois, degluObs, iddsi } from './deglucion.js';
 import { frax, dxa } from './osea.js';
 import { silla30, equilibrio4, dinamometria, ewgsop2 } from './movilidad.js';
+import { charlson, cirsg, news2 } from './comorbilidad.js';
 
 export const ESCALAS = [
   barthel, katz, lawton,
@@ -81,6 +82,7 @@ export const ESCALAS = [
   suenoClinico, isi, epworth, stopbang,
   braden,
   painad,
+  charlson, cirsg, news2,
   rcri, ariscat, dasi,
   pps,
   icopeFactores, zarit, gijon,

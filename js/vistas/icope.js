@@ -340,6 +340,7 @@ function panelPlan(v, hoy) {
     <section class="tarjeta">
       <h2 class="titulo-tarjeta">Paso 3 · Plan de atención personalizado</h2>
       <p>Prioriza según la urgencia clínica, la probabilidad de éxito, la repercusión en otros dominios, la carga de las intervenciones y lo que la persona considere más importante. Las intervenciones se acuerdan con la persona y, si corresponde, con quien la cuida.</p>
+      <p class="discreto">Este plan forma parte del <a href="#/plan">plan de atención geriátrica</a>, que reúne también los problemas de los demás dominios.</p>
     </section>
     ${formularioPreferencias(plan)}
     ${conPlan.length ? conPlan.map(tarjeta).join('') : '<p class="vacio-texto">Ningún dominio alterado todavía. Completa la evaluación básica o agrega un objetivo a cualquier dominio.</p>'}

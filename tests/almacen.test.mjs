@@ -77,7 +77,10 @@ test('momento elegido en una ruta y omisiones se guardan con la valoración', ()
 test('no se guardan datos identificables: el paciente solo admite datos clínicos generales', () => {
   almacen.borrarTodo();
   const v = almacen.valoracion();
-  assert.deepEqual(Object.keys(v).sort(), ['creada', 'id', 'paciente', 'resultados', 'rutas']);
+  assert.deepEqual(Object.keys(v).sort(), ['creada', 'episodio', 'id', 'paciente', 'resultados', 'rutas']);
   assert.deepEqual(v.paciente, {});
+  // El episodio solo lleva un código aleatorio, el estado y las fechas.
+  assert.deepEqual(Object.keys(v.episodio).sort(), ['abierto', 'codigo', 'estado']);
+  assert.match(v.episodio.codigo, /^EP-[A-Z0-9]{6}$/);
   assert.ok(porId.barthel);
 });

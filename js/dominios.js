@@ -85,6 +85,12 @@ export const DOMINIOS = [
     planeadas: ['Escala numérica análoga', 'Escala visual análoga'],
   },
   {
+    id: 'comorbilidad', nombre: 'Comorbilidad y riesgo hospitalario',
+    descripcion: 'Carga de comorbilidad (Charlson, CIRS-G) y alerta temprana de deterioro clínico (NEWS2). Sin porcentajes de mortalidad.',
+    problemas: ['comorbilidad', 'multimorbilidad', 'deterioro clínico', 'signos vitales', 'reingreso'],
+    planeadas: ['LACE (en evaluación: validez limitada en personas mayores)'],
+  },
+  {
     id: 'prequirurgica', nombre: 'Prequirúrgica',
     descripcion: 'Riesgo cardiaco y pulmonar, capacidad funcional y vulnerabilidad geriátrica antes de la cirugía.',
     problemas: ['cirugía', 'preoperatorio'],
@@ -106,7 +112,7 @@ export const DOMINIOS = [
     id: 'paliativos', nombre: 'Paliativos y pronóstico',
     descripcion: 'Funcionalidad, síntomas y necesidades paliativas.',
     problemas: ['cuidados paliativos', 'pronóstico', 'fin de vida'],
-    planeadas: ['Karnofsky', 'Índice pronóstico paliativo (PPI)', 'NECPAL (registro)', 'Índice de Charlson', 'G8', 'VES-13'],
+    planeadas: ['Karnofsky', 'Índice pronóstico paliativo (PPI)', 'NECPAL (registro)', 'G8', 'VES-13'],
   },
   {
     id: 'calculadoras', nombre: 'Calculadoras',

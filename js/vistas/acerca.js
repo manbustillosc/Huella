@@ -19,7 +19,9 @@ export function renderAcerca() {
         <h2 id="privacidad">${icono('escudo')} Qué se guarda y dónde</h2>
         <p>Todo se calcula en este navegador. Huella no tiene servidor y no envía datos a ningún lugar.</p>
         <ul>
-          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, respuestas, la lista de medicamentos con su revisión STOPP/START y Beers, y el plan de atención con sus objetivos, intervenciones, preferencias y bitácora): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio: inicia una nueva para no mezclar resultados de episodios distintos.</li>
+          <li><strong>Valoración en curso</strong> (datos clínicos opcionales, resultados con su fecha y momento clínico, respuestas, la lista de medicamentos con su revisión STOPP/START y Beers, y el plan de atención con sus objetivos, intervenciones, preferencias y bitácora): en el almacenamiento local del navegador. Permanece hasta que toques «Nueva valoración» o borres los datos del sitio. Cada valoración corresponde a un episodio con un código aleatorio (p. ej., EP-7KQ3MX): ciérralo en Seguimiento para no mezclar resultados de episodios distintos.</li>
+          <li><strong>Episodios cerrados</strong> (hasta 30): al cerrar un episodio en Seguimiento se archiva en este navegador con su código aleatorio. Puedes abrirlo, exportarlo o borrarlo; no se sincroniza con ningún servidor.</li>
+          <li><strong>Archivos exportados</strong>: la exportación descarga un archivo JSON en tu dispositivo. Contiene información de salud sin identificadores; guárdalo en un lugar seguro y bórralo cuando no lo necesites.</li>
           <li><strong>Respuestas en edición</strong>: en el almacenamiento de la pestaña; se borran al cerrarla y nunca se mezclan con otra valoración.</li>
           <li><strong>Preferencias</strong> (favoritas, tema, formato de la nota, instrumentos más usados): en el almacenamiento local.</li>
         </ul>
@@ -33,6 +35,7 @@ export function renderAcerca() {
 
         <h2>Uso clínico</h2>
         <p>Es un apoyo para aplicar e interpretar instrumentos; no sustituye el juicio clínico. Un tamizaje positivo no establece un diagnóstico. Las sugerencias son orientativas y se muestran separadas de los resultados. Los puntos de corte corresponden a las referencias citadas en cada instrumento; los valores continuos se clasifican sin redondear.</p>
+        <p>El plan de atención parte de los hallazgos de tamizaje de los instrumentos; el estado de cada problema (sospecha, diagnóstico confirmado, descartado o pendiente), la prioridad, los objetivos y las intervenciones los decide el médico. Ninguna intervención sugerida se agrega ni se marca como realizada sola. Los informes no llevan firma ni certificación.</p>
         <p>Al comparar aplicaciones, cada instrumento declara si un valor mayor es mejor, si un valor menor es mejor o si el cambio no tiene una dirección clínica uniforme. La comparación describe la diferencia y su dirección; su relevancia clínica, su causa y su reversibilidad requieren valoración.</p>
         <p>Los instrumentos con titular de derechos (${conLicencia}) se incluyen sin reproducir sus reactivos: se registra el puntaje obtenido con la versión oficial o se usan solo sus reglas de puntuación.</p>
 
@@ -51,6 +54,7 @@ export function renderAcerca() {
         <h2>Fuentes y créditos</h2>
         <p class="discreto">La valoración ICOPE es una adaptación del Manual de atención integrada para las personas mayores, 2.ª ed. (Organización Panamericana de la Salud, 2025; <a href="https://doi.org/10.37774/9789275330319" target="_blank" rel="noopener">doi:10.37774/9789275330319</a>), licencia CC BY-NC-SA 3.0 IGO; las partes adaptadas se comparten bajo la misma licencia. Esta publicación es una adaptación de una obra original de la Organización Panamericana de la Salud (OPS). Las opiniones expresadas en esta adaptación son responsabilidad exclusiva de los autores y no representan necesariamente los criterios de la OPS. Huella no usa el logotipo de la OPS ni de la OMS, y no reproduce la tabla optométrica.</p>
         <p class="discreto">FRAX® y FRAXplus® son marcas registradas (© Osteoporosis Research Ltd.); Huella solo registra el resultado de la herramienta oficial y no reconstruye su algoritmo. Valores de la silla en 30 s y del equilibrio en 4 etapas: CDC STEADI.</p>
+        <p class="discreto">NEWS2: reproducido de Royal College of Physicians. National Early Warning Score (NEWS) 2: Standardising the assessment of acute-illness severity in the NHS. London: RCP, 2017. La redacción de esta traducción no ha sido aprobada específicamente por el Royal College of Physicians; consulta la versión original en inglés antes de su uso clínico.</p>
         <p class="discreto">Versiones en español conforme a la Guía de instrumentos de evaluación de la capacidad funcional del Instituto Nacional de Geriatría (2022) cuando aplica, citando la fuente, con fines asistenciales sin ánimo de lucro. Íconos: Lucide (licencia ISC). Tipografías: Fraunces e Inter Tight (SIL Open Font License 1.1).</p>
       </div>
     </section>`;

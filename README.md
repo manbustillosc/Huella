@@ -4,7 +4,7 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 
 - Funciona en computadora y celular; se instala como app desde el navegador y sirve sin conexión.
 - Todo se calcula en el navegador. No envía datos a ningún servidor.
-- La valoración en curso se guarda solo en el dispositivo, sin nombre ni datos de identificación.
+- La valoración en curso y los episodios cerrados se guardan solo en el dispositivo, sin nombre ni datos de identificación.
 
 ## Estructura
 
@@ -21,6 +21,10 @@ Escalas de valoración geriátrica integral del Dr. Manuel Bustillos: se llenan,
 | `escalas/icope.js` | Evaluación básica ICOPE (paso 1): un instrumento por dominio de la capacidad intrínseca y los factores clave del cuadro 3.2, adaptados del manual de la OPS (2025, CC BY-NC-SA 3.0 IGO). |
 | `js/icope.js`, `js/vistas/icope.js` | Valoración ICOPE: estado de cada dominio, evaluación detallada sugerida (reutiliza resultados), panel de capacidad intrínseca sin puntaje global, plan y seguimiento. |
 | `js/plan.js` | Plan de atención: valoración del médico por problema, prioridad, objetivos, intervenciones, revaloraciones, preferencias de la persona y bitácora de cambios. |
+| `js/atencion.js`, `js/vistas/atencion.js`, `js/vistas/plan-ui.js` | Plan de atención geriátrica: lista de problemas (hallazgos de tamizaje derivados, dominios ICOPE alterados y problemas del médico), sugerencias orientativas por dominio, evolución y significado clínico del cambio. |
+| `js/episodio.js`, `js/vistas/seguimiento.js` | Episodios (código aleatorio, fechas, cierre, archivo local), gráficas de evolución, estado del plan, exportación e importación en JSON. |
+| `js/informes.js`, `js/vistas/informe.js` | Informes: evolución breve, nota completa, resumen por dominio, ICOPE, plan de atención y seguimiento; copiar, imprimir o guardar en PDF, sin firma. |
+| `js/vistas/catalogo.js` | Catálogo de futuras herramientas (sin implementar). |
 | `js/herramientas.js` | Herramientas con pantalla propia (revisión de medicamentos) para dominios, búsqueda, favoritas y rutas. |
 | `js/nota.js` | Nota de la valoración: párrafo, lista y completa (resultados, interpretación, cambios, hallazgos, sugerencias). |
 | `js/almacen.js` | Guardado local: valoración, aplicaciones repetidas, respuestas en curso y preferencias. |
@@ -90,6 +94,20 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - Dinamometría: hasta 3 intentos por mano, mano dominante, equipo; usa el máximo y los cortes del EWGSOP2. La fuerza baja no diagnostica sarcopenia por sí sola. Se reutiliza en el algoritmo EWGSOP2 (máximo) y en Fried (mano dominante, con advertencia de método); ICOPE la ofrece como complementaria.
 - Algoritmo EWGSOP2: sarcopenia probable, no confirmada, confirmada o grave según fuerza, masa muscular (ASM o ASM/talla², DXA o BIA) y desempeño; reutiliza la dinamometría, el SPPB, la velocidad de marcha y el TUG.
 
+## Comorbilidad y riesgo hospitalario
+
+- Índice de Charlson con los pesos originales (1987) y, aparte, el índice combinado edad-comorbilidad (1994). No muestra porcentajes de mortalidad: dependen de la cohorte y del horizonte.
+- CIRS-G: gravedad de 0 a 4 en 14 sistemas, total, sistemas afectados, índice de gravedad y número de sistemas en nivel 3 y 4. Sin puntos de corte del total; requiere juicio clínico y el manual de Miller y Towers, que Huella no reproduce.
+- NEWS2: siete parámetros con las dos escalas de SpO₂ del RCP; puntaje y categoría de riesgo. La frecuencia de monitorización del RCP se muestra como referencia; el escalamiento sigue el protocolo de cada institución.
+- LACE no se implementó: se derivó en adultos de Ontario y discriminó mal el reingreso en personas mayores (c = 0.55; Cotter et al., 2012). Queda documentado como pendiente.
+
+## Plan de atención, seguimiento e informes
+
+- **Inicio**: Atención (en curso, problemas, plan, seguimiento, informes), Valoraciones (ICOPE, rápida, completa, hospitalaria, cognitiva, fragilidad, prequirúrgica y paliativa) y Herramientas (calculadoras, revisión de medicamentos, favoritas, dominios y futuras herramientas).
+- **Plan de atención** (`#/plan`): la lista de problemas reúne los hallazgos de tamizaje de los instrumentos (estado derivado), los dominios ICOPE alterados y los problemas que agrega el médico. Estados: hallazgo de tamizaje, sospecha clínica, diagnóstico confirmado por el médico, descartado y pendiente de evaluación. Prioridad alta, intermedia o seguimiento, nunca automática. Objetivos con basal, meta, plazo, responsable, indicador y estado; intervenciones por categoría a partir de sugerencias que solo se agregan al tocarlas; revaloración por problema; lo que importa a la persona (no es un documento de voluntad anticipada).
+- **Seguimiento** (`#/seguimiento`): episodio con código aleatorio, fecha de apertura, fechas de evaluación, etiqueta opcional, cierre y reapertura. Gráficas cuando un instrumento tiene dos o más mediciones en el episodio; el cambio cuantitativo se distingue del clínicamente significativo, que solo se califica con los umbrales publicados que declara el instrumento. Estado de objetivos e intervenciones, revaloraciones vencidas y bitácora. Exportación e importación local en JSON con avisos de privacidad; la importación se agrega a los episodios cerrados y nunca reemplaza el episodio en curso.
+- **Informes** (`#/informe`): evolución breve, nota geriátrica completa, resumen por dominio, informe ICOPE, plan de atención e informe de seguimiento. Vista previa, copiar, imprimir o guardar en PDF desde el diálogo de impresión. Sin firma ni certificación automática.
+
 ## Agregar una escala
 
 1. Crear `escalas/<nombre>.js` con el mismo formato que las existentes.
@@ -107,6 +125,7 @@ Apoyo para aplicar e interpretar escalas; no sustituye el juicio clínico. Algun
 - Valoración ICOPE: adaptación del *Manual de atención integrada para las personas mayores*, 2.ª ed. (OPS, 2025; https://doi.org/10.37774/9789275330319), licencia CC BY-NC-SA 3.0 IGO; las partes adaptadas se comparten bajo la misma licencia. Esta publicación es una adaptación de una obra original de la Organización Panamericana de la Salud (OPS). Las opiniones expresadas en esta adaptación son responsabilidad exclusiva de los autores y no representan necesariamente los criterios de la OPS.
 - FRAX® y FRAXplus® son marcas registradas; © Osteoporosis Research Ltd. Huella solo registra el resultado de la herramienta oficial.
 - Valores de referencia de la silla en 30 s y criterio del equilibrio en 4 etapas: CDC STEADI (se citan los valores publicados; no se reproducen los materiales).
+- NEWS2: reproducido de Royal College of Physicians. National Early Warning Score (NEWS) 2. London: RCP, 2017. La redacción de esta traducción no ha sido aprobada específicamente por el RCP; consulta la versión en inglés antes de su uso clínico.
 - Íconos: [Lucide](https://lucide.dev), licencia ISC (`assets/LICENSE-Lucide.txt`).
 - Tipografías: Fraunces e Inter Tight, SIL Open Font License 1.1 (`assets/fonts/`).
 

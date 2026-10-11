@@ -2,8 +2,11 @@
 // La valoración no guarda nombre ni datos de identificación del paciente.
 //
 // localStorage (permanece al cerrar el navegador): favoritas, tema, formato de nota, usos,
-//   valoración en curso (datos clínicos opcionales, resultados, respuestas y rutas omitidas).
+//   valoración en curso (datos clínicos opcionales, resultados, respuestas y rutas omitidas) y
+//   episodios cerrados (hasta MAX_EPISODIOS), que se pueden exportar o borrar.
 // sessionStorage (se borra al cerrar la pestaña): respuestas en edición, ligadas al id de la valoración.
+
+import { codigoEpisodio, asegurarEpisodio, tieneContenido, MAX_EPISODIOS } from './episodio.js';
 
 const PREFIJO = 'huella.';
 
@@ -40,7 +43,8 @@ const local = seguro('localStorage');
 const sesion = seguro('sessionStorage');
 
 const nuevoId = (p = 'v') => `${p}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-const vacia = () => ({ id: nuevoId(), creada: Date.now(), paciente: {}, resultados: [], rutas: {} });
+const hoyLocal = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const vacia = () => ({ id: nuevoId(), creada: Date.now(), paciente: {}, resultados: [], rutas: {}, episodio: { codigo: codigoEpisodio(), estado: 'abierto', abierto: hoyLocal() } });
 export const claveResultado = (escalaId, momento) => (momento ? `${escalaId}@${momento}` : escalaId);
 const claveDe = (r) => claveResultado(r.escalaId, r.momento);
 const recientePrimero = (a, b) => ((b.fecha || '') > (a.fecha || '') ? 1 : (b.fecha || '') < (a.fecha || '') ? -1 : (b.guardado || 0) - (a.guardado || 0));
@@ -98,8 +102,43 @@ export const almacen = {
     for (const r of v.resultados) {
       if (!r.id) { r.id = nuevoId('r'); migrada = true; }
     }
+    if (asegurarEpisodio(v)) migrada = true;
     if (migrada) escribir(local, 'valoracion', v);
     return v;
+  },
+
+  /* Episodios cerrados (solo en este navegador) */
+  episodios: () => leer(local, 'episodios', []).filter((e) => e && Array.isArray(e.resultados)),
+  guardarEpisodios: (lista) => escribir(local, 'episodios', lista.slice(0, MAX_EPISODIOS)),
+  // Archiva la valoración en curso (si tiene contenido) y empieza una nueva.
+  archivarYNueva() {
+    const v = this.valoracion();
+    if (tieneContenido(v)) this.guardarEpisodios([v, ...this.episodios().filter((e) => e.id !== v.id)]);
+    this.nuevaValoracion();
+  },
+  // Abre un episodio archivado como valoración en curso; la actual pasa al archivo si tiene contenido.
+  abrirEpisodio(id) {
+    const lista = this.episodios();
+    const e = lista.find((x) => x.id === id);
+    if (!e) return false;
+    const actual = this.valoracion();
+    const resto = lista.filter((x) => x.id !== id);
+    this.guardarEpisodios(tieneContenido(actual) ? [actual, ...resto] : resto);
+    escribir(local, 'valoracion', e);
+    escribir(sesion, 'respuestas', null);
+    return true;
+  },
+  borrarEpisodio(id) {
+    this.guardarEpisodios(this.episodios().filter((x) => x.id !== id));
+  },
+  // Agrega al archivo un episodio importado (nunca reemplaza la valoración en curso).
+  importarEpisodio(v) {
+    const lista = this.episodios();
+    const ids = new Set([this.valoracion().id, ...lista.map((x) => x.id)]);
+    const nuevo = { ...v, id: v.id && !ids.has(v.id) ? v.id : nuevoId() };
+    if (lista.length >= MAX_EPISODIOS) return null;
+    this.guardarEpisodios([nuevo, ...lista]);
+    return nuevo;
   },
   guardarValoracion: (v) => escribir(local, 'valoracion', v),
   // Todas las aplicaciones de un instrumento, o solo las de un momento (sin momento = undefined).

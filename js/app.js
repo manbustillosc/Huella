@@ -10,6 +10,11 @@ import { renderEscala, montarEscala, renderResultado, montarResultado, contexto 
 import { renderRuta, montarRuta } from './vistas/ruta.js';
 import { renderValoracion, montarValoracion } from './vistas/valoracion.js';
 import { renderAcerca, montarAcerca } from './vistas/acerca.js';
+import { renderPlanAtencion, montarPlanAtencion } from './vistas/atencion.js';
+import { renderSeguimiento, montarSeguimiento } from './vistas/seguimiento.js';
+import { renderInforme, montarInforme } from './vistas/informe.js';
+import { renderCatalogo } from './vistas/catalogo.js';
+import { FORMATOS_INFORME } from './informes.js';
 
 const vista = $('#vista');
 
@@ -41,6 +46,10 @@ function ruta() {
   }
   if (a === 'medicacion') return { vista: 'medicacion', pestana: ['medicamentos', 'stopp', 'beers', 'resumen'].includes(b) ? b : 'medicamentos' };
   if (a === 'valoracion') return { vista: 'valoracion' };
+  if (a === 'plan') return { vista: 'plan' };
+  if (a === 'seguimiento') return { vista: 'seguimiento' };
+  if (a === 'informe') return { vista: 'informe', formato: FORMATOS_INFORME.some((f) => f.id === b) ? b : FORMATOS_INFORME[0].id };
+  if (a === 'catalogo') return { vista: 'catalogo' };
   if (a === 'favoritas') return { vista: 'favoritas' };
   if (a === 'acerca') return { vista: 'acerca' };
   return { vista: 'inicio' };
@@ -66,6 +75,10 @@ function render() {
       icope: renderIcope,
       favoritas: renderFavoritas,
       acerca: renderAcerca,
+      plan: renderPlanAtencion,
+      seguimiento: renderSeguimiento,
+      informe: renderInforme,
+      catalogo: renderCatalogo,
     }[r.vista](r);
   }
   document.body.dataset.vista = r.vista;
@@ -91,6 +104,9 @@ function montar(r) {
   if (r.vista === 'medicacion') montarMedicacion(r, render, navegacion);
   if (r.vista === 'icope') montarIcope(r, render, navegacion);
   if (r.vista === 'acerca') montarAcerca(() => { aplicarTema(); navegacion(); }, navegacion);
+  if (r.vista === 'plan') montarPlanAtencion(render, navegacion);
+  if (r.vista === 'seguimiento') montarSeguimiento(render, navegacion);
+  if (r.vista === 'informe') montarInforme(r);
 }
 
 function titulo(r) {
@@ -104,6 +120,10 @@ function titulo(r) {
   if (r.vista === 'icope') return `Valoración ICOPE · ${base}`;
   if (r.vista === 'favoritas') return `Favoritas · ${base}`;
   if (r.vista === 'acerca') return `Acerca de · ${base}`;
+  if (r.vista === 'plan') return `Plan de atención · ${base}`;
+  if (r.vista === 'seguimiento') return `Seguimiento · ${base}`;
+  if (r.vista === 'informe') return `Informes · ${base}`;
+  if (r.vista === 'catalogo') return `Futuras herramientas · ${base}`;
   return base;
 }
 
@@ -130,8 +150,14 @@ function renderNavegacion(r) {
       ${item('#/valoracion', 'valoracion', 'Valoración', r.vista === 'valoracion', nVal ? `<span class="insignia">${nVal}</span>` : '')}
       ${item('#/favoritas', 'estrella', 'Favoritas', r.vista === 'favoritas')}
     </nav>
-    <nav class="grupo-nav" aria-label="Rutas guiadas">
-      <p class="etq-nav">Rutas guiadas</p>
+    <nav class="grupo-nav" aria-label="Atención">
+      <p class="etq-nav">Atención</p>
+      ${item('#/plan', 'plan', 'Plan de atención', r.vista === 'plan')}
+      ${item('#/seguimiento', 'historial', 'Seguimiento', r.vista === 'seguimiento')}
+      ${item('#/informe', 'documento', 'Informes', r.vista === 'informe')}
+    </nav>
+    <nav class="grupo-nav" aria-label="Valoraciones guiadas">
+      <p class="etq-nav">Valoraciones</p>
       ${RUTAS.map((x) => item(`#/r/${x.id}`, x.icono, x.nombre.replace('Valoración geriátrica ', 'VGI '), rutaAct === x.id)).join('')}
     </nav>
     <nav class="grupo-nav" aria-label="Dominios">
@@ -166,6 +192,10 @@ function renderNavegacion(r) {
   if (r.vista === 'icope') tituloBarra = 'ICOPE';
   if (r.vista === 'favoritas') tituloBarra = 'Favoritas';
   if (r.vista === 'acerca') tituloBarra = 'Acerca de';
+  if (r.vista === 'plan') tituloBarra = 'Plan de atención';
+  if (r.vista === 'seguimiento') { tituloBarra = 'Seguimiento'; atras = '#/plan'; }
+  if (r.vista === 'informe') tituloBarra = 'Informes';
+  if (r.vista === 'catalogo') tituloBarra = 'Futuras herramientas';
 
   $('#barra').innerHTML = r.vista === 'inicio'
     ? `<a class="marca-movil" href="#/">
@@ -184,9 +214,10 @@ function renderNavegacion(r) {
   const tab = (href, ico, texto, activo, extra = '') =>
     `<a href="${href}"${activo ? ' class="activo" aria-current="page"' : ''}>${icono(ico)}<span>${texto}</span>${extra}</a>`;
   $('#pestanas').innerHTML = `
-    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion', 'icope'].includes(r.vista))}
-    ${tab('#/favoritas', 'estrella', 'Favoritas', r.vista === 'favoritas')}
-    ${tab('#/valoracion', 'valoracion', 'Valoración', r.vista === 'valoracion', nVal ? `<span class="insignia">${nVal}</span>` : '')}`;
+    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion', 'icope', 'favoritas', 'catalogo'].includes(r.vista))}
+    ${tab('#/valoracion', 'valoracion', 'Valoración', r.vista === 'valoracion', nVal ? `<span class="insignia">${nVal}</span>` : '')}
+    ${tab('#/plan', 'plan', 'Plan', ['plan', 'seguimiento'].includes(r.vista))}
+    ${tab('#/informe', 'documento', 'Informes', r.vista === 'informe')}`;
 }
 
 /* ---------- Eventos globales ---------- */

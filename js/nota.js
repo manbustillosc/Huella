@@ -284,7 +284,7 @@ function parrafoPlan(plan) {
     const objs = plan.objetivos.filter((x) => x.ambito === a).map((x) => x.texto);
     const ints = plan.intervenciones.filter((x) => x.ambito === a).map((x) => x.texto.replace(/\.$/, ''));
     const det = [prio ? `prioridad ${nombreDe(PRIORIDADES, prio).toLowerCase()}` : '', objs.length ? `objetivos: ${objs.join('; ')}` : '', ints.length ? `intervenciones: ${ints.join('; ')}` : ''].filter(Boolean);
-    return det.length ? `${nombreAmbito(a)}: ${det.join('; ')}` : '';
+    return det.length ? `${nombreAmbito(a, plan)}: ${det.join('; ')}` : '';
   }).filter(Boolean);
   const importa = plan.preferencias.importa ? ` Lo que más le importa: ${plan.preferencias.importa}.` : '';
   return partes.length ? `Plan de atención: ${partes.join('. ')}.${importa}` : importa.trim();

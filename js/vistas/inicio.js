@@ -2,11 +2,14 @@
 import { almacen } from '../almacen.js';
 import { escalas, porId, DOMINIOS, RUTAS, dominioDe, escalasDe } from '../datos.js';
 import { TIPOS, CLASES, claseDe, TEXTO_REGISTRO } from '../motor.js';
-import { $, esc, icono, plural, sinAcentos, filaEscala, filaHerramienta, tarjetaDominio } from '../ui.js';
+import { $, esc, icono, plural, sinAcentos, filaEscala, filaHerramienta, tarjetaDominio, hoyISO } from '../ui.js';
 import { HERRAMIENTAS, herramientaDe, herramientasDe } from '../herramientas.js';
 import { progresoRuta, tiempoRuta } from './rutas-estado.js';
 import { diasDesde } from './valoracion.js';
 import { tarjetaInicioIcope } from './icope.js';
+import { planDe } from '../plan.js';
+import { problemasPlan, revaloraciones } from '../atencion.js';
+import { episodioDe, fechasEvaluacion } from '../episodio.js';
 
 function tarjetaRuta(ruta) {
   const p = progresoRuta(ruta);
@@ -31,12 +34,45 @@ function frecuentes() {
     .map(([id]) => porId[id]);
 }
 
+// Atención: lo que está en curso, problemas, plan, seguimiento e informes.
+function seccionAtencion(val, dias) {
+  const hoy = hoyISO();
+  const plan = planDe(val);
+  const probs = problemasPlan(val, porId, hoy);
+  const sinValorar = probs.filter((p) => !p.asignado && p.derivado).length;
+  const rev = revaloraciones(plan, hoy);
+  const vencidas = rev.filter((r) => r.dias < 0).length;
+  const ep = episodioDe(val);
+  const n = val.resultados.length;
+  const fechas = fechasEvaluacion(val).length;
+  const tile = (href, ico, titulo, linea, extra = '', clase = '') => `
+    <a class="tile-atencion${clase}" href="${href}">
+      <span class="tile-ico">${icono(ico)}</span>
+      <span class="tile-texto"><strong>${esc(titulo)}</strong><span>${linea}</span>${extra}</span>
+    </a>`;
+  return `
+    <section class="atencion-inicio" aria-labelledby="atencion-t">
+      <h2 class="seccion" id="atencion-t">Atención</h2>
+      <div class="rejilla-atencion">
+        ${tile('#/valoracion', 'valoracion', 'En curso', n ? `${esc(plural(n, 'resultado', 'resultados'))} · ${dias > 0 ? `hace ${esc(plural(dias, 'día', 'días'))}` : 'hoy'}` : 'Sin resultados todavía', dias > 7 && n ? '<span class="en-curso-aviso">Si es otro episodio, ciérralo en Seguimiento.</span>' : '', ' tile-principal')}
+        ${tile('#/plan#problemas', 'lista', 'Problemas', probs.length ? `${esc(plural(probs.length, 'problema', 'problemas'))}${sinValorar ? ` · ${sinValorar} por valorar` : ''}` : 'Sin problemas')}
+        ${tile('#/plan', 'plan', 'Plan', plan.objetivos.length || plan.intervenciones.length ? `${esc(plural(plan.objetivos.length, 'objetivo', 'objetivos'))} · ${esc(plural(plan.intervenciones.length, 'intervención', 'intervenciones'))}` : 'Sin objetivos')}
+        ${tile('#/seguimiento', 'historial', 'Seguimiento', `${esc(ep.codigo)}${fechas ? ` · ${esc(plural(fechas, 'fecha', 'fechas'))}` : ''}`, vencidas ? `<span class="en-curso-aviso">${esc(plural(vencidas, 'revaloración vencida', 'revaloraciones vencidas'))}</span>` : '')}
+        ${tile('#/informe', 'documento', 'Informes', 'Evolución, nota, ICOPE, plan')}
+      </div>
+    </section>`;
+}
+
 export function renderInicio() {
   const val = almacen.valoracion();
   const favs = almacen.favoritas().filter((id) => porId[id] || herramientaDe(id));
   const frec = frecuentes().filter((e) => !favs.includes(e.id));
   const n = val.resultados.length;
   const dias = diasDesde(val.creada);
+  const valoraciones = RUTAS.filter((r) => !['icope', 'calculadoras'].includes(r.id));
+  const calculadoras = RUTAS.find((r) => r.id === 'calculadoras');
+  const atencion = seccionAtencion(val, dias);
+  const enCurso = n || planDe(val).objetivos.length || planDe(val).libres.length;
   return `
     <section class="vista inicio">
       <header class="cabecera">
@@ -49,15 +85,24 @@ export function renderInicio() {
       </label>
       <div id="busqueda" hidden></div>
       <div id="contenido-inicio">
-        ${n ? `
-          <a class="en-curso" href="#/valoracion">
-            ${icono('valoracion')}
-            <span><strong>Valoración en curso</strong><span>${plural(n, 'resultado guardado', 'resultados guardados')} · ${dias > 0 ? `iniciada hace ${plural(dias, 'día', 'días')}` : 'iniciada hoy'} · ver la nota</span>${dias > 7 ? '<span class="en-curso-aviso">Si es otro episodio clínico, inicia una nueva valoración para no mezclar resultados.</span>' : ''}</span>
-            ${icono('adelante', 'chev')}
-          </a>` : ''}
+        ${enCurso ? atencion : ''}
+        <h2 class="seccion">Valoraciones</h2>
         ${tarjetaInicioIcope()}
-        <h2 class="seccion">Rutas guiadas</h2>
-        <div class="rejilla-rutas">${RUTAS.filter((r) => r.id !== 'icope').map(tarjetaRuta).join('')}</div>
+        <div class="rejilla-rutas">${valoraciones.map(tarjetaRuta).join('')}</div>
+        ${enCurso ? '' : atencion}
+        <h2 class="seccion">Herramientas</h2>
+        <div class="rejilla-rutas herramientas-inicio">
+          ${calculadoras ? tarjetaRuta(calculadoras) : ''}
+          ${HERRAMIENTAS.map((h) => `
+            <a class="tarjeta-ruta" href="${esc(h.href)}">
+              <span class="ico-ruta">${icono(h.dominio)}</span>
+              <span class="ruta-texto"><span class="ruta-nombre">${esc(h.corto)}</span><span class="ruta-desc">${esc(h.descripcion)}</span></span>
+            </a>`).join('')}
+          <a class="tarjeta-ruta" href="#/catalogo">
+            <span class="ico-ruta">${icono('libro')}</span>
+            <span class="ruta-texto"><span class="ruta-nombre">Futuras herramientas</span><span class="ruta-desc">Instrumentos por agregar y el estado de su licencia.</span></span>
+          </a>
+        </div>
         ${favs.length ? `
           <h2 class="seccion">Favoritas</h2>
           <div class="lista-escalas">${favs.map((id) => filaFav(id)).join('')}</div>` : ''}

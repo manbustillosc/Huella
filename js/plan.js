@@ -1,3 +1,5 @@
+import { DOMINIOS } from './dominios.js';
+
 // Plan de atención: estado de los problemas, prioridades, objetivos, intervenciones, fechas de revaloración,
 // preferencias de la persona y bitácora de cambios. Lo usan ICOPE y el plan de atención geriátrica.
 // Todo lo decide el médico: Huella no asigna prioridades, no convierte un tamizaje en diagnóstico,
@@ -63,11 +65,11 @@ export const MAX_PREFERENCIA = 300;
 export const nombreDe = (lista, id) => lista.find((x) => x.id === id)?.nombre || '';
 
 export const planVacio = () => ({
-  problemas: [], prioridades: {}, objetivos: [], intervenciones: [], revaloraciones: {}, preferencias: {}, bitacora: [],
+  problemas: [], prioridades: {}, objetivos: [], intervenciones: [], revaloraciones: {}, preferencias: {}, bitacora: [], libres: [],
 });
 export function planDe(v) {
   const p = { ...planVacio(), ...(v?.plan || {}) };
-  for (const k of ['problemas', 'objetivos', 'intervenciones', 'bitacora']) if (!Array.isArray(p[k])) p[k] = [];
+  for (const k of ['problemas', 'objetivos', 'intervenciones', 'bitacora', 'libres']) if (!Array.isArray(p[k])) p[k] = [];
   for (const k of ['prioridades', 'revaloraciones', 'preferencias']) if (!p[k] || typeof p[k] !== 'object') p[k] = {};
   return p;
 }
@@ -118,6 +120,29 @@ export function fijarRevaloracion(plan, ambito, fecha, hoy, nombre = nombreAmbit
   if (f) plan.revaloraciones[ambito] = f;
   else delete plan.revaloraciones[ambito];
   if (antes !== f) anotar(plan, hoy, `${nombre}: ${f ? `revaloración programada para el ${f.split('-').reverse().join('/')}` : 'se quitó la fecha de revaloración'}.`);
+}
+
+// Problemas que el médico agrega por su cuenta (sin instrumento): solo un nombre breve, sin datos identificables.
+export const MAX_NOMBRE_PROBLEMA = 80;
+export function agregarProblemaLibre(plan, nombre, fecha) {
+  const n = limpio(nombre, MAX_NOMBRE_PROBLEMA);
+  if (!n) return null;
+  if (plan.libres.some((x) => x.nombre.toLowerCase() === n.toLowerCase())) return null;
+  const nuevo = { ambito: `libre:${nuevoIdPlan('l')}`, nombre: n, creado: fechaValida(fecha) };
+  plan.libres.push(nuevo);
+  anotar(plan, fecha, `Problema agregado por el médico: ${n}.`);
+  return nuevo;
+}
+export function quitarProblemaLibre(plan, ambito, fecha) {
+  const x = plan.libres.find((l) => l.ambito === ambito);
+  if (!x) return;
+  plan.libres = plan.libres.filter((l) => l !== x);
+  plan.problemas = plan.problemas.filter((pr) => pr.ambito !== ambito);
+  plan.objetivos = plan.objetivos.filter((o) => o.ambito !== ambito);
+  plan.intervenciones = plan.intervenciones.filter((i) => i.ambito !== ambito);
+  delete plan.prioridades[ambito];
+  delete plan.revaloraciones[ambito];
+  anotar(plan, fecha, `Problema retirado: ${x.nombre}.`);
 }
 
 /* ---------- Objetivos ---------- */
@@ -217,7 +242,7 @@ export function registrarCambio(plan, texto, fecha) {
 }
 
 export const planConContenido = (plan) => Boolean(
-  plan.problemas.length || plan.objetivos.length || plan.intervenciones.length || Object.keys(plan.prioridades).length
+  plan.problemas.length || plan.libres.length || plan.objetivos.length || plan.intervenciones.length || Object.keys(plan.prioridades).length
   || Object.keys(plan.revaloraciones).length || Object.keys(plan.preferencias).length,
 );
 
@@ -233,12 +258,12 @@ export function lineaObjetivo(o) {
     o.responsable ? `responsable: ${o.responsable}` : '',
     o.indicador ? `indicador: ${o.indicador}` : '',
   ].filter(Boolean).join('; ');
-  return `${o.texto}${det ? ` (${det})` : ''}; estado: ${nombreDe(ESTADOS_OBJETIVO, o.estado).toLowerCase()}`;
+  return `${o.texto.replace(/\.$/, '')}${det ? ` (${det})` : ''}; estado: ${nombreDe(ESTADOS_OBJETIVO, o.estado).toLowerCase()}`;
 }
 
 export function lineaIntervencion(i) {
   const cuando = i.fechaEstado && i.estado !== 'planeada' ? ` (${fechaDMA(i.fechaEstado)})` : '';
-  return `${nombreDe(CATEGORIAS_INTERVENCION, i.categoria)}: ${i.texto}; ${nombreDe(ESTADOS_INTERVENCION, i.estado).toLowerCase()}${cuando}${i.nota ? `; ${i.nota}` : ''}`;
+  return `${nombreDe(CATEGORIAS_INTERVENCION, i.categoria)}: ${i.texto.replace(/\.$/, '')}; ${nombreDe(ESTADOS_INTERVENCION, i.estado).toLowerCase()}${cuando}${i.nota ? `; ${i.nota}` : ''}`;
 }
 
 // Nombre legible de un ámbito del plan. Los dominios ICOPE se nombran aquí para que la nota no dependa
@@ -247,23 +272,26 @@ export const NOMBRES_ICOPE = {
   cognicion: 'Cognición', locomotora: 'Capacidad locomotora', vitalidad: 'Vitalidad', vision: 'Visión',
   audicion: 'Audición', psicologica: 'Capacidad psicológica', factores: 'Necesidades adicionales',
 };
-export function nombreAmbito(ambito) {
+export const ambitoDominio = (id) => `dom:${id}`;
+export function nombreAmbito(ambito, plan = null) {
   const [tipo, id] = String(ambito).split(':');
   if (tipo === 'icope') return `${NOMBRES_ICOPE[id] || id} (ICOPE)`;
+  if (tipo === 'dom') return DOMINIOS.find((d) => d.id === id)?.nombre || id;
+  if (tipo === 'libre') return plan?.libres?.find((x) => x.ambito === ambito)?.nombre || 'Problema agregado por el médico';
   return id || tipo;
 }
 // Ámbitos con contenido, en orden: primero los dominios ICOPE y después el resto en orden de creación.
 export function ambitosConContenido(plan) {
   const vistos = [];
   const agregar = (a) => { if (a && !vistos.includes(a)) vistos.push(a); };
-  const todos = [...plan.problemas.map((x) => x.ambito), ...Object.keys(plan.prioridades), ...plan.objetivos.map((x) => x.ambito), ...plan.intervenciones.map((x) => x.ambito), ...Object.keys(plan.revaloraciones)];
+  const todos = [...plan.problemas.map((x) => x.ambito), ...plan.libres.map((x) => x.ambito), ...Object.keys(plan.prioridades), ...plan.objetivos.map((x) => x.ambito), ...plan.intervenciones.map((x) => x.ambito), ...Object.keys(plan.revaloraciones)];
   Object.keys(NOMBRES_ICOPE).map((id) => `icope:${id}`).filter((a) => todos.includes(a)).forEach(agregar);
   todos.forEach(agregar);
   return vistos;
 }
 
 // Líneas del plan para un conjunto de ámbitos, con el nombre legible de cada uno.
-export function lineasPlan(plan, ambitos = ambitosConContenido(plan), nombre = nombreAmbito) {
+export function lineasPlan(plan, ambitos = ambitosConContenido(plan), nombre = (a) => nombreAmbito(a, plan)) {
   const l = [];
   const pref = CAMPOS_PREFERENCIAS.filter((c) => plan.preferencias[c.id]);
   if (pref.length) {
@@ -276,7 +304,8 @@ export function lineasPlan(plan, ambitos = ambitosConContenido(plan), nombre = n
     const prio = plan.prioridades[a];
     const rev = plan.revaloraciones[a];
     const prob = problemaDe(plan, a);
-    if (!objs.length && !ints.length && !prio && !rev && !prob) continue;
+    const libre = a.startsWith('libre:');
+    if (!objs.length && !ints.length && !prio && !rev && !prob && !libre) continue;
     l.push(`${nombre(a)}${prio ? ` (prioridad ${nombreDe(PRIORIDADES, prio).toLowerCase()})` : ''}:`);
     if (prob) l.push(`- Valoración del médico: ${nombreDe(ESTADOS_PROBLEMA, prob.estado).toLowerCase()}${prob.nota ? ` (${prob.nota})` : ''}.`);
     l.push(...objs.map((o) => `- Objetivo: ${lineaObjetivo(o)}.`));

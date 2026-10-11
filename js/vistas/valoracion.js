@@ -9,6 +9,7 @@ import { progresoRuta } from './rutas-estado.js';
 import { medicacionDe, resumenMedicacion } from '../medicacion.js';
 import { planDe, planConContenido } from '../plan.js';
 import { estadosIcope, avanceBasica, ESTADOS_ICOPE } from '../icope.js';
+import { episodioDe } from '../episodio.js';
 
 export const diasDesde = (ts) => (ts ? Math.max(0, Math.floor((Date.now() - ts) / 86400000)) : 0);
 
@@ -61,15 +62,17 @@ export function renderValoracion() {
   const icope = estadosIcope(v, isoDe(new Date()));
   const avIcope = avanceBasica(icope);
   const hayNota = v.resultados.length || med.hayContenido || planConContenido(plan);
+  const ep = episodioDe(v);
   return `
     <section class="vista valoracion">
       <header class="cabecera">
         <p class="ceja">Valoración en curso</p>
         <h1>Valoración</h1>
         <p class="entradilla">Se guarda solo en este navegador, sin nombre ni datos de identificación. <a href="#/acerca">Qué se guarda y sus límites</a>.</p>
-        ${v.creada ? `<p class="inicio-valoracion">${icono('calendario')} Iniciada el ${esc(fechaCorta(isoDe(new Date(v.creada))))}${dias > 0 ? ` (hace ${plural(dias, 'día', 'días')})` : ' (hoy)'}.</p>` : ''}
+        ${v.creada ? `<p class="inicio-valoracion">${icono('calendario')} Episodio <a href="#/seguimiento">${esc(ep.codigo)}</a> · iniciado el ${esc(fechaCorta(isoDe(new Date(v.creada))))}${dias > 0 ? ` (hace ${plural(dias, 'día', 'días')})` : ' (hoy)'}.</p>` : ''}
       </header>
-      ${dias > 7 && v.resultados.length ? `<p class="aviso-episodio">${icono('alerta')} Esta valoración tiene más de una semana. Si los nuevos resultados son de otro episodio clínico, copia la nota e inicia una nueva valoración para no mezclarlos.</p>` : ''}
+      ${ep.estado === 'cerrado' ? `<p class="aviso-episodio">${icono('alerta')} Este episodio está cerrado (${esc(fechaCorta(ep.cerrado))}). Puedes consultarlo y generar informes; para agregar resultados, reábrelo en <a href="#/seguimiento">Seguimiento</a>.</p>` : ''}
+      ${dias > 7 && v.resultados.length && ep.estado !== 'cerrado' ? `<p class="aviso-episodio">${icono('alerta')} Esta valoración tiene más de una semana. Si los nuevos resultados son de otro episodio clínico, cierra este en <a href="#/seguimiento">Seguimiento</a> para archivarlo y empieza otro, sin mezclar resultados.</p>` : ''}
       <div class="tarjeta">
         <p class="titulo-tarjeta">Datos clínicos <span>(opcionales, no identificables)</span></p>
         <div class="campos">
