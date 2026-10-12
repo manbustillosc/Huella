@@ -62,7 +62,7 @@ Estados:
 | CAM-ICU | Registro de los rasgos; las pruebas se aplican con el manual oficial | © Ely y Vanderbilt University | Cumple |
 | NPI-Q | Registro por dominio | © J. L. Cummings | Cumple |
 | FRAIL, SARC-F | Reactivos | Morley et al.; Malmstrom y Morley; sin titular de licencias identificado. Versiones del INGER | Cumple. Ver versión del INGER |
-| CFS | Registro del nivel | Dalhousie University | Cumple |
+| CFS | Registro del nivel, con resumen de cada nivel en redacción propia y figuras originales de Huella (no los pictogramas oficiales) | Dalhousie University | Cumple |
 | Fried | Criterios publicados | Fried et al., 2001 | Cumple |
 | SPPB | Protocolo y puntuación | Guralnik et al., 1994 (NIA); sin titular de licencias identificado | Cumple. Ver versión del INGER |
 | Vivifrail | Algoritmo publicado; no reproduce pasaportes ni videos | © consorcio Vivifrail | Cumple |

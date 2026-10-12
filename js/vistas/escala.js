@@ -212,10 +212,11 @@ function campoOpciones(c, n, r) {
       ${notaPrefill(c)}
       <div class="opciones">
         ${c.opciones.map((o, j) => {
-          const pts = c.puntua !== false && !c.anotaA && !o.especial && !c.compactoNumerico;
+          const pts = c.puntua !== false && !c.anotaA && !o.especial && !c.compactoNumerico && !o.figura;
           return `
-          <label class="opcion${o.especial ? ' especial' : ''}">
+          <label class="opcion${o.especial ? ' especial' : ''}${o.figura ? ' con-figura' : ''}">
             <input type="radio" name="${c.id}" value="${j}"${Number(sel) === j && sel !== '' && sel != null ? ' checked' : ''}>
+            ${o.figura ? `<span class="op-figura">${o.figura}</span>` : ''}
             <span class="op-texto">
               <span class="op-titulo">${esc(o.texto)}</span>
               ${o.detalle ? `<span class="op-detalle">${esc(o.detalle)}</span>` : ''}
@@ -841,6 +842,7 @@ export function renderResultado(params) {
             : res.puntaje == null && res.valor == null && !res.mostrar ? ''
             : `<p class="puntaje"><span class="puntaje-num${String(res.mostrar).length > 4 ? ' largo' : ''}">${esc(res.mostrar)}</span><span class="puntaje-de">${esc(res.sufijo)}</span></p>`}
         <p class="chip nivel-${b.nivel}"><span class="punto" aria-hidden="true"></span>${esc(b.etiqueta)}</p>
+        ${b.figura && !res.noEvaluable ? `<div class="figura-resultado">${b.figura}</div>` : ''}
         ${res.alertas?.length ? `
           <div class="alerta-seguridad" role="alert">
             ${icono('alerta')}

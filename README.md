@@ -155,6 +155,10 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - En Barthel, Katz, Lawton-Brody, Pfeffer, Mini-Cog, MoCA, MMSE, prueba del reloj, RUDAS, Isaacs, CDR e ICOPE cognición, las respuestas y el texto para el expediente presentan primero lo que la persona logra por completo, luego lo que logra en parte y al final lo que no logra (en Pfeffer y CDR, donde un puntaje menor es mejor, el orden se invierte). Las actividades que nunca ha realizado van al final.
 - Los subtotales por dominio (MMSE, MoCA, RUDAS, CDR, reloj, Isaacs y SPPB) siguen el mismo orden, y los resúmenes de Katz y Lawton-Brody nombran primero las actividades que realiza.
 
+## Figuras de la CFS (versión 2.6.1)
+
+- Cada nivel de la Escala Clínica de Fragilidad muestra una figura y una descripción breve. Las figuras son ilustraciones originales de Huella y las descripciones tienen redacción propia; no se reproducen los pictogramas ni el texto oficiales (© Dalhousie University).
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

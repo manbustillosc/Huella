@@ -115,3 +115,20 @@ test('las escalas sin configuración de orden conservan su texto', () => {
   assert.doesNotMatch(textoEscala(gds, res, 'lista'), /Puntaje completo:|Independiente:/);
   assert.equal(NINGUNO, '__ninguno');
 });
+
+test('CFS: cada nivel tiene una figura original y una descripción propia; el resultado muestra la figura', async () => {
+  const { FIGURAS_CFS } = await import('../escalas/cfs-figuras.js');
+  const op = porId.cfs.campos[0].opciones;
+  assert.equal(op.length, 9);
+  for (const [i, o] of op.entries()) {
+    assert.match(o.figura, /^<svg class="figura-cfs nivel-(bien|leve|moderado|grave|critico)" viewBox="0 0 64 64"/, `nivel ${i + 1}`);
+    assert.equal(o.figura, FIGURAS_CFS[i + 1]);
+    assert.ok(o.detalle.length > 40, `nivel ${i + 1}: descripción`);
+    assert.doesNotMatch(o.figura, /<(script|image|foreignObject)|href=|on[a-z]+=/i, 'SVG estático, sin recursos externos ni scripts');
+  }
+  assert.ok(porId.cfs.registro, 'sigue siendo de registro');
+  const res = calc('cfs', { nivel: '6 · Fragilidad moderada' });
+  assert.equal(res.banda.figura, FIGURAS_CFS[6]);
+  assert.match(res.banda.texto, /^Necesita ayuda en todas las actividades fuera de casa/);
+  assert.match(porId.cfs.campos[0].ayuda, /grave \(necesita que otros la cuiden\) = 7/);
+});
