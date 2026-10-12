@@ -264,14 +264,17 @@ export const ppi = {
 
 /* ---------- Clasificación ASA ---------- */
 
+// Clase, nombre, definición, ejemplos en adultos (ASA, actualización de diciembre de 2020; redacción propia) y nivel.
 const ASA = [
-  ['I', 'Paciente sano', 'Sin enfermedad sistémica; no fuma; consumo de alcohol nulo o mínimo.', 'bien'],
-  ['II', 'Enfermedad sistémica leve', 'Sin limitación funcional sustancial (p. ej., fumador, obesidad con IMC de 30 a 40, diabetes o hipertensión bien controladas, enfermedad pulmonar leve).', 'leve'],
-  ['III', 'Enfermedad sistémica grave', 'Con limitación funcional sustancial (p. ej., diabetes o hipertensión mal controladas, EPOC, IMC de 40 o más, fracción de expulsión moderadamente reducida, diálisis programada, infarto, ictus o stent coronario de más de 3 meses).', 'moderado'],
-  ['IV', 'Enfermedad sistémica grave que amenaza la vida de forma constante', 'P. ej., infarto, ictus o AIT recientes (menos de 3 meses), isquemia cardiaca activa, valvulopatía grave, fracción de expulsión muy reducida, sepsis o enfermedad renal terminal sin diálisis programada.', 'grave'],
-  ['V', 'Moribundo', 'No se espera que sobreviva sin la operación.', 'critico'],
-  ['VI', 'Muerte encefálica', 'Donante de órganos.', 'critico'],
+  ['I', 'Paciente sano', 'Sin enfermedad sistémica.', ['saludable', 'no fuma', 'consumo de alcohol nulo o mínimo'], 'bien'],
+  ['II', 'Enfermedad sistémica leve', 'Enfermedad leve sin limitación funcional sustancial.', ['fumador actual', 'consumo social de alcohol', 'embarazo', 'obesidad con IMC de 30 a menos de 40', 'diabetes o hipertensión bien controladas', 'enfermedad pulmonar leve'], 'leve'],
+  ['III', 'Enfermedad sistémica grave', 'Una o más enfermedades moderadas a graves con limitación funcional sustancial.', ['diabetes o hipertensión mal controladas', 'EPOC', 'obesidad mórbida (IMC de 40 o más)', 'hepatitis activa', 'dependencia o abuso de alcohol', 'marcapasos implantado', 'fracción de expulsión moderadamente reducida', 'enfermedad renal terminal en hemodiálisis o diálisis programada', 'infarto, EVC, AIT o enfermedad coronaria con stents de hace más de 3 meses'], 'moderado'],
+  ['IV', 'Enfermedad sistémica grave que amenaza la vida de forma constante', 'Enfermedad grave que pone en riesgo la vida de forma continua.', ['infarto, EVC, AIT o stents coronarios recientes (menos de 3 meses)', 'isquemia cardiaca en curso', 'valvulopatía grave', 'fracción de expulsión gravemente reducida', 'sepsis', 'coagulación intravascular diseminada', 'síndrome de dificultad respiratoria aguda', 'enfermedad renal terminal sin diálisis programada'], 'grave'],
+  ['V', 'Moribundo', 'No se espera que sobreviva sin la operación.', ['aneurisma abdominal o torácico roto', 'trauma masivo', 'hemorragia intracraneal con efecto de masa', 'isquemia intestinal con cardiopatía significativa o falla de varios órganos'], 'critico'],
+  ['VI', 'Muerte encefálica', 'Paciente con muerte encefálica declarada cuyos órganos se procuran para donación.', ['donador de órganos'], 'critico'],
 ];
+const textoAsa = ([, , def, ej]) => `${def} Ejemplos: ${ej.join('; ')}.`;
+const detalleAsa = ([, , def, ej]) => `${def}\nEjemplos: ${ej.join(' · ')}.`;
 
 export const asa = {
   id: 'asa',
@@ -291,10 +294,10 @@ export const asa = {
   min: 1,
   max: 6,
   campos: [
-    { id: 'clase', texto: 'Clase ASA', textoCorto: 'clase', puntua: false, opciones: ASA.map(([c, n, d], i) => ({ texto: `ASA ${c} · ${n}`, valor: i + 1, detalle: d })) },
+    { id: 'clase', texto: 'Clase ASA', textoCorto: 'clase', puntua: false, ayuda: 'Cada clase muestra ejemplos de pacientes en adultos. Son orientativos: elige la clase que mejor describe a tu paciente con todo el contexto clínico.', opciones: ASA.map((a, i) => ({ texto: `ASA ${a[0]} · ${a[1]}`, valor: i + 1, detalle: detalleAsa(a) })) },
     { id: 'urgencia', texto: '¿Cirugía de urgencia («E»)?', textoCorto: 'urgencia', puntua: false, opciones: [{ texto: 'No', valor: 0 }, { texto: 'Sí: el retraso aumentaría la amenaza para la vida o un órgano', valor: 1 }] },
   ],
-  bandas: ASA.map(([c, n, d, nivel], i) => ({ min: i + 1, max: i + 1, rango: `ASA ${c}`, etiqueta: `ASA ${c}: ${n.toLowerCase()}`, nivel, hallazgo: i >= 2, texto: d, sugerencias: i >= 2 ? ['Integrar con la valoración geriátrica preoperatoria: fragilidad, cognición, funcionalidad, nutrición y riesgo de delirium.'] : [] })),
+  bandas: ASA.map((a, i) => ({ min: i + 1, max: i + 1, rango: `ASA ${a[0]}`, etiqueta: `ASA ${a[0]}: ${a[1].toLowerCase()}`, nivel: a[4], hallazgo: i >= 2, texto: textoAsa(a), sugerencias: i >= 2 ? ['Integrar con la valoración geriátrica preoperatoria: fragilidad, cognición, funcionalidad, nutrición y riesgo de delirium.'] : [] })),
   calcular({ v }) {
     const c = ASA[v.clase.valor - 1][0];
     const e = v.urgencia.valor === 1 ? 'E' : '';
@@ -303,8 +306,9 @@ export const asa = {
   resumen: (res) => `ASA ${res.mostrar} (${res.banda.etiqueta.replace(/^ASA [IV]+: /, '')}).`,
   resumenBreve: (res) => `ASA ${res.mostrar}`,
   notas: [
-    'Definiciones resumidas de la ASA (actualización de diciembre de 2020); los ejemplos no sustituyen el juicio clínico.',
-    'No incluye la edad ni la fragilidad: complétala con RCRI, ARISCAT y la valoración geriátrica.',
+    'Definiciones y ejemplos en adultos de la ASA (actualización de diciembre de 2020), resumidos con redacción propia; los ejemplos no son una lista completa ni sustituyen el juicio clínico.',
+    'La edad por sí sola no cambia la clase. No incluye la fragilidad: complétala con RCRI, ARISCAT y la valoración geriátrica.',
+    '«E» se agrega a cualquier clase cuando la cirugía es de urgencia: el retraso aumentaría la amenaza para la vida o para un órgano.',
   ],
   licencia: { texto: 'ASA Physical Status Classification System © American Society of Anesthesiologists. Huella resume las definiciones con redacción propia.', enlace: 'https://www.asahq.org/standards-and-practice-parameters/statement-on-asa-physical-status-classification-system' },
   referencias: [

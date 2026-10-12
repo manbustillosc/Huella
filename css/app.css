@@ -673,7 +673,7 @@ body[data-vista="escala"] .vista { padding-bottom: 0; }
 .opcion input:checked::after { transform: scale(1); }
 .op-texto { flex: 1; min-width: 0; display: grid; gap: 2px; }
 .op-titulo { font-weight: 500; }
-.op-detalle { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.op-detalle { font-size: 14px; line-height: 20px; color: var(--ink-muted); white-space: pre-line; }
 .op-pts {
   flex: none;
   min-width: 28px;
