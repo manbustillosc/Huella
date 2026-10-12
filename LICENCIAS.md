@@ -93,7 +93,7 @@ Estados:
 | CKD-EPI 2021, Cockcroft-Gault | Fórmulas | Referencias citadas | Cumple |
 | FAQ de Pfeffer | Actividades del cuestionario con redacción en español propia | Pfeffer et al., 1982; sin titular de licencias identificado | Cumple |
 | GDS de Reisberg | Registro del estadio con descripciones breves propias | © B. Reisberg | Cumple (solo registro) |
-| Fluencia semántica | Consigna y percentiles mexicanos por edad y escolaridad (Chávez-Oliveros, 2015) citados como datos | Prueba de dominio público | Cumple |
+| Fluencia semántica | Consigna e interpretación del INGER (menos de −1 DE por edad y escolaridad); medias, DE y percentiles de Chávez-Oliveros (2015) citados como datos | Prueba de dominio público | Cumple |
 | GAD-7 | Reactivos | Pfizer: no requiere permiso para reproducir, traducir ni distribuir | Cumple |
 | CES-D 7 | Reactivos de la versión mexicana (ENASEM/ENSANUT) | CES-D de dominio público (Radloff, 1977); versión breve de Salinas-Rodríguez et al. (2014) | Cumple |
 | Soledad 3 reactivos | Reactivos con traducción propia | Hughes et al. (2004), derivada de la escala UCLA (Russell) | Cumple, confirmar |
@@ -119,6 +119,15 @@ Estados:
 | SPICT | Registro del resultado y de las condiciones presentes; no reproduce indicadores | © University of Edinburgh; descarga gratuita; no se reproduce en otro formato sin permiso | Cumple (solo registro) |
 | NECPAL | Registro de la pregunta sorpresa y del resultado; no reproduce criterios | NECPAL CCOMS-ICO© (Institut Català d’Oncologia) | Cumple (solo registro) |
 | Equivalente de morfina | Factores de conversión de los CDC (2022) | Dominio público (gobierno de EE. UU.) | Cumple |
+| Atenas | Formato del anexo 8 del INGER (reactivos y opciones) | Soldatos et al., 2000; formato reproducible del INGER con fines asistenciales sin ánimo de lucro | Cumple |
+| ISAR-HP | Formato del anexo 24 del INGER | Hoogerduijn et al., 2012; formato del INGER | Cumple |
+| HARP | Edad, actividades instrumentales y total del mini examen abreviado; no reproduce sus reactivos | Sager et al., 1996; formato del INGER (anexo 25) | Cumple |
+| SPPICEES | Formato del anexo 26 del INGER (adaptación de SPICES) | Fulmer (Hartford Institute); formato del INGER | Cumple |
+| Prueba del susurro | Procedimiento con redacción propia | Prueba clínica sin titular | Cumple |
+| Espacio de vida (LSA) | Niveles, frecuencia e independencia con redacción propia; cortes del INGER | Baker et al., 2003 (UAB); formato del INGER (anexo 40) | Cumple, confirmar |
+| Recursos sociales OARS | Registro de la categoría; no reproduce las 13 preguntas | Duke University; formato del INGER (anexo 37) | Cumple (solo registro) |
+| Díaz-Veiga | Preguntas resumidas con redacción propia | Díaz-Veiga; formato del INGER (anexo 38) | Cumple |
+| Barreras del entorno | Barreras resumidas con redacción propia | Formato del INGER (anexo 35) | Cumple |
 | Beers 2023 | No se reproducen las tablas | American Geriatrics Society | Cumple |
 
 ## Versiones en español del INGER (licencia comprobada el 12/10/2026)
@@ -168,6 +177,9 @@ Hoy esos instrumentos son solo de registro. Mostrar sus reactivos requeriría:
 | IPOS | Licencia gratuita con registro en pos-pal.org; sin cambiar la redacción ni cobrar; cada usuario debe registrarse | Registro y revisar sus términos para uso electrónico |
 | Carga anticolinérgica (ACB) | © Regenstrief Institute (2008, 2012); uso solo según sus términos | Permiso por escrito (acb@agingbraincare.org) |
 | Rotación de opioides | Las tablas varían entre guías; el error es grave | No se integrará; Huella calcula la carga en MME/día (CDC 2022) |
+| WHODAS 2.0 | © OMS; incluido en la guía del INGER; su uso digital requiere permiso de la OMS | Permiso de la OMS (gratuito para uso no comercial) |
+| Inventario de ansiedad de Beck | © Pearson; de pago | No se integrará (alternativa gratuita: GAD-7) |
+| SpRMBPC | Lista cualitativa de problemas de memoria y conducta para cuidadores (guía del INGER) | Pendiente; mientras tanto, NPI-Q y Zarit |
 
 Versiones completas (hoy solo registro): GPCOG (UNSW), G8 (autores y Nestlé), SPICT (equipo SPICT) y NECPAL (ICO) requieren permiso para mostrar sus reactivos o criterios dentro de Huella. MUST: BAPEN cobra licencia por calcularlo en apps fuera del Reino Unido; no se solicitará.
 

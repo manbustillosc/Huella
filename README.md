@@ -142,8 +142,13 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 ## Ajustes a la guía del INGER (versión 2.4)
 
 - Licencia de la guía de 2022 comprobada: CC BY-NC-ND 4.0, con un aviso contradictorio de «todos los derechos reservados»; sus formatos permiten reproducirse completos con fines asistenciales sin ánimo de lucro citando al INGER (ver `LICENCIAS.md`).
-- Fluencia semántica con percentiles de personas mayores mexicanas por edad y escolaridad (Chávez-Oliveros, 2015).
+- Fluencia semántica con las normas mexicanas del INGER por edad y escolaridad: menos de −1 DE es probable deterioro (desde los 65 años con los datos de Chávez-Oliveros, 2015; de 31 a 64 con la tabla del anexo 1).
 - Prueba de Isaacs con el corte del INGER (25 o menos).
+
+## Instrumentos de la guía del INGER que faltaban (versión 2.5)
+
+- Escala Atenas de insomnio, ISAR-HP, HARP (registra el total del mini examen abreviado), SPPICEES, prueba del susurro, espacio de vida (LSA), recursos sociales OARS (registro de la categoría), inventario de Díaz-Veiga y barreras del entorno físico y la movilidad. Total: 108 instrumentos.
+- Quedan fuera WHODAS 2.0 y WHOQOL-OLD (permiso de la OMS), el inventario de ansiedad de Beck (de pago; se usa el GAD-7) y la SpRMBPC (cualitativa, pendiente).
 
 ## Pruebas y publicación
 

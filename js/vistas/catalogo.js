@@ -8,6 +8,9 @@ export const CATALOGO_FUTURO = [
   { nombre: 'WHOQOL-OLD', dominio: 'Calidad de vida', uso: 'Calidad de vida en personas mayores (módulo de la OMS).', estado: 'Permiso por estudio del centro WHOQOL de cada idioma o de la OMS; orientado a investigación, con posible tarifa si hay financiamiento comercial. Poco adecuado para una app clínica.' },
   { nombre: 'IPOS', dominio: 'Paliativos', uso: 'Resultados centrados en la persona en cuidados paliativos.', estado: 'Licencia gratuita con registro en pos-pal.org; no se puede cambiar la redacción ni cobrar por su uso, y cada usuario debe registrarse.' },
   { nombre: 'Carga anticolinérgica (ACB)', dominio: 'Polifarmacia', uso: 'Suma del efecto anticolinérgico de la medicación.', estado: 'La escala ACB (actualización 2012) es © Regenstrief Institute y solo puede usarse según sus términos: falta su permiso (acb@agingbraincare.org). Mientras tanto, la revisión de medicamentos incluye la tabla 7 de Beers 2023.' },
+  { nombre: 'WHODAS 2.0', dominio: 'Funcional', uso: 'Discapacidad en 6 dominios según la CIF (OMS).', estado: 'Incluido en la guía del INGER, pero su uso en formato digital requiere permiso de la OMS (gratuito para uso no comercial).' },
+  { nombre: 'Inventario de ansiedad de Beck', dominio: 'Afectivo', uso: 'Síntomas de ansiedad (21 reactivos).', estado: 'Propiedad de Pearson y de pago: no se integrará. Huella incluye el GAD-7, gratuito.' },
+  { nombre: 'SpRMBPC', dominio: 'Social', uso: 'Lista de problemas de memoria y conducta y reacción del cuidador.', estado: 'Interpretación cualitativa (guía del INGER); pendiente de integrar. Mientras tanto, NPI-Q y Zarit.' },
   { nombre: 'Rotación de opioides', dominio: 'Calculadoras', uso: 'Dosis del nuevo opioide al cambiar de uno a otro.', estado: 'No se integrará: las tablas varían entre guías y el error tiene consecuencias graves. Huella calcula la carga total en MME/día (CDC 2022), que los CDC indican no usar para convertir dosis.' },
 ];
 

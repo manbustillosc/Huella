@@ -31,15 +31,20 @@ test('Isaacs: corte del INGER de 25 o menos y menos de 15 siempre asociado a dem
   assert.match(porId.isaacs.notas.join(' '), /INGER/);
 });
 
-test('Fluencia semántica: percentiles mexicanos por edad y escolaridad (Chávez-Oliveros, 2015)', () => {
+test('Fluencia semántica: normas mexicanas del INGER (menos de −1 DE = probable deterioro)', () => {
   const f = (m) => calc('fluencia', m);
   assert.equal(f({ animales: 9 }).banda.etiqueta, 'Por debajo del punto de corte', 'sin edad ni escolaridad usa el corte de 10');
-  assert.equal(f({ animales: 7, edad: 72, escolaridad: '1 a 5 años' }).banda.etiqueta, 'Por debajo de lo esperado para su edad y escolaridad');
-  assert.equal(f({ animales: 8, edad: 72, escolaridad: '1 a 5 años' }).banda.etiqueta, 'Límite bajo para su edad y escolaridad', 'el percentil 10 (8) ya no es bajo');
+  assert.equal(f({ animales: 9, edad: 72, escolaridad: '1 a 5 años' }).banda.etiqueta, 'Probable deterioro en fluencia semántica', '9 queda bajo el rango normal 10 a 19 del INGER');
+  assert.equal(f({ animales: 10, edad: 72, escolaridad: '1 a 5 años' }).banda.etiqueta, 'Dentro de lo esperado para su edad y escolaridad');
   assert.equal(f({ animales: 3, edad: 77, escolaridad: 'Sin escolaridad' }).banda.etiqueta, 'Muy por debajo de lo esperado para su edad y escolaridad');
-  assert.equal(f({ animales: 18, edad: 66, escolaridad: '9 años o más' }).banda.etiqueta, 'Dentro de lo esperado para su edad y escolaridad');
+  assert.equal(f({ animales: 14, edad: 66, escolaridad: '9 años o más' }).banda.etiqueta, 'Probable deterioro en fluencia semántica', '65 a 69 con 9 años o más: rango normal 15 a 24');
+  assert.equal(f({ animales: 15, edad: 66, escolaridad: '9 años o más' }).banda.etiqueta, 'Dentro de lo esperado para su edad y escolaridad');
   assert.ok(f({ animales: 12, edad: 85, escolaridad: '6 a 8 años' }).lineas.some((l) => /80 años o más, 6 a 8 años de escolaridad/.test(l)));
-  assert.ok(f({ animales: 12, edad: 60, escolaridad: '6 a 8 años' }).lineas.some((l) => /Menor de 65 años/.test(l)));
+  // Menores de 65: tabla del INGER
+  assert.equal(f({ animales: 13, edad: 60, escolaridad: '6 a 8 años' }).banda.etiqueta, 'Probable deterioro en fluencia semántica');
+  assert.equal(f({ animales: 14, edad: 60, escolaridad: '6 a 8 años' }).banda.etiqueta, 'Dentro de lo esperado para su edad y escolaridad');
+  assert.equal(f({ animales: 6, edad: 45, escolaridad: 'Sin escolaridad' }).banda.etiqueta, 'Muy por debajo de lo esperado para su edad y escolaridad');
+  assert.ok(f({ animales: 12, edad: 25, escolaridad: '6 a 8 años' }).lineas.some((l) => /Menor de 31 años/.test(l)));
 });
 
 test('GPCOG: algoritmo oficial con informante solo en la zona intermedia', () => {

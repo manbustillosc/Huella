@@ -141,20 +141,33 @@ const ESCOLARIDAD_FLUENCIA = [
   { texto: '6 a 8 años', valor: 2, hasta: 8 },
   { texto: '9 años o más', valor: 3, hasta: 99 },
 ];
+// Tabla del INGER (anexo 1) para menores de 65 años: valor en −1 DE y en −2 DE por escolaridad (0, 1 a 5, 6 a 8, 9 o más).
+// Un puntaje igual o menor que el valor está por debajo de ese límite.
+export const INGER_FLUENCIA_JOVENES = {
+  '31-55': { 0: [9, 6], 1: [9, 6], 2: [12, 8], 3: [16, 11] },
+  '56-64': { 0: [7, 1], 1: [7, 1], 2: [13, 8], 3: [16, 12] },
+};
 const grupoEdad = (e) => (e >= 80 ? '80+' : e >= 75 ? '75-79' : e >= 70 ? '70-74' : '65-69');
+const nombreGrupo = (g) => (g === '80+' ? '80 años o más' : `${g.replace('-', ' a ')} años`);
 export function percentilFluencia(animales, edad, escolaridad) {
-  if (!Number.isFinite(edad) || edad < 65 || escolaridad == null) return null;
+  if (!Number.isFinite(edad) || edad < 31 || escolaridad == null) return null;
+  if (edad < 65) {
+    const g = edad <= 55 ? '31-55' : '56-64';
+    const [uno, dos] = INGER_FLUENCIA_JOVENES[g][escolaridad];
+    const id = animales <= dos ? 'dos' : animales <= uno ? 'uno' : 'normal';
+    return { fuente: 'inger', grupo: g, id, uno, dos };
+  }
   const fila = NORMAS_FLUENCIA[grupoEdad(edad)][escolaridad];
   const [, p5, p10, p25, p50, p75, p90, media, de] = fila;
   const rango = animales < p5 ? 'menor del percentil 5' : animales < p10 ? 'percentil 5 a 9' : animales < p25 ? 'percentil 10 a 24' : animales < p50 ? 'percentil 25 a 49' : animales < p75 ? 'percentil 50 a 74' : animales < p90 ? 'percentil 75 a 89' : 'percentil 90 o más';
-  const id = animales < p5 ? 'p5' : animales < p10 ? 'p10' : animales < p25 ? 'p25' : 'normal';
-  return { grupo: grupoEdad(edad), rango, id, p10, p50, media, de };
+  const z = (animales - media) / de;
+  const id = z < -2 ? 'dos' : z < -1 ? 'uno' : 'normal';
+  return { fuente: 'chavez', grupo: grupoEdad(edad), rango, id, z, p10, p50, media, de, normal: [Math.ceil(media - de), Math.floor(media + de)] };
 }
 const BF = {
-  p5: { id: 'p5', rango: 'Menor del percentil 5', etiqueta: 'Muy por debajo de lo esperado para su edad y escolaridad', nivel: 'grave', hallazgo: true, texto: 'Menos animales que el 95 % de las personas mayores mexicanas sin deterioro de su edad y escolaridad.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
-  p10: { id: 'p10', rango: 'Percentil 5 a 9', etiqueta: 'Por debajo de lo esperado para su edad y escolaridad', nivel: 'moderado', hallazgo: true, texto: 'Por debajo del percentil 10 de su grupo de edad y escolaridad.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
-  p25: { id: 'p25', rango: 'Percentil 10 a 24', etiqueta: 'Límite bajo para su edad y escolaridad', nivel: 'leve', texto: 'Entre los percentiles 10 y 24 de su grupo: interpreta con la queja cognitiva y otras pruebas.', sugerencias: [] },
-  normal: { id: 'normal', rango: 'Percentil 25 o más', etiqueta: 'Dentro de lo esperado para su edad y escolaridad', nivel: 'bien', texto: 'En el percentil 25 o más de su grupo de edad y escolaridad.', sugerencias: [] },
+  dos: { id: 'dos', rango: 'Menos de −2 DE', etiqueta: 'Muy por debajo de lo esperado para su edad y escolaridad', nivel: 'grave', hallazgo: true, texto: 'Más de 2 desviaciones estándar por debajo de la media de su grupo de edad y escolaridad.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
+  uno: { id: 'uno', rango: 'Menos de −1 DE', etiqueta: 'Probable deterioro en fluencia semántica', nivel: 'moderado', hallazgo: true, texto: 'Menos de −1 desviación estándar para su edad y escolaridad: probable deterioro en fluencia verbal semántica (guía del INGER).', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
+  normal: { id: 'normal', rango: 'Dentro de ±1 DE o más', etiqueta: 'Dentro de lo esperado para su edad y escolaridad', nivel: 'bien', texto: 'Dentro del rango normal para su edad y escolaridad: no hay deterioro en este dominio (guía del INGER).', sugerencias: [] },
   bajo: { id: 'bajo', rango: '0 a 10', etiqueta: 'Por debajo del punto de corte', nivel: 'moderado', hallazgo: true, texto: '10 animales o menos: punto de corte usado en estudios españoles para demencia (sensibilidad alta, especificidad moderada). Sin edad y escolaridad no se usan las normas mexicanas.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
   alto: { id: 'alto', rango: '11 o más', etiqueta: 'Por encima del punto de corte', nivel: 'bien', texto: 'Más de 10 animales. No descarta deterioro cognitivo, sobre todo con escolaridad alta.', sugerencias: [] },
 };
@@ -167,7 +180,7 @@ export const fluencia = {
   tipo: 'tamizaje',
   aliases: ['fluidez verbal', 'animales', 'fluencia categorial', 'FVS', 'evocación categorial'],
   problemas: ['deterioro cognitivo', 'demencia', 'memoria semántica', 'función ejecutiva'],
-  descripcion: 'Animales distintos en 60 segundos, interpretados con percentiles de personas mayores mexicanas por edad y escolaridad.',
+  descripcion: 'Animales distintos en 60 segundos, interpretados con las normas mexicanas por edad y escolaridad de la guía del INGER.',
   objetivo: 'Evaluar la producción espontánea de palabras: explora lenguaje, memoria semántica y función ejecutiva.',
   poblacion: 'Personas mayores. Muy influida por la edad, la escolaridad, el sexo y la ocupación; la guía del INGER (2022) indica interpretarla con tablas normativas por edad y escolaridad.',
   aplicacion: [
@@ -185,31 +198,35 @@ export const fluencia = {
   max: 60,
   campos: [
     { id: 'animales', tipo: 'numero', texto: 'Animales distintos en 60 segundos', unidad: 'animales', min: 0, max: 60, entero: true },
-    { id: 'edad', tipo: 'numero', texto: 'Edad', unidad: 'años', min: 18, max: 120, entero: true, prefill: 'edad', opcional: true, ayuda: 'Las normas son para 65 años o más.' },
+    { id: 'edad', tipo: 'numero', texto: 'Edad', unidad: 'años', min: 18, max: 120, entero: true, prefill: 'edad', opcional: true, ayuda: 'Las normas mexicanas cubren de 31 años en adelante.' },
     { id: 'escolaridad', texto: 'Escolaridad', textoCorto: 'escolaridad', puntua: false, prefill: 'escolaridadRango', opcional: true, opciones: ESCOLARIDAD_FLUENCIA },
   ],
-  bandas: [BF.p5, BF.p10, BF.p25, BF.normal, BF.bajo, BF.alto],
+  bandas: [BF.dos, BF.uno, BF.normal, BF.bajo, BF.alto],
   calcular({ v }) {
     const n = v.animales;
     const esc = v.escolaridad ? v.escolaridad.valor : null;
     const norma = percentilFluencia(n, v.edad, esc);
     const lineas = [];
     let banda;
-    if (norma) {
+    if (norma && norma.fuente === 'chavez') {
       banda = BF[norma.id];
-      const grupo = norma.grupo === '80+' ? '80 años o más' : `${norma.grupo.replace('-', ' a ')} años`;
-      lineas.push(`Normas mexicanas (${grupo}, ${minusculaEsc(v.escolaridad.texto)}): ${norma.rango}; mediana ${norma.p50}, percentil 10: ${norma.p10} (media ${norma.media.toFixed(1)} ± ${norma.de.toFixed(1)}).`);
+      const z = norma.z.toFixed(1).replace('-', '−');
+      lineas.push(`Normas mexicanas (${nombreGrupo(norma.grupo)}, ${minusculaEsc(v.escolaridad.texto)}): ${z} DE (media ${norma.media.toFixed(1)} ± ${norma.de.toFixed(1)}); rango normal ${norma.normal[0]} a ${norma.normal[1]}; ${norma.rango}.`);
+    } else if (norma) {
+      banda = BF[norma.id];
+      lineas.push(`Tabla del INGER (${norma.grupo.replace('-', ' a ')} años, ${minusculaEsc(v.escolaridad.texto)}): ${norma.uno} o menos está por debajo de −1 DE y ${norma.dos} o menos por debajo de −2 DE.`);
     } else {
       banda = n <= 10 ? BF.bajo : BF.alto;
-      lineas.push(Number.isFinite(v.edad) && v.edad < 65 ? 'Menor de 65 años: las normas mexicanas no aplican; se usa el punto de corte de 10.' : 'Sin edad y escolaridad: se usa el punto de corte de 10; regístralas para interpretar con las normas mexicanas.');
+      lineas.push(Number.isFinite(v.edad) && v.edad < 31 ? 'Menor de 31 años: la tabla del INGER no aplica; se usa el punto de corte de 10.' : 'Sin edad y escolaridad: se usa el punto de corte de 10; regístralas para interpretar con las normas mexicanas.');
     }
-    return { puntaje: n, mostrar: String(n), sufijo: 'animales en 1 min', banda, lineas, lineasNota: lineas, extras: { norma: norma ? norma.rango : null } };
+    return { puntaje: n, mostrar: String(n), sufijo: 'animales en 1 min', banda, lineas, lineasNota: lineas, extras: { norma: norma?.rango || null } };
   },
   resumen: (res) => `Fluencia semántica: ${res.puntaje} animales en 1 minuto (${res.banda.etiqueta.toLowerCase()}${res.extras?.norma ? `; ${res.extras.norma}` : ''}).`,
   resumenBreve: (res) => `Fluencia semántica ${res.puntaje} animales/min`,
   notas: [
-    'Percentiles de Chávez-Oliveros et al. (2015) en 1,233 personas mayores mexicanas sin deterioro cognitivo ni síntomas depresivos, por edad (65 a 69, 70 a 74, 75 a 79 y 80 o más) y escolaridad (0, 1 a 5, 6 a 8 y 9 años o más). Es la referencia que cita la guía del INGER.',
-    'Los autores no fijan un punto de corte: el percentil 10 se usa con frecuencia como límite bajo. Sin edad o escolaridad, Huella usa el corte de 10 animales (Barrero-Hernández, 2006).',
+    'Interpretación de la guía del INGER (anexo 1): un resultado menor de −1 desviación estándar para la edad y la escolaridad indica probable deterioro en fluencia verbal semántica.',
+    'Desde los 65 años, Huella usa la media, la desviación estándar y los percentiles de Chávez-Oliveros et al. (2015; 1,233 personas mayores mexicanas sin deterioro cognitivo ni síntomas depresivos), los mismos datos de la tabla del INGER. De 31 a 64 años usa los valores de la tabla del INGER.',
+    'Sin edad o escolaridad, Huella usa el corte de 10 animales (Barrero-Hernández, 2006).',
     'Útil para el seguimiento: compara siempre con la misma categoría (animales) y el mismo tiempo.',
   ],
   licencia: { texto: 'Prueba de dominio público. Los valores normativos se citan como datos publicados.' },

@@ -74,6 +74,7 @@ import { gad7, cesd7, soledad3 } from './afectivas-extra.js';
 import { downton, shortFesi } from './caidas-extra.js';
 import { must, norton, dolorIntensidad, karnofsky, ppi, asa, lsns6, maltrato, ves13 } from './dominios-extra.js';
 import { isaacs, gpcog, gohai, mos, caprini, lace, g8, esasr, spict, necpal, mme } from './fase5.js';
+import { atenas, isarhp, harp, sppicees, susurro, lsa, oars, diazveiga, barreras } from './inger.js';
 
 export const ESCALAS = [
   barthel, katz, lawton, pfeffer,
@@ -81,18 +82,18 @@ export const ESCALAS = [
   icopePsicologica, gds15, phq9, cesd7, gad7, cornell,
   cuatroAt, cam, rass, camicu, npiq,
   frail, cfs, fried, sarcf, dinamometria, ewgsop2, sppb, vivifrail, ves13, g8,
-  icopeLocomotora, tug, velocidad, tinetti, silla30, equilibrio4, downton, shortFesi,
+  icopeLocomotora, tug, velocidad, tinetti, silla30, equilibrio4, downton, shortFesi, lsa,
   dxa, frax,
   icopeVitalidad, mnasf, must,
-  icopeVision, agudezaVisual, icopeAudicion, audiometria, hhies, ohat, saludBucal, gohai,
+  icopeVision, agudezaVisual, icopeAudicion, audiometria, susurro, hhies, ohat, saludBucal, gohai,
   eat10, degluObs, fois, iddsi,
   sintomasUrinarios, iciq, diarioMiccional, funcionIntestinal,
-  suenoClinico, isi, epworth, stopbang,
+  suenoClinico, atenas, isi, epworth, stopbang,
   braden, norton,
   painad, dolorIntensidad,
-  charlson, cirsg, news2, lace,
+  charlson, cirsg, news2, lace, isarhp, harp, sppicees,
   rcri, ariscat, dasi, asa, caprini,
   pps, karnofsky, ppi, esasr, spict, necpal,
-  icopeFactores, zarit, gijon, lsns6, soledad3, mos, maltrato,
+  icopeFactores, zarit, gijon, lsns6, soledad3, mos, oars, diazveiga, barreras, maltrato,
   ckdepi, cockcroft, mme,
 ];

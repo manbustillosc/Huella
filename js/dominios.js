@@ -86,7 +86,7 @@ export const DOMINIOS = [
   },
   {
     id: 'comorbilidad', nombre: 'Comorbilidad y riesgo hospitalario',
-    descripcion: 'Carga de comorbilidad (Charlson, CIRS-G), alerta temprana de deterioro clínico (NEWS2) y riesgo de reingreso (LACE). Sin porcentajes de mortalidad.',
+    descripcion: 'Carga de comorbilidad (Charlson, CIRS-G), alerta temprana de deterioro (NEWS2), riesgo funcional en la hospitalización (ISAR-HP, HARP, SPPICEES) y de reingreso (LACE). Sin porcentajes de mortalidad.',
     problemas: ['comorbilidad', 'multimorbilidad', 'deterioro clínico', 'signos vitales', 'reingreso'],
     planeadas: [],
   },
@@ -104,7 +104,7 @@ export const DOMINIOS = [
   },
   {
     id: 'social', nombre: 'Social y cuidador',
-    descripcion: 'Riesgo social, red de apoyo, sobrecarga del cuidador y maltrato.',
+    descripcion: 'Riesgo social, red y recursos de apoyo, barreras del entorno, sobrecarga del cuidador y maltrato.',
     problemas: ['cuidador', 'aislamiento', 'red de apoyo', 'maltrato'],
     planeadas: [],
   },

@@ -68,3 +68,20 @@ Pendientes de esta fase: confirmar por escrito las condiciones de ASA, LSNS-6 y 
 | ESAS-r | Watanabe, 2011; manual de AHS | 9 síntomas 0 a 10; categoría por el síntoma más intenso (1 a 3, 4 a 6, 7 a 10). |
 | SPICT, NECPAL | Highet, 2014; Gómez-Batiste, 2013 | Solo registro del resultado. |
 | Equivalente de morfina | CDC, 2022 | Factores: codeína 0.15, tramadol 0.2, tapentadol 0.4, morfina 1, hidrocodona 1, oxicodona 1.5, oximorfona 3, metadona 4.7, hidromorfona 5, fentanilo TD 2.4 por mcg/h. No convierte dosis. |
+
+## Fase 6 (versión 2.5): instrumentos de la guía del INGER, 12/10/2026
+
+Fuente: *Guía de instrumentos de evaluación de la capacidad funcional* (INGER, 2022), texto principal y anexos.
+
+| Instrumento | Revisión |
+|---|---|
+| MMSE | Cambiado a la versión mexicana del INGER (Reyes de Beaman): forma abreviada con 8 puntos de entrada si la escolaridad es de 3 años o menos y corte ≤24. La guía dice «3 o menos» y «menos de 3»; Huella usa 3 o menos. |
+| Fluencia semántica | Menos de −1 DE por edad y escolaridad (anexo 1). La tabla del INGER para 65 años o más coincide con las medias y DE de Chávez-Oliveros (2015). |
+| Isaacs | Corte del INGER ≤25 (antes ≤27 del protocolo andaluz, que se conserva como nota). |
+| Atenas | 8 reactivos 0 a 3; ≥8 insomnio. Se corrige una errata del formato en «despertares durante la noche». |
+| ISAR-HP | Puntos 1, 2, 1 y 1 (educación después de los 14 años invertida); categorías del INGER 0 a 1, 2 a 3 y 4 a 5. |
+| HARP | Edad (76 a 84 = 1, ≥85 = 2), actividades instrumentales (0 a 5 = 2) y examen abreviado (≤14 = 1). |
+| SPPICEES | Sin puntaje; el reactivo de apoyo social se considera problema cuando no hay cuidador primario. |
+| LSA | Nivel × frecuencia × independencia (0 a 120); <56 y <20 según el INGER. Frecuencia 1 = menos de una vez por semana (el formato dice «1 vez a la semana»). |
+| Zarit, Gijón, MNA-SF, SARC-F, CES-D 7, LSNS-6, MUST, GPCOG | Cortes revisados: coinciden con la guía del INGER (en Gijón, con su anexo). |
+| Norton | El texto principal del INGER describe por error la escala de Barthel (0 a 100); Huella conserva la escala original de 5 a 20. |
