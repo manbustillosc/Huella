@@ -1,4 +1,5 @@
 import { SUG, REF_INGER_2022 } from './_comun.js';
+import { ordenarPorLogro } from '../js/motor.js';
 
 // Mini-Mental State Examination, versión mexicana de la guía de instrumentos del INGER (2022; Reyes de Beaman, 2004):
 // registro guiado por dominios del puntaje obtenido con el formato. Las reglas están redactadas para Huella; no se
@@ -11,12 +12,19 @@ export const ENTRADA_BAJA_ESCOLARIDAD = 8;
 export const CORTE_INGER = 24;
 
 const DOMINIOS_MMSE = [
-  { id: 'orientacion', nombre: 'Orientación', max: 10, campos: ['tiempo', 'lugar'] },
-  { id: 'fijacion', nombre: 'Fijación', max: 3, campos: ['fijacion'] },
-  { id: 'atencion', nombre: 'Atención y cálculo', max: 5, campos: ['atencion'], completa: true },
-  { id: 'recuerdo', nombre: 'Recuerdo diferido', max: 3, campos: ['recuerdo'] },
-  { id: 'lenguaje', nombre: 'Lenguaje y praxis', max: 9, campos: ['denominacion', 'repeticion', 'orden', 'lectura', 'escritura', 'copia'] },
+  { id: 'orientacion', nombre: 'Orientación', corto: 'orientación', max: 10, campos: ['tiempo', 'lugar'] },
+  { id: 'fijacion', nombre: 'Fijación', corto: 'fijación', max: 3, campos: ['fijacion'] },
+  { id: 'atencion', nombre: 'Atención y cálculo', corto: 'atención y cálculo', max: 5, campos: ['atencion'], completa: true },
+  { id: 'recuerdo', nombre: 'Recuerdo diferido', corto: 'recuerdo', max: 3, campos: ['recuerdo'] },
+  { id: 'lenguaje', nombre: 'Lenguaje y praxis', corto: 'lenguaje y praxis', max: 9, campos: ['denominacion', 'repeticion', 'orden', 'lectura', 'escritura', 'copia'] },
 ];
+
+// Dominios aplicados con su puntaje, primero los completos, luego los parciales y al final los que no obtuvieron puntos.
+export function perfilMmse(dominios, escolaridadBaja) {
+  const partes = DOMINIOS_MMSE.filter((d) => !(escolaridadBaja && d.completa))
+    .map((d) => ({ ...d, pts: dominios[d.id], max: escolaridadBaja && d.id === 'lenguaje' ? 6 : d.max }));
+  return ordenarPorLogro(partes, (d) => d.pts / d.max);
+}
 const SOLO_COMPLETA = ['atencion', 'lectura', 'escritura', 'copia'];
 const completa = (r) => r.escolaridad === 1;
 
@@ -132,6 +140,7 @@ export default {
       opciones: LIMITACIONES,
     },
   ],
+  ordenCapacidad: { campos: DOMINIOS_MMSE.flatMap((d) => d.campos), mejor: 'alto' },
   bandas: [
     { id: 'probable', min: 0, max: 24, etiqueta: 'Probable deterioro cognitivo', nivel: 'moderado', hallazgo: true, texto: '24 puntos o menos (guía del INGER). Requiere una evaluación clínica y neuropsicológica más amplia para confirmar y graduar el deterioro.', sugerencias: SUG_ALTERADO },
     { id: 'sin', min: 25, max: 30, etiqueta: 'Sin deterioro cognitivo probable', nivel: 'bien', texto: 'Más de 24 puntos. El MMSE es poco sensible al deterioro leve: no lo descarta si la sospecha clínica persiste.', sugerencias: ['Si hay queja cognitiva o sospecha clínica, considerar una prueba más sensible al deterioro leve (p. ej., MoCA).'] },
@@ -142,8 +151,7 @@ export default {
     const sub = Object.fromEntries(DOMINIOS_MMSE.map((d) => [d.id, d.campos.reduce((t, id) => t + val(id), 0)]));
     const entrada = baja ? ENTRADA_BAJA_ESCOLARIDAD : 0;
     const puntaje = Object.values(sub).reduce((t, x) => t + x, 0) + entrada;
-    const doms = DOMINIOS_MMSE.filter((d) => !(baja && d.completa)).map((d) => `${d.nombre} ${sub[d.id]}/${baja && d.id === 'lenguaje' ? 6 : d.max}`);
-    const lineas = [`${doms.join(' · ')}.`];
+    const lineas = [`${perfilMmse(sub, baja).map((d) => `${d.nombre} ${d.pts}/${d.max}`).join(' · ')}.`];
     if (baja) lineas.push(`Forma abreviada por escolaridad de 3 años o menos: ${puntaje - entrada} puntos aplicados + ${entrada} de entrada = ${puntaje}.`);
     if (puntaje === CORTE_INGER) lineas.push('24 está en el límite: el INGER lo considera probable deterioro; con la versión original, la guía del IMSS lo considera normal con 5 años o más de escolaridad.');
     else if (puntaje < CORTE_INGER) lineas.push(`Gravedad orientativa con los rangos de la guía del IMSS: ${gravedadIMSS(puntaje)} (19 a 23 leve, 14 a 18 moderada, menos de 14 grave).`);
@@ -154,9 +162,9 @@ export default {
     return { puntaje, extras: { dominios: sub, corte: CORTE_INGER, escolaridadBaja: baja, entrada, version: 'inger', limitaciones: lim }, lineas, lineasNota: lineas };
   },
   resumen: (res) => {
-    const d = res.extras.dominios;
-    const at = res.extras.escolaridadBaja ? 'forma abreviada por escolaridad (8 puntos de entrada)' : `atención y cálculo ${d.atencion}/5`;
-    return `MMSE (versión mexicana del INGER): ${res.puntaje}/30 (${res.banda.etiqueta.toLowerCase()}); orientación ${d.orientacion}/10, fijación ${d.fijacion}/3, ${at}, recuerdo ${d.recuerdo}/3, lenguaje y praxis ${d.lenguaje}/${res.extras.escolaridadBaja ? 6 : 9}.`;
+    const baja = res.extras.escolaridadBaja;
+    const doms = perfilMmse(res.extras.dominios, baja).map((d) => `${d.corto} ${d.pts}/${d.max}`).join(', ');
+    return `MMSE (versión mexicana del INGER): ${res.puntaje}/30 (${res.banda.etiqueta.toLowerCase()})${baja ? ', forma abreviada por escolaridad (8 puntos de entrada)' : ''}; ${doms}.`;
   },
   resumenBreve: (res) => `MMSE ${res.puntaje}/30 (${res.banda.etiqueta.toLowerCase()})`,
   detalleEnResumen: true,

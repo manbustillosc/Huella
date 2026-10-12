@@ -99,6 +99,7 @@ export default {
   max: 6,
   barra: false,
   textoEmpeoradas: 'actividades básicas perdidas respecto a la referencia',
+  ordenCapacidad: { campos: ['bano', 'vestido', 'sanitario', 'transferencias', 'continencia', 'alimentacion'], mejor: 'alto' },
   campos: ACTIVIDADES,
   bandas: LETRAS,
   calcular({ v }) {
@@ -112,11 +113,14 @@ export default {
       hallazgo: dependientes.length > 0,
       sugerencias: dependientes.length ? [SUG.causaFuncional, SUG.rehabilitacion, SUG.cuidador] : [],
     };
-    return { puntaje: 6 - dependientes.length, banda, extras: { letra, dependientes: nombres } };
+    const independientes = ACTIVIDADES.filter((a) => !dependientes.includes(a.id)).map((a) => a.textoCorto);
+    return { puntaje: 6 - dependientes.length, banda, extras: { letra, dependientes: nombres, independientes } };
   },
+  // Primero lo que hace de forma independiente y después en lo que depende.
   resumen(res) {
-    const { letra, dependientes } = res.extras;
-    return `Katz ${letra}: ${res.puntaje}/6 (${dependientes.length ? `dependiente en ${dependientes.join(', ')}` : 'independiente en las 6 ABVD'}).`;
+    const { letra, dependientes, independientes = [] } = res.extras;
+    const indep = independientes.length && dependientes.length ? `independiente en ${independientes.join(', ')}; ` : '';
+    return `Katz ${letra}: ${res.puntaje}/6 (${dependientes.length ? `${indep}dependiente en ${dependientes.join(', ')}` : 'independiente en las 6 ABVD'}).`;
   },
   resumenBreve(res) {
     const { letra, dependientes } = res.extras;

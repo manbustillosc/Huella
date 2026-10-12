@@ -1,4 +1,5 @@
 import { REF_INGER_2022, SUG } from './_comun.js';
+import { ordenarPorLogro } from '../js/motor.js';
 
 // MoCA: registro guiado por secciones (o solo el total) del puntaje obtenido con la hoja oficial.
 // Las descripciones y reglas de puntuación están redactadas para Huella; no se reproducen láminas, palabras,
@@ -9,14 +10,16 @@ const guiado = (r) => r.modo === 0;
 const conteo = (n, singular, plural) => Array.from({ length: n + 1 }, (_, i) => n - i).map((k) => ({ texto: k === 0 ? 'Ninguna (0)' : `${k} ${k === 1 ? singular : plural} (${k})`, valor: k }));
 
 const SECCIONES = [
-  { id: 'visuo', nombre: 'Visuoespacial y ejecutiva', max: 5, campos: ['trazo', 'cubo', 'reloj_contorno', 'reloj_numeros', 'reloj_manecillas'] },
-  { id: 'identificacion', nombre: 'Identificación', max: 3, campos: ['identificacion'] },
-  { id: 'atencion', nombre: 'Atención', max: 6, campos: ['digitos_directo', 'digitos_inverso', 'letras', 'resta'] },
-  { id: 'lenguaje', nombre: 'Lenguaje', max: 3, campos: ['repeticion', 'fluidez'] },
-  { id: 'abstraccion', nombre: 'Abstracción', max: 2, campos: ['abstraccion'] },
-  { id: 'recuerdo', nombre: 'Recuerdo diferido', max: 5, campos: ['recuerdo'] },
-  { id: 'orientacion', nombre: 'Orientación', max: 6, campos: ['orientacion'] },
+  { id: 'visuo', nombre: 'Visuoespacial y ejecutiva', corto: 'visuoespacial/ejecutiva', max: 5, campos: ['trazo', 'cubo', 'reloj_contorno', 'reloj_numeros', 'reloj_manecillas'] },
+  { id: 'identificacion', nombre: 'Identificación', corto: 'identificación', max: 3, campos: ['identificacion'] },
+  { id: 'atencion', nombre: 'Atención', corto: 'atención', max: 6, campos: ['digitos_directo', 'digitos_inverso', 'letras', 'resta'] },
+  { id: 'lenguaje', nombre: 'Lenguaje', corto: 'lenguaje', max: 3, campos: ['repeticion', 'fluidez'] },
+  { id: 'abstraccion', nombre: 'Abstracción', corto: 'abstracción', max: 2, campos: ['abstraccion'] },
+  { id: 'recuerdo', nombre: 'Recuerdo diferido', corto: 'recuerdo diferido', max: 5, campos: ['recuerdo'] },
+  { id: 'orientacion', nombre: 'Orientación', corto: 'orientación', max: 6, campos: ['orientacion'] },
 ];
+// Secciones con su subtotal: primero las completas, luego las parciales y al final las que no obtuvieron puntos.
+const perfilMoca = (sub) => ordenarPorLogro(SECCIONES.map((s) => ({ ...s, pts: sub[s.id] })), (s) => s.pts / s.max);
 const ORIENTACION = [
   { id: 'fecha', texto: 'Fecha (día del mes)' },
   { id: 'mes', texto: 'Mes' },
@@ -160,6 +163,7 @@ export default {
       puntua: false,
     },
   ],
+  ordenCapacidad: { campos: [...SECCIONES.flatMap((s) => s.campos)], mejor: 'alto' },
   bandas: [
     {
       min: 0, max: 25, etiqueta: 'Probable trastorno cognitivo', nivel: 'moderado', hallazgo: true,
@@ -188,7 +192,7 @@ export default {
       const sub = Object.fromEntries(SECCIONES.map((s) => [s.id, s.campos.reduce((t, id) => t + pts[id], 0)]));
       bruto = Object.values(sub).reduce((t, x) => t + x, 0);
       extras.secciones = sub;
-      lineas.push(`${SECCIONES.map((s) => `${s.nombre} ${sub[s.id]}/${s.max}`).join(' · ')}.`);
+      lineas.push(`${perfilMoca(sub).map((s) => `${s.nombre} ${s.pts}/${s.max}`).join(' · ')}.`);
       const bajos = SECCIONES.filter((s) => sub[s.id] < s.max).map((s) => s.nombre.toLowerCase());
       if (bajos.length) lineas.push(`Dominios con puntos perdidos: ${bajos.join(', ')}.`);
     } else bruto = v.puntaje;
@@ -201,7 +205,7 @@ export default {
   resumen(res) {
     const aj = res.extras.ajuste ? ' (incluye +1 por escolaridad ≤12 años)' : '';
     const s = res.extras.secciones;
-    const det = s ? `; visuoespacial/ejecutiva ${s.visuo}/5, identificación ${s.identificacion}/3, atención ${s.atencion}/6, lenguaje ${s.lenguaje}/3, abstracción ${s.abstraccion}/2, recuerdo diferido ${s.recuerdo}/5, orientación ${s.orientacion}/6` : '';
+    const det = s ? `; ${perfilMoca(s).map((x) => `${x.corto} ${x.pts}/${x.max}`).join(', ')}` : '';
     return `MoCA: ${res.puntaje}/30${aj} (${res.banda.etiqueta.toLowerCase()})${det}.`;
   },
   resumenBreve: (res) => `MoCA ${res.puntaje}/30 (${res.banda.etiqueta.toLowerCase()})`,

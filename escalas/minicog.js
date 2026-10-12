@@ -27,6 +27,7 @@ export default {
     { id: 'moca', si: (res) => !res.noEvaluable && Boolean(res.banda?.hallazgo), motivo: 'Evaluación cognitiva más amplia (hoja oficial y evaluador certificado).' },
     { id: 'rudas', si: (res) => !res.noEvaluable && Boolean(res.banda?.hallazgo), motivo: 'Alternativa con menor influencia de la escolaridad y el idioma.' },
   ],
+  ordenCapacidad: { campos: ['palabras', 'reloj'], mejor: 'alto' },
   campos: [
     {
       id: 'palabras', texto: 'Palabras recordadas sin pistas', textoCorto: 'recuerdo de palabras',

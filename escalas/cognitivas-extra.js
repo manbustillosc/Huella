@@ -45,6 +45,11 @@ export const pfeffer = {
   textoEmpeoramiento: 'más dependencia en actividades complejas',
   min: 0,
   max: 30,
+  ordenCapacidad: {
+    campos: ACTIVIDADES_PFEFFER.map(([id]) => id),
+    mejor: 'bajo',
+    etiquetas: ['Lo hace solo, sin dificultad', 'Con dificultad o con ayuda', 'Depende de otra persona', 'No aplica'],
+  },
   campos: ACTIVIDADES_PFEFFER.map(([id, texto]) => ({ id, texto, textoCorto: texto.split(':')[0].split(' (')[0].toLowerCase(), opciones: OPC_PFEFFER })),
   bandas: [
     { min: 0, max: 8, etiqueta: 'Sin alteración funcional significativa', nivel: 'bien', texto: 'Puntaje menor de 9. No descarta un deterioro leve; en el trastorno neurocognitivo leve suele haber puntajes bajos.', sugerencias: [] },

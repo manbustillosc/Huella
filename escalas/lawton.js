@@ -137,12 +137,18 @@ export default {
   max: 8,
   barra: false,
   textoEmpeoradas: 'actividades con menor puntaje que en la referencia',
+  ordenCapacidad: {
+    campos: ['telefono', 'transporte', 'medicacion', 'dinero', 'compras', 'comida', 'casa', 'ropa'],
+    mejor: 'alto',
+    etiquetas: ['Realiza (suma punto)', 'Realiza en parte', 'No realiza (sin punto)', 'No aplica (nunca la ha realizado)'],
+  },
   campos,
   bandas: [BANDA_INDEP, BANDA_DEP],
   calcular({ v }) {
     let puntaje = 0;
     let aplicables = 0;
     const dependientes = [];
+    const realiza = [];
     const noAplica = [];
     const barrera = [];
     for (const a of ACTIVIDADES) {
@@ -153,19 +159,23 @@ export default {
       }
       aplicables += 1;
       puntaje += o.valor;
+      if (o.valor > 0) realiza.push(a.textoCorto);
       if (o.valor === 0) {
         dependientes.push(a.textoCorto);
         if (v[`${a.id}_motivo`]?.clave === 'barrera') barrera.push(a.textoCorto);
       }
     }
     if (!aplicables) {
-      return { banda: { etiqueta: 'Sin actividades aplicables', nivel: 'neutro', texto: 'Todas las actividades se marcaron como nunca realizadas; no se interpreta.' } };
+      return {
+        banda: { etiqueta: 'Sin actividades aplicables', nivel: 'neutro', texto: 'Todas las actividades se marcaron como nunca realizadas; no se interpreta.' },
+        extras: { realiza, dependientes, noAplica, barrera },
+      };
     }
     const lineas = [];
     if (noAplica.length) lineas.push(`No aplicables (nunca las ha realizado): ${lista(noAplica)}. Se excluyen del total.`);
     if (barrera.length) lineas.push(`No realizadas por barrera ambiental o sociocultural: ${lista(barrera)}. No equivale necesariamente a pérdida funcional.`);
     if (puntaje === aplicables) {
-      return { puntaje, max: aplicables, banda: BANDA_INDEP, lineas, extras: { dependientes, noAplica, barrera } };
+      return { puntaje, max: aplicables, banda: BANDA_INDEP, lineas, extras: { realiza, dependientes, noAplica, barrera } };
     }
     const n = dependientes.length;
     const banda = {
@@ -175,19 +185,22 @@ export default {
       texto: `Dependencia en ${n} de ${aplicables} actividades instrumentales aplicables: ${lista(dependientes)}.`,
       sugerencias: [SUG.causaFuncional, 'Si la dependencia es reciente o no se explica por limitación física, valorar la cognición (p. ej., Mini-Cog o MoCA).', SUG.cuidador],
     };
-    return { puntaje, max: aplicables, banda, lineas, extras: { dependientes, noAplica, barrera } };
+    return { puntaje, max: aplicables, banda, lineas, extras: { realiza, dependientes, noAplica, barrera } };
   },
+  // Primero las actividades que realiza y después las que no.
   resumen(res) {
-    const { dependientes, noAplica, barrera } = res.extras;
+    const { realiza = [], dependientes, noAplica, barrera } = res.extras;
+    if (res.puntaje == null) return 'Lawton-Brody: sin actividades aplicables (nunca ha realizado ninguna de las 8).';
     let t = `Lawton-Brody: ${res.puntaje}/${res.max}`;
     t += dependientes.length
-      ? ` (dependencia en ${dependientes.length} ${plural(dependientes.length, 'actividad', 'actividades')}: ${lista(dependientes)}${barrera.length ? `; por barrera ambiental o sociocultural: ${lista(barrera)}` : ''})`
+      ? ` (${realiza.length ? `realiza: ${lista(realiza)}; ` : ''}dependencia en ${dependientes.length} ${plural(dependientes.length, 'actividad', 'actividades')}: ${lista(dependientes)}${barrera.length ? `; por barrera ambiental o sociocultural: ${lista(barrera)}` : ''})`
       : ' (independiente en las actividades aplicables)';
     if (noAplica.length) t += `; no aplica: ${lista(noAplica)}`;
     return `${t}.`;
   },
   resumenBreve(res) {
     const { dependientes, noAplica } = res.extras;
+    if (res.puntaje == null) return 'Lawton-Brody sin actividades aplicables';
     const dep = dependientes.length ? `dependencia en ${lista(dependientes)}` : 'independiente';
     return `Lawton-Brody ${res.puntaje}/${res.max} (${dep}${noAplica.length ? `; no aplica: ${lista(noAplica)}` : ''})`;
   },

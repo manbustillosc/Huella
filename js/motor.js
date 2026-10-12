@@ -181,7 +181,7 @@ export function evaluarCampos(escala, r = {}) {
         continue;
       }
       if (requerido) contestadas += 1;
-      desglose.push({ campo: c, respuesta: `${fmt(leido.crudo, c.decimales ?? 2)} ${leido.etiqueta}`.trim(), valor: null });
+      desglose.push({ campo: c, respuesta: `${fmt(leido.crudo, c.decimales ?? 2)} ${leido.etiqueta}`.trim(), valor: null, crudo: leido.valor });
     } else if (c.tipo === 'checklist') {
       // Una lista sin marcas queda pendiente: «ninguno» debe confirmarse de forma explícita.
       const crudo = Array.isArray(r[c.id]) ? r[c.id] : [];
@@ -313,23 +313,136 @@ function filaDesglose(d) {
   return { pregunta: d.campo.texto.endsWith('?'), texto: d.campo.texto, respuesta: d.respuesta, pts, nota };
 }
 
+/* ---------- Orden por logro ---------- */
+// En las escalas cognitivas y funcionales, los reactivos se presentan primero con lo que la persona logra por completo,
+// después lo que logra en parte y al final lo que no logra. Cada escala declara sus reactivos en «ordenCapacidad».
+
+// 0 = completo, 1 = parcial, 2 = sin logro, para una proporción de logro entre 0 y 1.
+export const nivelLogro = (p) => (p >= 0.999 ? 0 : p <= 0.001 ? 2 : 1);
+
+// Orden estable por nivel de logro: completas, parciales y sin logro, conservando el orden original dentro de cada grupo.
+export function ordenarPorLogro(partes, proporcion = (x) => x.proporcion) {
+  return partes.map((x, i) => ({ x, i, n: nivelLogro(proporcion(x)) })).sort((a, b) => a.n - b.n || a.i - b.i).map((o) => o.x);
+}
+
+export const ETIQUETAS_LOGRO = {
+  funcional: ['Independiente', 'Con ayuda o de forma parcial', 'Dependiente', 'No aplica'],
+  cognitivo: ['Puntaje completo', 'Puntaje parcial', 'Sin puntos', 'Sin calificar'],
+};
+const IDS_GRUPO = ['completo', 'parcial', 'nulo', 'otro'];
+
+// Proporción de logro de un reactivo del desglose (0 a 1), 'otro' si es una opción especial, o null si no es reactivo.
+function logroDe(escala, d) {
+  const cfg = escala.ordenCapacidad;
+  const c = d.campo;
+  if (!cfg.campos.includes(c.id)) return null;
+  let p = null;
+  if (c.tipo === 'opciones') {
+    if (!d.opcion) return null;
+    if (d.opcion.especial) return 'otro';
+    const vals = c.opciones.filter((o) => !o.especial).map((o) => o.valor);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    if (!(max > min)) return null;
+    p = (d.opcion.valor - min) / (max - min);
+  } else if (c.tipo === 'numero') {
+    const min = c.min ?? 0;
+    if (!Number.isFinite(d.crudo) || !(c.max > min)) return null;
+    p = (d.crudo - min) / (c.max - min);
+  } else if (c.tipo === 'checklist') {
+    p = (d.cuenta || 0) / c.opciones.length;
+  }
+  if (p == null) return null;
+  return cfg.mejor === 'bajo' ? 1 - p : p;
+}
+
+// Agrupa el desglose: campos de contexto antes y después, y los reactivos por nivel de logro.
+export function ordenarPorCapacidad(escala, desglose) {
+  if (!escala.ordenCapacidad || !desglose?.length) return null;
+  const etiquetas = escala.ordenCapacidad.etiquetas || ETIQUETAS_LOGRO[escala.dominio] || ETIQUETAS_LOGRO.cognitivo;
+  const grupos = IDS_GRUPO.map((id, i) => ({ id, etiqueta: etiquetas[i], items: [] }));
+  const antes = [];
+  const despues = [];
+  let reactivos = 0;
+  for (const d of desglose) {
+    const l = logroDe(escala, d);
+    if (l == null) {
+      (reactivos ? despues : antes).push(d);
+      continue;
+    }
+    reactivos += 1;
+    grupos[l === 'otro' ? 3 : nivelLogro(l)].items.push(d);
+  }
+  if (!reactivos) return null;
+  return { antes, grupos: grupos.filter((g) => g.items.length), despues };
+}
+
+const lineaLista = (f) => (f.pregunta ? `- ${f.texto} ${f.respuesta}${f.pts}${f.nota}` : `- ${f.texto}: ${minusculaInicial(f.respuesta)}${f.pts}${f.nota}`);
+
+// Reactivo dentro de un grupo de logro: sin repetir lo que ya dice el encabezado del grupo.
+// En los grupos de logro completo y nulo el puntaje queda implícito (máximo o mínimo); en el parcial se anota
+// «obtenido/máximo» (o el puntaje, si un valor menor es mejor).
+const sinPrefijo = (t) => String(t).replace(/^\d+(?:\.\d+)?\s*·\s*/, '').trim();
+const RANGO_FINAL = /\s*\(\d+(?:\.\d+)? a \d+(?:\.\d+)?\)$/;
+function filaGrupo(escala, d, g) {
+  const c = d.campo;
+  const bajo = escala.ordenCapacidad.mejor === 'bajo';
+  const parcial = g.id === 'parcial';
+  const texto = c.texto.replace(RANGO_FINAL, '');
+  let respuesta = '';
+  let pts = '';
+  if (c.tipo === 'numero') {
+    if (parcial) respuesta = bajo ? fmt(d.crudo) : `${fmt(d.crudo)}/${fmt(c.max)}`;
+  } else if (c.tipo === 'checklist') {
+    if (parcial) pts = `${d.cuenta || 0}/${c.opciones.length}`;
+  } else if (d.opcion) {
+    const v = d.opcion.valor;
+    respuesta = sinPrefijo(d.respuesta).replace(new RegExp(`\\s*\\(${String(v).replace('.', '\\.')}\\)$`), '');
+    if (respuesta === String(v)) respuesta = '';
+    if (parcial && !d.opcion.especial) pts = bajo ? fmt(v) : `${fmt(v)}/${fmt(Math.max(...c.opciones.filter((o) => !o.especial).map((o) => o.valor)))}`;
+  }
+  if (g.id === 'otro' || (respuesta && respuesta.toLocaleLowerCase('es').endsWith(sinPrefijo(g.etiqueta).toLocaleLowerCase('es')))) respuesta = '';
+  const nota = d.anotacion ? minusculaInicial(d.anotacion) : '';
+  return { pregunta: texto.endsWith('?'), texto, respuesta, pts, nota };
+}
+function lineaGrupo(f) {
+  const pts = f.pts ? ` (${f.pts})` : '';
+  if (f.pregunta) return `- ${f.texto}${f.respuesta ? ` ${f.respuesta}` : ''}${pts}${f.nota ? `; ${f.nota}` : ''}`;
+  // Si el texto del reactivo ya lleva dos puntos, la respuesta va entre paréntesis.
+  if (f.respuesta && !f.texto.includes(':')) return `- ${f.texto}: ${minusculaInicial(f.respuesta)}${pts}${f.nota ? `; ${f.nota}` : ''}`;
+  return `- ${reactivoGrupo(f, false)}`;
+}
+function reactivoGrupo(f, minuscula = true) {
+  const dentro = [f.respuesta && minusculaInicial(f.respuesta), f.pts].filter(Boolean).join(', ') + (f.nota ? `${f.respuesta || f.pts ? '; ' : ''}${f.nota}` : '');
+  return `${minuscula ? minusculaInicial(f.texto) : f.texto}${dentro ? ` (${dentro})` : ''}`;
+}
+
 // Texto de un instrumento para copiar al expediente.
 // 'lista': el resumen y un renglón por reactivo.
 // 'parrafo': todo seguido; de los reactivos de sí/no solo se mencionan los que suman puntos.
+// Con «ordenCapacidad», los reactivos se agrupan: primero lo que logra por completo, luego lo parcial y al final lo que no.
 export function textoEscala(escala, res, formato = 'parrafo', encabezado = '') {
   const resumen = encabezado + resumenDe(escala, res);
   if (res.noEvaluable) return resumen;
-  const filas = res.desglose.map(filaDesglose);
   const extra = res.lineasNota || [];
+  const orden = ordenarPorCapacidad(escala, res.desglose);
   if (formato === 'lista') {
-    return [
-      resumen,
-      ...extra,
-      ...filas.map((f) => (f.pregunta ? `- ${f.texto} ${f.respuesta}${f.pts}${f.nota}` : `- ${f.texto}: ${minusculaInicial(f.respuesta)}${f.pts}${f.nota}`)),
-    ].join('\n');
+    if (orden) {
+      const out = [resumen, ...extra, ...orden.antes.map((d) => lineaLista(filaDesglose(d)))];
+      for (const g of orden.grupos) out.push(`${g.etiqueta}:`, ...g.items.map((d) => lineaGrupo(filaGrupo(escala, d, g))));
+      out.push(...orden.despues.map((d) => lineaLista(filaDesglose(d))));
+      return out.join('\n');
+    }
+    return [resumen, ...extra, ...res.desglose.map((d) => lineaLista(filaDesglose(d)))].join('\n');
   }
   const partes = [resumen, ...extra];
   if (!escala.detalleEnResumen) {
+    if (orden) {
+      const ctx = [...orden.antes, ...orden.despues].filter((d) => !d.campo.compacto).map(filaDesglose);
+      if (ctx.length) partes.push(`${mayusculaInicial(ctx.map((f) => `${minusculaInicial(f.texto)}: ${minusculaInicial(f.respuesta)}${f.pts}${f.nota}`).join('; '))}.`);
+      for (const g of orden.grupos) partes.push(`${g.etiqueta}: ${g.items.map((d) => reactivoGrupo(filaGrupo(escala, d, g))).join('; ')}.`);
+      return partes.join(' ');
+    }
     const conOpciones = res.desglose.filter((d) => !d.campo.compacto).map(filaDesglose);
     if (conOpciones.length) {
       const t = conOpciones.map((f) => `${minusculaInicial(f.texto)}: ${minusculaInicial(f.respuesta)}${f.pts}${f.nota}`).join('; ');

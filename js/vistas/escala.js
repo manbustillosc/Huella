@@ -4,6 +4,7 @@ import { porId, dominioDe, momentoPorDefecto } from '../datos.js';
 import {
   calcular, resumenDe, resumenBreveDe, textoEscala, posicionMarcador, rangoTexto, campoVisible,
   limpiarOcultas, TIPOS, MOMENTOS, momentoDe, FUENTES, MOTIVOS_NO_EVALUABLE, minusculaInicial, NINGUNO, TEXTO_NINGUNO,
+  ordenarPorCapacidad,
 } from '../motor.js';
 import {
   compararResultados, esUnico, etiquetaAplicacion, fechaCorta, textoRespectoA, textoCambio, vigenteDe, diasEntre,
@@ -633,6 +634,18 @@ function avanzar() {
 /* ---------- Resultado ---------- */
 
 // Objeto que se guarda en la valoración. Las respuestas ocultas no se guardan.
+// Respuestas del resultado. En las escalas cognitivas y funcionales se agrupan: primero lo que logra por completo,
+// luego lo parcial y al final lo que no logra.
+const filaRespuesta = (d) => `
+  <div><dt>${esc(d.campo.texto)}</dt><dd><span>${esc(d.respuesta)}${d.anotacion ? ` · ${esc(minusculaInicial(d.anotacion))}` : ''}</span>${d.valor != null ? `<strong>${d.valor}</strong>` : ''}</dd></div>`;
+const listaRespuestas = (ds) => (ds.length ? `<dl class="desglose">${ds.map(filaRespuesta).join('')}</dl>` : '');
+function bloqueRespuestas(e, desglose) {
+  const orden = ordenarPorCapacidad(e, desglose);
+  if (!orden) return listaRespuestas(desglose);
+  return `${listaRespuestas(orden.antes)}${orden.grupos.map((g) => `
+    <h3 class="grupo-logro grupo-${g.id}">${esc(g.etiqueta)}</h3>${listaRespuestas(g.items)}`).join('')}${listaRespuestas(orden.despues)}`;
+}
+
 export function aGuardado(e, res, r, momento) {
   const respuestas = limpiarOcultas(e, r);
   delete respuestas._origen;
@@ -863,10 +876,7 @@ export function renderResultado(params) {
         <ul class="notas">${e.notas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
         ${res.desglose.length && !res.noEvaluable ? `
           <h2 class="sub">Respuestas</h2>
-          <dl class="desglose">
-            ${res.desglose.map((d) => `
-              <div><dt>${esc(d.campo.texto)}</dt><dd><span>${esc(d.respuesta)}${d.anotacion ? ` · ${esc(minusculaInicial(d.anotacion))}` : ''}</span>${d.valor != null ? `<strong>${d.valor}</strong>` : ''}</dd></div>`).join('')}
-          </dl>` : ''}
+          ${bloqueRespuestas(e, res.desglose)}` : ''}
         <details class="referencias">
           <summary>${icono('libro')} Referencias${e.licencia ? ' y licencia' : ''}</summary>
           <ol>${e.referencias.map((x) => `<li>${esc(x.texto)}${x.doi ? ` <a href="https://doi.org/${esc(x.doi)}" target="_blank" rel="noopener">doi:${esc(x.doi)}</a>` : ''}${x.enlace ? ` <a href="${esc(x.enlace)}" target="_blank" rel="noopener">Enlace</a>` : ''}</li>`).join('')}</ol>

@@ -150,6 +150,11 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - Escala Atenas de insomnio, ISAR-HP, HARP (registra el total del mini examen abreviado), SPPICEES, prueba del susurro, espacio de vida (LSA), recursos sociales OARS (registro de la categoría), inventario de Díaz-Veiga y barreras del entorno físico y la movilidad. Total: 108 instrumentos.
 - Quedan fuera WHODAS 2.0 y WHOQOL-OLD (permiso de la OMS), el inventario de ansiedad de Beck (de pago; se usa el GAD-7) y la SpRMBPC (cualitativa, pendiente).
 
+## Orden de los resultados (versión 2.6)
+
+- En Barthel, Katz, Lawton-Brody, Pfeffer, Mini-Cog, MoCA, MMSE, prueba del reloj, RUDAS, Isaacs, CDR e ICOPE cognición, las respuestas y el texto para el expediente presentan primero lo que la persona logra por completo, luego lo que logra en parte y al final lo que no logra (en Pfeffer y CDR, donde un puntaje menor es mejor, el orden se invierte). Las actividades que nunca ha realizado van al final.
+- Los subtotales por dominio (MMSE, MoCA, RUDAS, CDR, reloj, Isaacs y SPPB) siguen el mismo orden, y los resúmenes de Katz y Lawton-Brody nombran primero las actividades que realiza.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.
@@ -161,6 +166,7 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 2. Importarla en `escalas/index.js`.
 3. Agregar su ruta a `ARCHIVOS` en `sw.js` y subir `VERSION` (aquí y en `js/datos.js`).
 4. Declarar `direccionClinica` y, si aplica, `unidadCambio`, `decimalesCambio` y los textos de mejoría y empeoramiento.
+   En escalas cognitivas o funcionales, declarar `ordenCapacidad: { campos, mejor: 'alto' | 'bajo', etiquetas? }` para agrupar los reactivos por logro.
 5. Correr las pruebas (`node --test tests/*.test.mjs`): revisan estructura, dirección clínica, mínimo, máximo, bandas, listas de verificación y que `sw.js` incluya todos los archivos.
 
 ## Aviso

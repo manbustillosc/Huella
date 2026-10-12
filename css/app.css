@@ -816,6 +816,8 @@ body[data-vista="escala"] .vista { padding-bottom: 0; }
 .desglose dt { color: var(--ink); }
 .desglose dd { margin: 0; display: flex; gap: var(--space-3); color: var(--ink-muted); text-align: right; }
 .desglose dd strong { color: var(--ink); min-width: 20px; font-variant-numeric: tabular-nums; }
+.grupo-logro { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--ink-muted); margin: var(--space-4) 0 0; padding-bottom: var(--space-1); border-bottom: 1px solid var(--line); }
+.desglose + .grupo-logro { margin-top: var(--space-6); }
 .referencias { margin-top: var(--space-6); font-size: 14px; line-height: 20px; }
 .referencias summary { display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer; font-weight: 600; color: var(--ink-muted); min-height: 40px; }
 .referencias summary .ico { width: 18px; height: 18px; }

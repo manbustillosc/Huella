@@ -1,4 +1,5 @@
 import { SUG } from './_comun.js';
+import { ordenarPorLogro } from '../js/motor.js';
 
 // Prueba del dibujo del reloj con los criterios de aplicación y puntuación de Cacho et al. (1999), a la orden y a la copia.
 // Criterios resumidos con redacción propia; ante una duda, el artículo original.
@@ -32,6 +33,10 @@ const CORTE = { orden: 6, copia: 8, ambas: 15 };
 const conOrden = (r) => r.condicion === 0 || r.condicion === 2;
 const conCopia = (r) => r.condicion === 1 || r.condicion === 2;
 const f1 = (n) => String(n).replace(/\.0$/, '');
+// Componentes de un dibujo: primero los de puntaje completo, luego los parciales y al final los de 0.
+const componentes = (esfera, numeros, manecillas) => ordenarPorLogro([
+  { t: 'esfera', pts: esfera, max: 2 }, { t: 'números', pts: numeros, max: 4 }, { t: 'manecillas', pts: manecillas, max: 4 },
+], (c) => c.pts / c.max).map((c) => `${c.t} ${f1(c.pts)}/${c.max}`).join(', ');
 
 const POSITIVO = {
   id: 'positivo', rango: 'Orden ≤6 · copia ≤8', etiqueta: 'Por debajo del punto de corte', nivel: 'moderado', hallazgo: true,
@@ -91,6 +96,7 @@ export default {
       opciones: SIGNOS,
     },
   ],
+  ordenCapacidad: { campos: ['o_esfera', 'o_numeros', 'o_manecillas', 'c_esfera', 'c_numeros', 'c_manecillas'], mejor: 'alto' },
   bandas: [POSITIVO, NEGATIVO],
   calcular({ v }) {
     const c = v.condicion.valor;
@@ -100,8 +106,8 @@ export default {
     const condicion = orden != null ? 'orden' : 'copia';
     const positivo = principal <= CORTE[condicion];
     const lineas = [];
-    if (orden != null) lineas.push(`A la orden: ${f1(orden)}/10 (esfera ${v.o_esfera.valor}, números ${f1(v.o_numeros.valor)}, manecillas ${f1(v.o_manecillas.valor)}); punto de corte ≤${CORTE.orden}: ${orden <= CORTE.orden ? 'positivo' : 'negativo'}.`);
-    if (copia != null) lineas.push(`A la copia: ${f1(copia)}/10 (esfera ${v.c_esfera.valor}, números ${f1(v.c_numeros.valor)}, manecillas ${f1(v.c_manecillas.valor)}); punto de corte ≤${CORTE.copia}: ${copia <= CORTE.copia ? 'positivo' : 'negativo'}.`);
+    if (orden != null) lineas.push(`A la orden: ${f1(orden)}/10 (${componentes(v.o_esfera.valor, v.o_numeros.valor, v.o_manecillas.valor)}); punto de corte ≤${CORTE.orden}: ${orden <= CORTE.orden ? 'positivo' : 'negativo'}.`);
+    if (copia != null) lineas.push(`A la copia: ${f1(copia)}/10 (${componentes(v.c_esfera.valor, v.c_numeros.valor, v.c_manecillas.valor)}); punto de corte ≤${CORTE.copia}: ${copia <= CORTE.copia ? 'positivo' : 'negativo'}.`);
     if (orden != null && copia != null) {
       const suma = orden + copia;
       lineas.push(`Orden + copia: ${f1(suma)}/20; punto de corte ≤${CORTE.ambas}: ${suma <= CORTE.ambas ? 'positivo' : 'negativo'}.`);

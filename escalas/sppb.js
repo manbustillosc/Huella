@@ -1,4 +1,8 @@
 import { REF_INGER_2022, SUG } from './_comun.js';
+import { ordenarPorLogro } from '../js/motor.js';
+
+// Componentes con 4 puntos primero, luego los parciales y al final los que puntuaron 0.
+const componentesSppb = (eq, marcha, silla) => ordenarPorLogro([['equilibrio', eq], ['marcha', marcha], ['silla', silla]], (c) => c[1] / 4);
 
 // Puntos por tiempo de marcha (mejor de dos intentos) y por levantarse 5 veces de la silla.
 // Tablas de Guralnik (1994), la guía del INGER (2022) y Vivifrail; se comparan los tiempos sin redondear.
@@ -175,7 +179,7 @@ export default {
       puntaje: total,
       extras: { eq, marcha, silla, velocidad, distanciaMarcha, tiempoMarcha: mejor, tiempoSilla: v.silla_pre.valor === 1 && v.silla_estado.valor === 1 ? v.silla_t : null, programa: prog, noRealizadas },
       lineas: [
-        `Equilibrio ${eq}/4 · Marcha ${marcha}/4 · Silla ${silla}/4.`,
+        `${componentesSppb(eq, marcha, silla).map(([t, n]) => `${t.charAt(0).toUpperCase()}${t.slice(1)} ${n}/4`).join(' · ')}.`,
         lineaMarcha,
         lineaSilla,
         noRealizadas.length ? `Pruebas que puntuaron 0 sin completarse: ${noRealizadas.join('; ')}.` : null,
@@ -187,7 +191,8 @@ export default {
   resumen(res) {
     const { eq, marcha, silla, velocidad, noRealizadas } = res.extras;
     const nr = noRealizadas?.length ? `; sin completar: ${noRealizadas.join(', ')}` : '';
-    return `SPPB: ${res.puntaje}/12 (${res.banda.etiqueta.toLowerCase()}); equilibrio ${eq}, marcha ${marcha}${velocidad ? ` (${velocidad.toFixed(2)} m/s)` : ''}, silla ${silla}${nr}.`;
+    const comp = componentesSppb(eq, marcha, silla).map(([t, n]) => `${t} ${n}${t === 'marcha' && velocidad ? ` (${velocidad.toFixed(2)} m/s)` : ''}`).join(', ');
+    return `SPPB: ${res.puntaje}/12 (${res.banda.etiqueta.toLowerCase()}); ${comp}${nr}.`;
   },
   resumenBreve(res) {
     return `SPPB ${res.puntaje}/12 (${res.banda.etiqueta.toLowerCase()})`;

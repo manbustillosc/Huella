@@ -1,5 +1,5 @@
 // Clinical Dementia Rating: registro del CDR global asignado con el algoritmo oficial y, opcionalmente, de las 6 casillas (CDR-SB).
-import { fmt } from '../js/motor.js';
+import { fmt, ordenarPorLogro } from '../js/motor.js';
 
 const ESTADIOS = [
   { valor: 0, nombre: 'Normal', nivel: 'bien', texto: 'Sin deterioro cognitivo ni funcional atribuible.' },
@@ -77,6 +77,11 @@ export default {
       opciones: opcionesCasilla(c.mediaPunto), visibleSi: (r) => r.casillas === 0,
     })),
   ],
+  ordenCapacidad: {
+    campos: CASILLAS.map((c) => c.id),
+    mejor: 'bajo',
+    etiquetas: ['Sin alteración (0)', 'Alteración cuestionable a moderada (0.5 a 2)', 'Alteración grave (3)', 'Sin dato'],
+  },
   bandas: ESTADIOS.map((x) => ({
     min: x.valor, max: x.valor, rango: String(x.valor), etiqueta: x.nombre, nivel: x.nivel, hallazgo: x.valor > 0,
     texto: x.texto, sugerencias: x.valor >= 1 ? SUG_DEMENCIA : x.valor === 0.5 ? ['Completar la evaluación cognitiva y funcional y repetir el CDR para seguir la evolución.'] : [],
@@ -91,7 +96,7 @@ export default {
       extras.casillas = Object.fromEntries(CASILLAS.map((c) => [c.id, v[c.id].valor]));
       const esperado = estadioPorSumaCasillas(sb);
       lineas.push(`CDR-SB (suma de casillas): ${fmt(sb)}/18.`);
-      lineas.push(`Casillas: ${CASILLAS.map((c) => `${c.texto.toLowerCase()} ${v[c.id].valor}`).join(', ')}.`);
+      lineas.push(`Casillas: ${ordenarPorLogro(CASILLAS, (c) => 1 - v[c.id].valor / 3).map((c) => `${c.texto.toLowerCase()} ${fmt(v[c.id].valor)}`).join(', ')}.`);
       if (esperado !== global) {
         lineas.push(`Un CDR-SB de ${fmt(sb)} suele corresponder a un CDR global de ${esperado} (O'Bryant, 2008): verifica la asignación con el algoritmo oficial.`);
       }

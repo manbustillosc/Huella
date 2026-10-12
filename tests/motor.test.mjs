@@ -190,7 +190,7 @@ test('Katz: clasificación jerárquica A–H', () => {
   assert.equal(res.puntaje, 3);
   assert.equal(res.extras.letra, 'D');
   assert.equal(res.banda.etiqueta, 'Clase D: dependiente en baño, vestido, continencia');
-  assert.equal(resumenDe(porId.katz, res), 'Katz D: 3/6 (dependiente en baño, vestido, continencia).');
+  assert.equal(resumenDe(porId.katz, res), 'Katz D: 3/6 (independiente en uso del sanitario, transferencias, alimentación; dependiente en baño, vestido, continencia).');
 });
 
 test('Lawton: puntuación original, «no aplica» reduce el total, barrera anotada', () => {
@@ -206,8 +206,8 @@ test('Lawton: puntuación original, «no aplica» reduce el total, barrera anota
   const res = calcular(porId.lawton, r);
   assert.equal(res.puntaje, 6);
   assert.equal(res.max, 7);
-  assert.match(resumenDe(porId.lawton, res), /6\/7 \(dependencia en 1 actividad: compras; por barrera ambiental o sociocultural: compras\); no aplica: preparación de la comida\./);
-  assert.match(textoEscala(porId.lawton, res, 'lista'), /Hacer compras: necesita compañía para cualquier compra \(0\); por barrera ambiental/);
+  assert.match(resumenDe(porId.lawton, res), /6\/7 \(realiza: uso del teléfono, .*lavado de la ropa; dependencia en 1 actividad: compras; por barrera ambiental o sociocultural: compras\); no aplica: preparación de la comida\./);
+  assert.match(textoEscala(porId.lawton, res, 'lista'), /No realiza \(sin punto\):\n- Hacer compras: necesita compañía para cualquier compra; por barrera ambiental/);
 });
 
 /* ---------- Cognitivo, afectivo y delirium ---------- */

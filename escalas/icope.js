@@ -3,6 +3,8 @@
 // Adaptación del Manual de atención integrada para las personas mayores, 2.ª ed. (OPS, 2025; CC BY-NC-SA 3.0 IGO).
 // No hay puntaje global de capacidad intrínseca: cada dominio se informa por separado.
 
+import { ordenarPorLogro } from '../js/motor.js';
+
 // Forma de cita propuesta por la OPS (página legal de la edición en español, 2025).
 export const REF_ICOPE = {
   texto: 'Organización Panamericana de la Salud. Manual de atención integrada para las personas mayores. Guía sobre la evaluación y los esquemas de atención centrados en la persona en la atención primaria de salud. Segunda edición. Washington, D.C.: OPS; 2025. ISBN 978-92-75-33031-9 (PDF). Licencia CC BY-NC-SA 3.0 IGO.',
@@ -124,15 +126,20 @@ export const icopeCognicion = {
       ],
     },
   ],
+  ordenCapacidad: { campos: ['fecha', 'lugar', 'palabras'], mejor: 'alto', etiquetas: ['Correcto', 'Parcial', 'Incorrecto', 'Sin dato'] },
   bandas: [B_COG.conservado, B_COG.alterado, B_COG.filtro],
   calcular({ v }) {
     if (esSi(v.filtro)) return { banda: B_COG.filtro, extras: { hallazgo: 'refiere problemas de memoria u orientación', filtro: true } };
-    const fallas = [];
-    if (v.fecha.valor === 0) fallas.push('orientación en tiempo incorrecta');
-    if (v.lugar.valor === 0) fallas.push('orientación en espacio incorrecta');
-    if (v.palabras.valor < 3) fallas.push(`recordó ${v.palabras.valor} de 3 palabras`);
-    const banda = fallas.length ? B_COG.alterado : B_COG.conservado;
-    return { banda, extras: { hallazgo: fallas.join('; ') || 'orientación correcta y recuerdo de 3 palabras', palabras: v.palabras.valor } };
+    // Primero lo que logra, luego lo parcial y al final lo que no logra.
+    const partes = [
+      { p: v.fecha.valor, t: `orientación en tiempo ${v.fecha.valor ? 'correcta' : 'incorrecta'}` },
+      { p: v.lugar.valor, t: `orientación en espacio ${v.lugar.valor ? 'correcta' : 'incorrecta'}` },
+      { p: v.palabras.valor / 3, t: v.palabras.valor === 3 ? 'recordó las 3 palabras' : `recordó ${v.palabras.valor} de 3 palabras` },
+    ];
+    const alterado = partes.some((x) => x.p < 1);
+    const banda = alterado ? B_COG.alterado : B_COG.conservado;
+    const hallazgo = alterado ? ordenarPorLogro(partes, (x) => x.p).map((x) => x.t).join('; ') : 'orientación correcta y recuerdo de 3 palabras';
+    return { banda, extras: { hallazgo, palabras: v.palabras.valor } };
   },
   resumen: (res) => textoResumen('ICOPE, cognición', res.banda, res.extras.hallazgo),
   resumenBreve: (res) => breve('ICOPE cognición', res.banda),

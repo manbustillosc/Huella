@@ -2,6 +2,7 @@
 // Isaacs, GPCOG (registro), GOHAI (registro), MOS de apoyo social, Caprini, LACE, G8 (registro), ESAS-r,
 // SPICT (registro), NECPAL (registro) y dosis equivalente de morfina oral (MME, CDC 2022).
 import { SUG } from './_comun.js';
+import { ordenarPorLogro } from '../js/motor.js';
 
 const minus = (t) => t.charAt(0).toLowerCase() + t.slice(1);
 
@@ -34,6 +35,7 @@ export const isaacs = {
   textoEmpeoramiento: 'menos palabras evocadas',
   min: 0,
   max: 40,
+  ordenCapacidad: { campos: ['colores', 'animales', 'frutas', 'ciudades'], mejor: 'alto' },
   campos: [categoria('colores', 'Colores'), categoria('animales', 'Animales'), categoria('frutas', 'Frutas'), categoria('ciudades', 'Ciudades')],
   bandas: [
     { min: 0, max: 25, etiqueta: 'Probable trastorno neurocognitivo', nivel: 'moderado', hallazgo: true, texto: '25 o menos (guía del INGER, 2022). No establece el diagnóstico.', sugerencias: [SUG.descartarDelirium, SUG.cognitivaCompleta, SUG.causasReversibles] },
@@ -41,10 +43,13 @@ export const isaacs = {
   ],
   calcular({ v }) {
     const puntaje = v.colores + v.animales + v.frutas + v.ciudades;
-    const lineas = [`Colores ${v.colores}, animales ${v.animales}, frutas ${v.frutas}, ciudades ${v.ciudades}.`];
+    // Categorías con 10 palabras primero, luego las parciales y al final las que quedaron en 0.
+    const cats = ordenarPorLogro([['colores', v.colores], ['animales', v.animales], ['frutas', v.frutas], ['ciudades', v.ciudades]], (c) => c[1] / 10)
+      .map(([t, n]) => `${t} ${n}/10`).join(', ');
+    const lineas = [`${cats.charAt(0).toUpperCase()}${cats.slice(1)}.`];
     if (puntaje < 15) lineas.push('Menos de 15: en la serie original, este puntaje siempre se asoció a demencia.');
     else if (puntaje <= 27 && puntaje > 25) lineas.push('26 a 27: por encima del corte del INGER, pero en el corte del protocolo andaluz para personas mayores (27 o menos); interpreta con la clínica.');
-    return { puntaje, lineas, lineasNota: lineas };
+    return { puntaje, lineas, lineasNota: lineas.slice(1) };
   },
   notas: [
     'Punto de corte de la guía del INGER (2022): 25 o menos indica probable trastorno neurocognitivo; según la guía, no requiere ajustar por escolaridad.',

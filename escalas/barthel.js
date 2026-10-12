@@ -27,6 +27,7 @@ export default {
   min: 0,
   max: 100,
   textoEmpeoradas: 'actividades con menor puntaje que en la referencia',
+  ordenCapacidad: { campos: ['comer', 'banarse', 'vestirse', 'arreglarse', 'deposicion', 'miccion', 'retrete', 'traslado', 'deambulacion', 'escalones'], mejor: 'alto' },
   campos: [
     {
       id: 'comer', texto: 'Comer', textoCorto: 'comer',

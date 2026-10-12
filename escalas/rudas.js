@@ -1,4 +1,5 @@
 import { SUG } from './_comun.js';
+import { ordenarPorLogro } from '../js/motor.js';
 
 const DOMINIOS_RUDAS = [
   { id: 'memoria', texto: 'Memoria', max: 8 },
@@ -38,6 +39,7 @@ export default {
   campos: DOMINIOS_RUDAS.map((d) => ({
     id: d.id, tipo: 'numero', texto: `${d.texto} (0 a ${d.max})`, textoCorto: d.texto.toLowerCase(), unidad: `de ${d.max}`, min: 0, max: d.max, entero: true,
   })),
+  ordenCapacidad: { campos: DOMINIOS_RUDAS.map((d) => d.id), mejor: 'alto' },
   bandas: [
     {
       min: 0, max: 22, etiqueta: 'Tamizaje positivo', nivel: 'moderado', hallazgo: true,
@@ -56,7 +58,7 @@ export default {
   ],
   calcular({ v }) {
     const puntaje = DOMINIOS_RUDAS.reduce((s, d) => s + v[d.id], 0);
-    const perfil = DOMINIOS_RUDAS.map((d) => `${d.texto.split(' (')[0].toLowerCase()} ${v[d.id]}/${d.max}`).join(', ');
+    const perfil = ordenarPorLogro(DOMINIOS_RUDAS, (d) => v[d.id] / d.max).map((d) => `${d.texto.split(' (')[0].toLowerCase()} ${v[d.id]}/${d.max}`).join(', ');
     return { puntaje, lineas: [`Dominios: ${perfil}.`], lineasNota: [`Dominios: ${perfil}.`], extras: { dominios: Object.fromEntries(DOMINIOS_RUDAS.map((d) => [d.id, v[d.id]])) } };
   },
   detalleEnResumen: true,
