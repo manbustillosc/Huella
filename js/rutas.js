@@ -102,6 +102,8 @@ export const RUTAS = [
       { id: 'cam', nota: 'Algoritmo para identificar delirium si el 4AT es positivo o hay sospecha clínica.' },
       { id: 'katz', momento: 'basal', nota: 'Alternativa al Barthel para actividades básicas; no es necesario aplicar ambos.' },
       { id: 'katz', nota: 'Alternativa al Barthel en el momento elegido.' },
+      { id: 'rankin', momento: 'basal', nota: 'Discapacidad previa (Rankin premórbido), sobre todo en EVC.' },
+      { id: 'rankin', nota: 'Discapacidad global en el momento elegido, para compararla con la previa.' },
       { id: 'ckdepi', nota: 'Función renal: categoría KDIGO de la TFG estimada.' },
       { id: 'cockcroft', nota: 'Depuración de creatinina para dosificar fármacos.' },
       { id: 'rass', nota: 'Nivel de agitación o sedación; en UCI es el paso previo del CAM-ICU.' },

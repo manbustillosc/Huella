@@ -59,6 +59,7 @@ import gijon from './gijon.js';
 import ariscat from './ariscat.js';
 import dasi from './dasi.js';
 import pps from './pps.js';
+import rankin from './rankin.js';
 import {
   icopeCognicion, icopeLocomotora, icopeVitalidad, icopeVision, icopeAudicion, icopePsicologica, icopeFactores,
 } from './icope.js';
@@ -77,7 +78,7 @@ import { isaacs, gpcog, gohai, mos, caprini, lace, g8, esasr, spict, necpal, mme
 import { atenas, isarhp, harp, sppicees, susurro, lsa, oars, diazveiga, barreras } from './inger.js';
 
 export const ESCALAS = [
-  barthel, katz, lawton, pfeffer,
+  barthel, katz, lawton, pfeffer, rankin,
   icopeCognicion, minicog, moca, mmse, reloj, gpcog, fluencia, isaacs, rudas, cdr, gdsReisberg, fast,
   icopePsicologica, gds15, phq9, cesd7, gad7, cornell,
   cuatroAt, cam, rass, camicu, npiq,

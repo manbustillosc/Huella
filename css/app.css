@@ -678,11 +678,13 @@ body[data-vista="escala"] .vista { padding-bottom: 0; }
 .op-figura { flex: none; width: 60px; height: 60px; margin: -4px 0; }
 .op-figura svg, .figura-resultado svg { display: block; width: 100%; height: 100%; }
 .figura-resultado { width: 96px; height: 96px; margin: var(--space-3) 0 0; }
-.figura-cfs .fig-fondo { fill: var(--nivel); opacity: 0.14; }
-.figura-cfs .fig-trazo, .figura-cfs .fig-acento { fill: none; stroke-width: 2.7; stroke-linecap: round; stroke-linejoin: round; }
-.figura-cfs .fig-trazo { stroke: var(--ink); }
-.figura-cfs .fig-acento { stroke: var(--nivel-texto); }
-.figura-cfs .fig-suelo { stroke-width: 1.6; opacity: 0.45; }
+.figura.nivel-neutro { --nivel: var(--ink-muted); --nivel-texto: var(--ink-muted); }
+.figura .fig-fondo { fill: var(--nivel); opacity: 0.14; }
+.figura .fig-trazo, .figura .fig-acento { fill: none; stroke-width: 2.7; stroke-linecap: round; stroke-linejoin: round; }
+.figura .fig-trazo { stroke: var(--ink); }
+.figura .fig-acento { stroke: var(--nivel-texto); }
+.figura .fig-suelo { stroke-width: 1.6; opacity: 0.45; }
+.figura .fig-texto { fill: var(--nivel-texto); stroke: none; font-family: inherit; font-size: 8.5px; font-weight: 700; }
 /* Con figura: la figura y el título en el primer renglón; la descripción debajo, a todo lo ancho. */
 .opcion.con-figura { display: grid; grid-template-columns: 20px 60px minmax(0, 1fr); column-gap: var(--space-3); row-gap: var(--space-2); align-items: center; }
 .opcion.con-figura input { margin: 0; grid-row: 1; grid-column: 1; }

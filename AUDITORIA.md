@@ -85,3 +85,9 @@ Fuente: *Guía de instrumentos de evaluación de la capacidad funcional* (INGER,
 | LSA | Nivel × frecuencia × independencia (0 a 120); <56 y <20 según el INGER. Frecuencia 1 = menos de una vez por semana (el formato dice «1 vez a la semana»). |
 | Zarit, Gijón, MNA-SF, SARC-F, CES-D 7, LSNS-6, MUST, GPCOG | Cortes revisados: coinciden con la guía del INGER (en Gijón, con su anexo). |
 | Norton | El texto principal del INGER describe por error la escala de Barthel (0 a 100); Huella conserva la escala original de 5 a 20. |
+
+## Versión 2.7: escala de Rankin modificada, 12/10/2026
+
+| Instrumento | Revisión |
+|---|---|
+| Rankin modificada | Grados 0 a 5 de van Swieten (1988) y grado 6 (muerte) de los estudios de desenlace; referencias verificadas en PubMed (doi 10.1177/003693305700200504 y 10.1161/01.str.19.5.604). Secuencia de decisión basada en el cuestionario simplificado de Bruno (2010), con redacción propia. 0 a 2 independencia; 3 a 5 dependencia. |

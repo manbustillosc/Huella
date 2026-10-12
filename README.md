@@ -159,6 +159,10 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 
 - Cada nivel de la Escala Clínica de Fragilidad muestra una figura y una descripción breve. Las figuras son ilustraciones originales de Huella y las descripciones tienen redacción propia; no se reproducen los pictogramas ni el texto oficiales (© Dalhousie University).
 
+## Escala de Rankin modificada (versión 2.7)
+
+- Grados 0 a 6 con figuras originales, descripción de cada grado y una secuencia de preguntas para decidir entre dos grados. Se puede registrar el Rankin premórbido (momento «Basal») y compararlo con el actual; está en los complementarios de la valoración hospitalaria. Total: 109 instrumentos.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

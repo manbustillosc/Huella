@@ -121,7 +121,7 @@ test('CFS: cada nivel tiene una figura original y una descripción propia; el re
   const op = porId.cfs.campos[0].opciones;
   assert.equal(op.length, 9);
   for (const [i, o] of op.entries()) {
-    assert.match(o.figura, /^<svg class="figura-cfs nivel-(bien|leve|moderado|grave|critico)" viewBox="0 0 64 64"/, `nivel ${i + 1}`);
+    assert.match(o.figura, /^<svg class="figura figura-cfs nivel-(bien|leve|moderado|grave|critico)" viewBox="0 0 64 64"/, `nivel ${i + 1}`);
     assert.equal(o.figura, FIGURAS_CFS[i + 1]);
     assert.ok(o.detalle.length > 40, `nivel ${i + 1}: descripción`);
     assert.doesNotMatch(o.figura, /<(script|image|foreignObject)|href=|on[a-z]+=/i, 'SVG estático, sin recursos externos ni scripts');
@@ -131,4 +131,30 @@ test('CFS: cada nivel tiene una figura original y una descripción propia; el re
   assert.equal(res.banda.figura, FIGURAS_CFS[6]);
   assert.match(res.banda.texto, /^Necesita ayuda en todas las actividades fuera de casa/);
   assert.match(porId.cfs.campos[0].ayuda, /grave \(necesita que otros la cuiden\) = 7/);
+});
+
+test('Rankin modificada: 7 grados con figura y descripción, premórbido y cortes de independencia', async () => {
+  const { FIGURAS_RANKIN } = await import('../escalas/rankin-figuras.js');
+  const e = porId.rankin;
+  assert.equal(e.dominio, 'funcional');
+  assert.ok(e.momentos, 'permite registrar el Rankin premórbido (basal)');
+  const op = e.campos[0].opciones;
+  assert.deepEqual(op.map((o) => o.valor), [0, 1, 2, 3, 4, 5, 6]);
+  for (const o of op) {
+    assert.equal(o.figura, FIGURAS_RANKIN[o.valor]);
+    assert.match(o.figura, /^<svg class="figura figura-rankin nivel-/);
+    assert.doesNotMatch(o.figura, /<(script|image|foreignObject)|href=|on[a-z]+=/i);
+    assert.ok(o.detalle.length > 10);
+  }
+  const g = (n) => calc('rankin', { grado: op[n].texto });
+  assert.equal(g(2).banda.etiqueta, 'Grado 2: discapacidad leve');
+  assert.match(g(2).banda.texto, /Grados 0 a 2: independencia funcional/);
+  assert.match(g(3).banda.texto, /Grados 3 a 5: dependencia/);
+  assert.equal(g(1).banda.hallazgo, false);
+  assert.equal(g(4).banda.hallazgo, true);
+  assert.equal(resumenDe(e, g(3)), 'Rankin modificada: grado 3 (discapacidad moderada).');
+  assert.match(e.campos[0].ayuda, /¿camina sin ayuda de otra persona\?/);
+  const { RUTAS } = await import('../js/rutas.js');
+  const hosp = RUTAS.find((r) => r.id === 'hospital');
+  assert.ok(hosp.complementarios.some((p) => p.id === 'rankin' && p.momento === 'basal'));
 });
