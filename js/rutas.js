@@ -127,7 +127,7 @@ export const RUTAS = [
     complementarios: [
       { id: 'barthel', nota: 'Actividades básicas si se sospecha un deterioro avanzado.' },
       { id: 'reloj', nota: 'Dibujo del reloj a la orden y a la copia (criterios de Cacho): función ejecutiva y praxis visuoconstructiva.' },
-      { id: 'mmse', nota: 'Estado cognitivo global y su gravedad, útil para el seguimiento; punto de corte según la escolaridad (hoja oficial).' },
+      { id: 'mmse', nota: 'Estado cognitivo global, útil para el seguimiento; versión mexicana del INGER (corte de 24 o menos, forma abreviada con 3 años o menos de escolaridad).' },
       { id: 'rudas', nota: 'Tamizaje alternativo si la escolaridad o el idioma limitan el Mini-Cog o el MoCA.' },
       { id: 'cdr', nota: 'Estadificación si se confirma un trastorno neurocognitivo (entrevista y algoritmo oficiales).' },
       { id: 'fast', nota: 'Estadio funcional en enfermedad de Alzheimer; distinto del CDR y de la GDS de Reisberg.' },
@@ -135,7 +135,7 @@ export const RUTAS = [
       { id: 'cornell', nota: 'Síntomas depresivos con informante cuando la GDS-15 no es fiable por el deterioro cognitivo.' },
       { id: 'zarit', nota: 'Si hay un cuidador principal.' },
       { id: 'pfeffer', nota: 'Actividades complejas informadas por un familiar: ayuda a distinguir trastorno neurocognitivo leve de mayor.' },
-      { id: 'fluencia', nota: 'Fluencia semántica (animales en 1 minuto): memoria semántica y función ejecutiva.' },
+      { id: 'fluencia', nota: 'Fluencia semántica (animales en 1 minuto) con percentiles mexicanos por edad y escolaridad.' },
       { id: 'gdsr', nota: 'Estadio global del deterioro (Reisberg), complementario de la FAST.' },
       { id: 'gpcog', nota: 'Tamizaje con la persona y un informante (registro de los totales de la hoja oficial).' },
       { id: 'isaacs', nota: 'Fluencia en cuatro categorías; útil con baja escolaridad o déficit sensorial.' },

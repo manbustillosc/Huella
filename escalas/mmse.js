@@ -1,19 +1,24 @@
-import { SUG } from './_comun.js';
+import { SUG, REF_INGER_2022 } from './_comun.js';
 
-// Mini-Mental State Examination (MMSE): registro guiado por dominios del puntaje obtenido con la hoja oficial.
-// Las descripciones y reglas de puntuación están redactadas para Huella; no se reproducen las preguntas, las palabras,
-// la frase para repetir, las órdenes escritas ni el dibujo de la hoja.
+// Mini-Mental State Examination, versión mexicana de la guía de instrumentos del INGER (2022; Reyes de Beaman, 2004):
+// registro guiado por dominios del puntaje obtenido con el formato. Las reglas están redactadas para Huella; no se
+// reproducen las preguntas, las palabras, la frase para repetir, las órdenes escritas ni el dibujo.
 // Botones numéricos compactos (5, 4, 3…): el título del campo y la regla indican qué cuenta cada punto.
 const conteo = (n) => Array.from({ length: n + 1 }, (_, i) => n - i).map((k) => ({ texto: String(k), valor: k }));
 const BIN = (si, no) => [{ texto: si, valor: 1 }, { texto: no, valor: 0 }];
+export const GUIA_INGER_2022 = 'https://www.gob.mx/cms/uploads/attachment/file/813747/Guia_InstrumentosEvaluacion_2022_31oct.pdf';
+export const ENTRADA_BAJA_ESCOLARIDAD = 8;
+export const CORTE_INGER = 24;
 
 const DOMINIOS_MMSE = [
   { id: 'orientacion', nombre: 'Orientación', max: 10, campos: ['tiempo', 'lugar'] },
   { id: 'fijacion', nombre: 'Fijación', max: 3, campos: ['fijacion'] },
-  { id: 'atencion', nombre: 'Atención y cálculo', max: 5, campos: ['atencion'] },
+  { id: 'atencion', nombre: 'Atención y cálculo', max: 5, campos: ['atencion'], completa: true },
   { id: 'recuerdo', nombre: 'Recuerdo diferido', max: 3, campos: ['recuerdo'] },
   { id: 'lenguaje', nombre: 'Lenguaje y praxis', max: 9, campos: ['denominacion', 'repeticion', 'orden', 'lectura', 'escritura', 'copia'] },
 ];
+const SOLO_COMPLETA = ['atencion', 'lectura', 'escritura', 'copia'];
+const completa = (r) => r.escolaridad === 1;
 
 const LIMITACIONES = [
   { id: 'vision', texto: 'Déficit visual' },
@@ -27,35 +32,30 @@ const SUG_ALTERADO = [
   SUG.descartarDelirium,
   'Correlacionar con la funcionalidad (Lawton-Brody, Barthel) y con la información de un informante.',
   SUG.causasReversibles,
-  'Completar la evaluación (MoCA, prueba del reloj o valoración neuropsicológica) si el diagnóstico es incierto; el MMSE es poco sensible al deterioro leve.',
+  'Completar la evaluación clínica y neuropsicológica para confirmar y graduar el deterioro (MoCA, prueba del reloj o valoración neuropsicológica); el MMSE es poco sensible al deterioro leve.',
 ];
-const B = {
-  normal: { id: 'normal', rango: '24 a 30 (22 a 30 con 0 a 4 años de escolaridad)', etiqueta: 'Dentro de lo esperado para la escolaridad', nivel: 'bien', texto: 'Puntaje igual o mayor que el punto de corte para su escolaridad. El MMSE es poco sensible al deterioro leve, sobre todo con escolaridad alta: no lo descarta si la sospecha clínica persiste.', sugerencias: ['Si hay queja cognitiva o sospecha clínica, considerar una prueba más sensible al deterioro leve (p. ej., MoCA).'] },
-  leve: { id: 'leve', rango: '19 a 23 (19 a 21 con 0 a 4 años)', etiqueta: 'Alteración cognitiva leve', nivel: 'moderado', hallazgo: true, texto: 'Puntaje por debajo del punto de corte para su escolaridad, en el rango leve de la guía del IMSS. No establece el diagnóstico ni la causa.', sugerencias: SUG_ALTERADO },
-  moderada: { id: 'moderada', rango: '14 a 18', etiqueta: 'Alteración cognitiva moderada', nivel: 'grave', hallazgo: true, texto: 'Puntaje en el rango moderado de la guía del IMSS. No establece el diagnóstico ni la causa.', sugerencias: SUG_ALTERADO },
-  grave: { id: 'grave', rango: '0 a 13', etiqueta: 'Alteración cognitiva grave', nivel: 'critico', hallazgo: true, texto: 'Puntaje en el rango grave de la guía del IMSS. No establece el diagnóstico ni la causa.', sugerencias: SUG_ALTERADO },
-};
+const gravedadIMSS = (p) => (p >= 19 ? 'leve' : p >= 14 ? 'moderada' : 'grave');
 
 export default {
   id: 'mmse',
-  nombre: 'Mini-Mental State Examination (MMSE) de Folstein',
+  nombre: 'Mini-Examen del Estado Mental (MMSE), versión mexicana del INGER',
   corto: 'MMSE',
   dominio: 'cognitivo',
   tipo: 'evaluacion',
   registro: true,
   hojaOficial: true,
-  aliases: ['minimental', 'mini mental', 'Folstein', 'MMSE', 'MEC', 'examen mínimo del estado mental', 'mini examen'],
+  aliases: ['minimental', 'mini mental', 'Folstein', 'MMSE', 'MEC', 'examen mínimo del estado mental', 'mini examen', 'Reyes de Beaman', 'INGER'],
   problemas: ['deterioro cognitivo', 'demencia', 'queja de memoria', 'seguimiento de demencia'],
-  descripcion: 'Registro guiado por dominios del puntaje obtenido con la hoja oficial: orientación, fijación, atención y cálculo, recuerdo, y lenguaje y praxis (0 a 30), con punto de corte según la escolaridad.',
-  objetivo: 'Tamizaje y seguimiento del estado cognitivo global; útil para graduar y seguir la gravedad del deterioro.',
-  poblacion: 'Adultos y personas mayores en cualquier nivel de atención (Folstein, 1975). En México, la guía del IMSS indica ajustar el resultado a la escolaridad; existe una versión mexicana modificada (Reyes de Beaman, 2004).',
+  descripcion: 'Registro guiado por dominios del puntaje obtenido con el formato de la versión mexicana (guía del INGER, 2022): 0 a 30; probable deterioro cognitivo con 24 o menos.',
+  objetivo: 'Detectar deterioro cognitivo leve o demencia y seguir su evolución.',
+  poblacion: 'Personas mayores en México. Versión adaptada y validada por Reyes de Beaman et al. (2004), incluida en la guía de instrumentos del INGER (2022), con un ajuste para quienes tienen 3 años o menos de escolaridad formal.',
   aplicacion: [
-    'Aplica la prueba con tu hoja oficial, en un lugar tranquilo, con lentes y auxiliares auditivos puestos. Huella no reproduce las preguntas, las palabras, la frase, las órdenes ni el dibujo.',
-    'Registra los puntos de cada dominio con la regla que se describe en cada uno; Huella suma, muestra los subtotales e interpreta según la escolaridad.',
-    'Pregunta de forma abierta, sin dar opciones ni pistas, salvo donde la hoja lo indique.',
-    'Si la persona no puede hacer una tarea por un déficit sensorial o motor (p. ej., no ve para leer), anótalo: el puntaje subestima su cognición. Si no fue posible aplicarla, márcala como no evaluable.',
+    'Aplica la prueba con el formato del anexo 3 de la guía del INGER, en un lugar privado y tranquilo, con lentes y auxiliares auditivos puestos. Puedes guardar ese formato en «Tu hoja oficial».',
+    'Pregunta primero si sabe leer y escribir y hasta qué año estudió: con 3 años o menos de escolaridad formal se dan 8 puntos de entrada y no se aplican la resta, la lectura, la escritura ni la copia.',
+    'Di cada instrucción tal como aparece en el formato y registra los puntos de cada dominio; Huella suma, muestra los subtotales e interpreta.',
+    'Si la persona no puede hacer una tarea por un déficit sensorial o motor, anótalo: el puntaje subestima su cognición. Si no fue posible aplicarla, márcala como no evaluable.',
   ],
-  tiempo: '5 a 10 min',
+  tiempo: '10 min',
   direccionClinica: 'mayor_mejor',
   textoMejoria: 'mejor desempeño en la prueba',
   textoEmpeoramiento: 'peor desempeño en la prueba',
@@ -64,31 +64,31 @@ export default {
   max: 30,
   campos: [
     {
-      id: 'escolaridad', texto: 'Escolaridad', textoCorto: 'escolaridad', puntua: false, prefill: 'escolaridadRango',
-      ayuda: 'Define el punto de corte: 24 con 5 años o más; 22 con 0 a 4 años (guía del IMSS).',
+      id: 'escolaridad', texto: 'Escolaridad formal', textoCorto: 'escolaridad', puntua: false, prefill: 'escolaridadRango',
+      ayuda: 'Con 3 años o menos se asignan 8 puntos de entrada y se omiten la resta (5), la lectura (1), la escritura (1) y la copia (1). Así se usa el mismo punto de corte para todos.',
       opciones: [
-        { texto: '0 a 4 años', valor: 0, hasta: 4 },
-        { texto: '5 años o más', valor: 5, hasta: 99 },
+        { texto: '3 años o menos', valor: 0, hasta: 3, detalle: '8 puntos de entrada; forma abreviada' },
+        { texto: '4 años o más', valor: 1, hasta: 99, detalle: 'Forma completa' },
       ],
     },
     {
       id: 'tiempo', texto: 'Orientación en el tiempo', textoCorto: 'orientación en el tiempo', puntua: false, grupo: 'Orientación · 10 puntos', compactoNumerico: true,
-      ayuda: '1 punto por cada uno de los cinco datos de la fecha que responde correctamente (los indica la hoja oficial). Pregunta de forma abierta.',
+      ayuda: '1 punto por cada uno de los cinco datos que pide el formato. En la versión mexicana la estación del año se cambia por la hora: es correcta si difiere 30 minutos o menos de la hora real.',
       opciones: conteo(5),
     },
     {
       id: 'lugar', texto: 'Orientación en el espacio', textoCorto: 'orientación en el espacio', puntua: false, compactoNumerico: true,
-      ayuda: '1 punto por cada uno de los cinco datos del lugar donde se encuentra (los indica la hoja oficial).',
+      ayuda: '1 punto por cada uno de los cinco datos del lugar. El nombre del hospital solo se pregunta a personas hospitalizadas; en otros lugares se pregunta dónde están ahora. Incluye la colonia y la ciudad.',
       opciones: conteo(5),
     },
     {
       id: 'fijacion', texto: 'Fijación (registro de tres palabras)', textoCorto: 'fijación', puntua: false, grupo: 'Fijación · 3 puntos', compactoNumerico: true,
-      ayuda: 'Di las tres palabras de la hoja, una por segundo. 1 punto por cada palabra repetida en el primer intento. Después repítelas hasta que las aprenda (la hoja indica cuántos intentos) para poder evaluar el recuerdo.',
+      ayuda: 'Di las tres palabras del formato, una por segundo. 1 punto por cada palabra repetida en el primer intento. Después repítelas hasta que las aprenda para poder evaluar el recuerdo.',
       opciones: conteo(3),
     },
     {
-      id: 'atencion', texto: 'Atención y cálculo', textoCorto: 'atención y cálculo', puntua: false, grupo: 'Atención y cálculo · 5 puntos', compactoNumerico: true,
-      ayuda: 'La tarea que indica tu hoja (restas seriadas o deletreo inverso de una palabra). 1 punto por cada respuesta correcta, hasta 5. En las restas, cada una se califica respecto al número anterior, aunque ese estuviera mal.',
+      id: 'atencion', texto: 'Atención y cálculo', textoCorto: 'atención y cálculo', puntua: false, grupo: 'Atención y cálculo · 5 puntos', compactoNumerico: true, visibleSi: completa,
+      ayuda: 'Resta de 7 en 7 desde 100; la versión mexicana deja como alternativa la resta de 3 en 3 desde 20. 1 punto por cada resta correcta, hasta 5; cada una se califica respecto al número anterior, aunque ese estuviera mal.',
       opciones: conteo(5),
     },
     {
@@ -97,32 +97,32 @@ export default {
       opciones: conteo(3),
     },
     {
-      id: 'denominacion', texto: 'Denominación', textoCorto: 'denominación', puntua: false, grupo: 'Lenguaje y praxis · 9 puntos', compactoNumerico: true,
+      id: 'denominacion', texto: 'Denominación', textoCorto: 'denominación', puntua: false, grupo: 'Lenguaje y praxis · 9 puntos (6 en la forma abreviada)', compactoNumerico: true,
       ayuda: '1 punto por cada uno de los dos objetos comunes que nombra correctamente al mostrárselos.',
       opciones: conteo(2),
     },
     {
       id: 'repeticion', texto: 'Repetición', textoCorto: 'repetición', puntua: false,
-      ayuda: '1 punto si repite exactamente la frase de la hoja, al primer intento.',
+      ayuda: '1 punto si repite exactamente la frase del formato (la versión mexicana usa una frase propia), al primer intento.',
       opciones: BIN('Correcta (1)', 'Incorrecta (0)'),
     },
     {
       id: 'orden', texto: 'Orden verbal en tres pasos', textoCorto: 'orden en tres pasos', puntua: false, compactoNumerico: true,
-      ayuda: 'Da la orden completa una sola vez. 1 punto por cada paso que realiza correctamente.',
+      ayuda: 'Da la orden completa una sola vez, con la hoja de papel que pide el formato. 1 punto por cada paso que realiza correctamente.',
       opciones: conteo(3),
     },
     {
-      id: 'lectura', texto: 'Lectura (orden escrita)', textoCorto: 'lectura', puntua: false,
-      ayuda: '1 punto si lee la indicación escrita de la hoja y la realiza. Leerla en voz alta sin hacerla no cuenta.',
+      id: 'lectura', texto: 'Lectura (orden escrita)', textoCorto: 'lectura', puntua: false, visibleSi: completa,
+      ayuda: '1 punto si lee la indicación escrita del formato y la realiza. Leerla en voz alta sin hacerla no cuenta.',
       opciones: BIN('Correcta (1)', 'Incorrecta (0)'),
     },
     {
-      id: 'escritura', texto: 'Escritura de una oración', textoCorto: 'escritura', puntua: false,
-      ayuda: '1 punto si escribe por sí misma una oración completa y con sentido (con sujeto y verbo). No cuentan los errores de ortografía ni de gramática.',
+      id: 'escritura', texto: 'Escritura de una oración', textoCorto: 'escritura', puntua: false, visibleSi: completa,
+      ayuda: '1 punto si escribe por sí misma una oración completa y con sentido. No cuentan los errores de ortografía ni de gramática.',
       opciones: BIN('Correcta (1)', 'Incorrecta (0)'),
     },
     {
-      id: 'copia', texto: 'Copia del dibujo', textoCorto: 'copia del dibujo', puntua: false,
+      id: 'copia', texto: 'Copia del dibujo', textoCorto: 'copia del dibujo', puntua: false, visibleSi: completa,
       ayuda: '1 punto si la copia conserva todos los ángulos de las figuras y la intersección que muestra el modelo. No se toman en cuenta el temblor ni la rotación.',
       opciones: BIN('Correcta (1)', 'Incorrecta (0)'),
     },
@@ -132,40 +132,51 @@ export default {
       opciones: LIMITACIONES,
     },
   ],
-  bandas: [B.normal, B.leve, B.moderada, B.grave],
+  bandas: [
+    { id: 'probable', min: 0, max: 24, etiqueta: 'Probable deterioro cognitivo', nivel: 'moderado', hallazgo: true, texto: '24 puntos o menos (guía del INGER). Requiere una evaluación clínica y neuropsicológica más amplia para confirmar y graduar el deterioro.', sugerencias: SUG_ALTERADO },
+    { id: 'sin', min: 25, max: 30, etiqueta: 'Sin deterioro cognitivo probable', nivel: 'bien', texto: 'Más de 24 puntos. El MMSE es poco sensible al deterioro leve: no lo descarta si la sospecha clínica persiste.', sugerencias: ['Si hay queja cognitiva o sospecha clínica, considerar una prueba más sensible al deterioro leve (p. ej., MoCA).'] },
+  ],
   calcular({ v }) {
-    const pts = { tiempo: v.tiempo.valor, lugar: v.lugar.valor, fijacion: v.fijacion.valor, atencion: v.atencion.valor, recuerdo: v.recuerdo.valor, denominacion: v.denominacion.valor, repeticion: v.repeticion.valor, orden: v.orden.valor, lectura: v.lectura.valor, escritura: v.escritura.valor, copia: v.copia.valor };
-    const sub = Object.fromEntries(DOMINIOS_MMSE.map((d) => [d.id, d.campos.reduce((t, id) => t + pts[id], 0)]));
-    const puntaje = Object.values(sub).reduce((t, x) => t + x, 0);
     const baja = v.escolaridad.valor === 0;
-    const corte = baja ? 22 : 24;
-    const banda = puntaje >= corte ? B.normal : puntaje >= 19 ? B.leve : puntaje >= 14 ? B.moderada : B.grave;
-    const lineas = [
-      `${DOMINIOS_MMSE.map((d) => `${d.nombre} ${sub[d.id]}/${d.max}`).join(' · ')}.`,
-      `Punto de corte para ${baja ? '0 a 4 años' : '5 años o más'} de escolaridad: ${corte} (guía del IMSS).`,
-    ];
+    const val = (id) => (baja && SOLO_COMPLETA.includes(id) ? 0 : v[id].valor);
+    const sub = Object.fromEntries(DOMINIOS_MMSE.map((d) => [d.id, d.campos.reduce((t, id) => t + val(id), 0)]));
+    const entrada = baja ? ENTRADA_BAJA_ESCOLARIDAD : 0;
+    const puntaje = Object.values(sub).reduce((t, x) => t + x, 0) + entrada;
+    const doms = DOMINIOS_MMSE.filter((d) => !(baja && d.completa)).map((d) => `${d.nombre} ${sub[d.id]}/${baja && d.id === 'lenguaje' ? 6 : d.max}`);
+    const lineas = [`${doms.join(' · ')}.`];
+    if (baja) lineas.push(`Forma abreviada por escolaridad de 3 años o menos: ${puntaje - entrada} puntos aplicados + ${entrada} de entrada = ${puntaje}.`);
+    if (puntaje === CORTE_INGER) lineas.push('24 está en el límite: el INGER lo considera probable deterioro; con la versión original, la guía del IMSS lo considera normal con 5 años o más de escolaridad.');
+    else if (puntaje < CORTE_INGER) lineas.push(`Gravedad orientativa con los rangos de la guía del IMSS: ${gravedadIMSS(puntaje)} (19 a 23 leve, 14 a 18 moderada, menos de 14 grave).`);
     const lim = Array.isArray(v.limitacion) ? v.limitacion : [];
     const limTexto = LIMITACIONES.filter((o) => lim.includes(o.id)).map((o) => o.texto.toLowerCase());
     if (limTexto.length) lineas.push(`Limitaciones durante la aplicación: ${limTexto.join(', ')}; el puntaje puede subestimar la cognición.`);
-    if (pts.recuerdo === 0 && sub.orientacion >= 9) lineas.push('Recuerdo diferido nulo con orientación conservada: conviene explorar la memoria con una prueba más sensible.');
-    return { puntaje, banda, extras: { dominios: sub, corte, escolaridadBaja: baja, limitaciones: lim }, lineas, lineasNota: lineas };
+    if (v.recuerdo.valor === 0 && sub.orientacion >= 9) lineas.push('Recuerdo diferido nulo con orientación conservada: conviene explorar la memoria con una prueba más sensible.');
+    return { puntaje, extras: { dominios: sub, corte: CORTE_INGER, escolaridadBaja: baja, entrada, version: 'inger', limitaciones: lim }, lineas, lineasNota: lineas };
   },
   resumen: (res) => {
     const d = res.extras.dominios;
-    return `MMSE: ${res.puntaje}/30 (${res.banda.etiqueta.toLowerCase()}; corte ${res.extras.corte} para la escolaridad); orientación ${d.orientacion}/10, fijación ${d.fijacion}/3, atención y cálculo ${d.atencion}/5, recuerdo ${d.recuerdo}/3, lenguaje y praxis ${d.lenguaje}/9.`;
+    const at = res.extras.escolaridadBaja ? 'forma abreviada por escolaridad (8 puntos de entrada)' : `atención y cálculo ${d.atencion}/5`;
+    return `MMSE (versión mexicana del INGER): ${res.puntaje}/30 (${res.banda.etiqueta.toLowerCase()}); orientación ${d.orientacion}/10, fijación ${d.fijacion}/3, ${at}, recuerdo ${d.recuerdo}/3, lenguaje y praxis ${d.lenguaje}/${res.extras.escolaridadBaja ? 6 : 9}.`;
   },
   resumenBreve: (res) => `MMSE ${res.puntaje}/30 (${res.banda.etiqueta.toLowerCase()})`,
   detalleEnResumen: true,
-  comparable: (a, b) => (a.extras && b.extras && a.extras.corte !== b.extras.corte ? { advertencia: 'Las aplicaciones usaron puntos de corte distintos (escolaridad registrada de forma diferente).' } : null),
+  comparable(a, b) {
+    if (!a.extras || !b.extras) return null;
+    if (a.extras.version !== b.extras.version) return { advertencia: 'Una de las aplicaciones se registró con otra versión del MMSE (puntos de corte distintos): compara con cautela.' };
+    if (a.extras.escolaridadBaja !== b.extras.escolaridadBaja) return { advertencia: 'Una aplicación usó la forma abreviada por escolaridad (8 puntos de entrada) y otra la completa: compara los dominios aplicados en ambas.' };
+    return null;
+  },
   notas: [
-    'Puntos de corte de la guía de práctica clínica del IMSS (IMSS-144-08, actualización 2012): 24 con 5 años o más de escolaridad y 22 con 0 a 4 años. Gravedad (cuadro 1 de la guía): 24 a 30 normal, 19 a 23 leve, 14 a 18 moderado y menos de 14 grave; el texto de la misma guía menciona 18 a 23 para el rango leve.',
-    'Folstein (1975) no fijó un punto de corte; el más usado es 23/24.',
-    'Es poco sensible al deterioro cognitivo leve y tiene efecto techo con escolaridad alta y efecto suelo con escolaridad baja, aun después de ajustar (Franco-Marina, 2010). Para deterioro leve, el MoCA es más sensible.',
-    'Útil para seguir la evolución: compara siempre con la misma versión de la hoja y con la misma tarea de atención (restas o deletreo).',
+    'Versión de la guía de instrumentos del INGER (2022), adaptada y validada en población mexicana por Reyes de Beaman et al. (2004): probable deterioro cognitivo con 24 puntos o menos; más de 24, sin deterioro.',
+    'Con 3 años o menos de escolaridad formal se asignan 8 puntos de entrada y se omiten la resta (5 puntos), la lectura (1), la escritura (1) y la copia (1), lo que permite usar el mismo punto de corte. La guía dice «3 o menos» en la descripción y «menos de 3» en las instrucciones; Huella usa 3 o menos.',
+    'Cambios de la versión mexicana: la hora en lugar de la estación del año; «dónde estamos ahora» fuera del hospital, con colonia y ciudad; palabras y frase de repetición propias; resta de 3 en 3 desde 20 como alternativa.',
+    'Referencia aparte: la guía del IMSS (IMSS-144-08) usa con la versión original 24 con 5 años o más y 22 con 0 a 4 años, y gradúa la gravedad en 19 a 23 leve, 14 a 18 moderada y menos de 14 grave.',
+    'La puntuación está muy influida por la escolaridad y la edad, y es poco sensible al deterioro leve (Franco-Marina, 2010). Para seguir la evolución compara siempre con la misma versión y la misma forma.',
     'No interpretar durante delirium, sedación o déficit sensorial no corregido.',
   ],
-  licencia: { texto: 'MMSE: derechos de autor de Folstein y colaboradores (MiniMental LLC); las hojas y la versión MMSE-2, incluida una versión en español para Latinoamérica, se distribuyen por PAR (Psychological Assessment Resources). Huella no reproduce preguntas, palabras, frases, órdenes ni el dibujo; registra los puntos obtenidos con la hoja oficial y describe las reglas de puntuación con redacción propia.', enlace: 'https://www.parinc.com' },
+  licencia: { texto: 'Versión mexicana del MMSE (Reyes de Beaman, 2004) publicada en la guía de instrumentos del INGER (2022; licencia CC BY-NC-ND 4.0 y permiso para reproducir sus formatos completos con fines educativos o asistenciales sin ánimo de lucro, citando al INGER). Los derechos del MMSE original son de Folstein y colaboradores (MiniMental LLC; distribuye PAR). Huella no reproduce las preguntas, las palabras, la frase, las órdenes ni el dibujo: registra los puntos obtenidos con el formato y describe las reglas con redacción propia.', enlace: GUIA_INGER_2022 },
   referencias: [
+    { ...REF_INGER_2022, enlace: GUIA_INGER_2022 },
     { texto: 'Folstein MF, Folstein SE, McHugh PR. "Mini-mental state". A practical method for grading the cognitive state of patients for the clinician. J Psychiatr Res. 1975;12(3):189-98.', doi: '10.1016/0022-3956(75)90026-6' },
     { texto: 'Instituto Mexicano del Seguro Social. Diagnóstico y tratamiento del deterioro cognoscitivo en el adulto mayor en el primer nivel de atención. Guía de referencia rápida IMSS-144-08, actualización 2012.', enlace: 'https://www.imss.gob.mx/sites/all/statics/guiasclinicas/144GRR.pdf' },
     { texto: 'Reyes de Beaman S, Beaman PE, García-Peña C, et al. Validation of a modified version of the Mini-Mental State Examination (MMSE) in Spanish. Aging Neuropsychol Cogn. 2004;11(1):1-11.', doi: '10.1076/anec.11.1.1.29366' },

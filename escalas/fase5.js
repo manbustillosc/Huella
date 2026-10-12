@@ -22,7 +22,7 @@ export const isaacs = {
   problemas: ['deterioro cognitivo', 'demencia', 'baja escolaridad', 'déficit sensorial'],
   descripcion: 'Fluencia verbal en cuatro categorías (colores, animales, frutas y ciudades), hasta 10 por categoría: 0 a 40.',
   objetivo: 'Tamizaje rápido de demencia, útil con baja escolaridad o con déficit sensorial porque no requiere leer, escribir ni dibujar.',
-  poblacion: 'Personas mayores de 65 años (Isaacs y Akhtar, 1972; validación española de Pascual et al., 1990).',
+  poblacion: 'Personas mayores (Isaacs y Akhtar, 1972); incluida en la guía de instrumentos del INGER (2022).',
   aplicacion: [
     'Pide que diga todos los colores que recuerde; después, animales, frutas y ciudades, en ese orden.',
     'Da 1 minuto por categoría o detente al llegar a 10 palabras distintas.',
@@ -36,25 +36,26 @@ export const isaacs = {
   max: 40,
   campos: [categoria('colores', 'Colores'), categoria('animales', 'Animales'), categoria('frutas', 'Frutas'), categoria('ciudades', 'Ciudades')],
   bandas: [
-    { min: 0, max: 27, etiqueta: 'Por debajo del punto de corte', nivel: 'moderado', hallazgo: true, texto: '27 o menos en personas mayores: sugiere deterioro cognitivo. No establece el diagnóstico.', sugerencias: [SUG.descartarDelirium, SUG.cognitivaCompleta, SUG.causasReversibles] },
-    { min: 28, max: 40, etiqueta: 'Dentro de lo esperado', nivel: 'bien', texto: '28 o más en personas mayores.', sugerencias: [] },
+    { min: 0, max: 25, etiqueta: 'Probable trastorno neurocognitivo', nivel: 'moderado', hallazgo: true, texto: '25 o menos (guía del INGER, 2022). No establece el diagnóstico.', sugerencias: [SUG.descartarDelirium, SUG.cognitivaCompleta, SUG.causasReversibles] },
+    { min: 26, max: 40, etiqueta: 'Dentro de lo esperado', nivel: 'bien', texto: 'Más de 25 puntos.', sugerencias: [] },
   ],
   calcular({ v }) {
     const puntaje = v.colores + v.animales + v.frutas + v.ciudades;
     const lineas = [`Colores ${v.colores}, animales ${v.animales}, frutas ${v.frutas}, ciudades ${v.ciudades}.`];
     if (puntaje < 15) lineas.push('Menos de 15: en la serie original, este puntaje siempre se asoció a demencia.');
-    else if (puntaje <= 25) lineas.push('25 o menos: punto de corte propuesto para demencia tipo Alzheimer probable (sensibilidad 87 %, especificidad 67 %).');
+    else if (puntaje <= 27 && puntaje > 25) lineas.push('26 a 27: por encima del corte del INGER, pero en el corte del protocolo andaluz para personas mayores (27 o menos); interpreta con la clínica.');
     return { puntaje, lineas, lineasNota: lineas };
   },
   notas: [
-    'Punto de corte de la validación española: 29 o menos en adultos y 27 o menos en personas mayores (protocolo del Servicio Andaluz de Salud).',
-    'La escolaridad muy baja reduce el desempeño; interprétalo con el contexto y la información de un informante.',
+    'Punto de corte de la guía del INGER (2022): 25 o menos indica probable trastorno neurocognitivo; según la guía, no requiere ajustar por escolaridad.',
+    'Otros cortes publicados: 27 o menos en personas mayores y 29 o menos en adultos (protocolo del Servicio Andaluz de Salud, validación de Pascual, 1990); 25 o menos para demencia tipo Alzheimer probable (sensibilidad 87 %, especificidad 67 %).',
     'La fluencia semántica de animales en 1 minuto es una prueba distinta, con su propio punto de corte.',
   ],
   licencia: { texto: 'Prueba publicada por Isaacs y Akhtar (1972); sin titular de derechos identificado.' },
   referencias: [
     { texto: 'Isaacs B, Akhtar AJ. The set test: a rapid test of mental function in old people. Age Ageing. 1972;1(4):222-6.', doi: '10.1093/ageing/1.4.222' },
     { texto: 'Isaacs B, Kennie AT. The set test as an aid to the detection of dementia in old people. Br J Psychiatry. 1973;123(575):467-70.', doi: '10.1192/bjp.123.4.467' },
+    { texto: 'Instituto Nacional de Geriatría. Guía de instrumentos de evaluación de la capacidad funcional. Prueba de categorías de Isaacs. Ciudad de México: INGER; 2022.', enlace: 'https://www.gob.mx/cms/uploads/attachment/file/813747/Guia_InstrumentosEvaluacion_2022_31oct.pdf' },
     { texto: 'Pascual LF, et al. Validación española del Set Test de Isaacs. Neurología. 1990.' },
     { texto: 'Servicio Andaluz de Salud. Set Test de Isaacs (protocolo de cribado de demencias).', enlace: 'https://www.sspa.juntadeandalucia.es/servicioandaluzdesalud/sites/default/files/sincfiles/wsas-media-mediafile_sasdocumento/2019/PT6_CribDemencias_ISSAACS.pdf' },
   ],

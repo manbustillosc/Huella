@@ -46,7 +46,7 @@ export function guardado(id, respuestas, extra = {}) {
 export const EJEMPLOS = {
   barthel: () => todos('barthel', () => 0), katz: () => todos('katz', () => 0), lawton: () => todos('lawton', () => 0),
   minicog: () => todos('minicog', () => 0), moca: () => resp('moca', { puntaje: 22, escolaridad: 'No, más de 12 años' }),
-  mmse: () => resp('mmse', { escolaridad: '5 años o más', tiempo: '4', lugar: '5', fijacion: '3', atencion: '3', recuerdo: '1', denominacion: '2', repeticion: 'Correcta (1)', orden: '3', lectura: 'Correcta (1)', escritura: 'Correcta (1)', copia: 'Incorrecta (0)' }),
+  mmse: () => resp('mmse', { escolaridad: '4 años o más', tiempo: '4', lugar: '5', fijacion: '3', atencion: '3', recuerdo: '1', denominacion: '2', repeticion: 'Correcta (1)', orden: '3', lectura: 'Correcta (1)', escritura: 'Correcta (1)', copia: 'Incorrecta (0)' }),
   reloj: () => resp('reloj', { condicion: 'A la orden y a la copia', o_esfera: '2 · Esfera normal', o_numeros: '3 · Error de posición significativo o desorden leve', o_manecillas: '2 · Gran distorsión, o no se unen y la hora es correcta', c_esfera: '2 · Esfera normal', c_numeros: '4 · Todos, en orden', c_manecillas: '3.5 · Posición correcta, del mismo tamaño' }),
   gds15: () => todos('gds15', () => 0), '4at': () => todos('4at', () => 0), cam: () => todos('cam', () => 0),
   frail: () => resp('frail', { ...todos('frail', () => 0), enfermedades: [NINGUNO], perdida: 'No' }), cfs: () => todos('cfs', () => 4),
@@ -113,7 +113,7 @@ export const EJEMPLOS = {
   news2: () => resp('news2', { fr: 22, escala_spo2: 'Escala 1', spo2: 94, oxigeno: 'Aire ambiente', pas: 105, fc: 96, conciencia: 'Alerta (A)', temp: 38.3 }),
   pfeffer: () => resp('pfeffer', { ...todos('pfeffer', () => 0), cuentas: '2 · Necesita ayuda', papeles: '3 · No puede: depende de otra persona', recordar: '2 · Necesita ayuda', atencion: '1 · Lo hace solo, con dificultad', traslado: '1 · Lo hace solo, con dificultad' }),
   gdsr: () => resp('gdsr', { estadio: 'GDS 4 · Deterioro cognitivo moderado' }),
-  fluencia: () => resp('fluencia', { animales: 9 }),
+  fluencia: () => resp('fluencia', { animales: 9, edad: 76, escolaridad: '1 a 5 años' }),
   gad7: () => todos('gad7', () => 1),
   cesd7: () => resp('cesd7', { ...todos('cesd7', () => 1), disfruto: 'Todo el tiempo o la mayoría del tiempo (5 a 7 días)' }),
   soledad3: () => resp('soledad3', { compania: 'A menudo', excluido: 'Algunas veces', aislado: 'Algunas veces' }),

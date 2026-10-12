@@ -22,12 +22,24 @@ test('fase 5: once escalas registradas, en su dominio y en alguna ruta', () => {
   assert.deepEqual([...new Set(planes)].sort(), ['Carga anticolinérgica (ACB)', 'IPOS']);
 });
 
-test('Isaacs: corte de 27 en personas mayores y menos de 15 siempre asociado a demencia', () => {
+test('Isaacs: corte del INGER de 25 o menos y menos de 15 siempre asociado a demencia', () => {
   const t = (c, a, f, ci) => calc('isaacs', { colores: c, animales: a, frutas: f, ciudades: ci });
-  assert.equal(t(7, 7, 7, 6).banda.etiqueta, 'Por debajo del punto de corte');
-  assert.equal(t(7, 7, 7, 7).banda.etiqueta, 'Dentro de lo esperado');
+  assert.equal(t(7, 6, 6, 6).banda.etiqueta, 'Probable trastorno neurocognitivo');
+  assert.equal(t(7, 7, 6, 6).banda.etiqueta, 'Dentro de lo esperado');
+  assert.ok(t(7, 7, 7, 6).lineas.some((l) => /protocolo andaluz/.test(l)), '27 se marca con el corte andaluz');
   assert.ok(t(4, 4, 3, 2).lineas.some((l) => /siempre se asoció a demencia/.test(l)));
-  assert.ok(t(7, 7, 6, 5).lineas.some((l) => /25 o menos/.test(l)));
+  assert.match(porId.isaacs.notas.join(' '), /INGER/);
+});
+
+test('Fluencia semántica: percentiles mexicanos por edad y escolaridad (Chávez-Oliveros, 2015)', () => {
+  const f = (m) => calc('fluencia', m);
+  assert.equal(f({ animales: 9 }).banda.etiqueta, 'Por debajo del punto de corte', 'sin edad ni escolaridad usa el corte de 10');
+  assert.equal(f({ animales: 7, edad: 72, escolaridad: '1 a 5 años' }).banda.etiqueta, 'Por debajo de lo esperado para su edad y escolaridad');
+  assert.equal(f({ animales: 8, edad: 72, escolaridad: '1 a 5 años' }).banda.etiqueta, 'Límite bajo para su edad y escolaridad', 'el percentil 10 (8) ya no es bajo');
+  assert.equal(f({ animales: 3, edad: 77, escolaridad: 'Sin escolaridad' }).banda.etiqueta, 'Muy por debajo de lo esperado para su edad y escolaridad');
+  assert.equal(f({ animales: 18, edad: 66, escolaridad: '9 años o más' }).banda.etiqueta, 'Dentro de lo esperado para su edad y escolaridad');
+  assert.ok(f({ animales: 12, edad: 85, escolaridad: '6 a 8 años' }).lineas.some((l) => /80 años o más, 6 a 8 años de escolaridad/.test(l)));
+  assert.ok(f({ animales: 12, edad: 60, escolaridad: '6 a 8 años' }).lineas.some((l) => /Menor de 65 años/.test(l)));
 });
 
 test('GPCOG: algoritmo oficial con informante solo en la zona intermedia', () => {

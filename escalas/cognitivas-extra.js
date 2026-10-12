@@ -126,21 +126,54 @@ export const gdsReisberg = {
 
 /* ---------- Fluencia verbal semántica ---------- */
 
+// Percentiles de animales en 1 minuto en personas mayores mexicanas sin deterioro cognitivo (Chávez-Oliveros, 2015;
+// referencia de la guía del INGER). Columnas: P1, P5, P10, P25, P50, P75, P90, media, DE.
+const minusculaEsc = (t) => (t === 'Sin escolaridad' ? 'sin escolaridad' : `${t} de escolaridad`);
+export const NORMAS_FLUENCIA = {
+  '65-69': { 0: [5, 7, 8, 11, 13, 16, 20, 14.0, 4.1], 1: [4, 8, 9, 12, 15, 18, 20, 14.9, 4.4], 2: [7, 10, 11, 14, 17, 20, 22, 16.7, 4.3], 3: [9, 11, 13, 16, 18, 23, 26, 19.3, 5.0] },
+  '70-74': { 0: [0, 6, 9, 11, 14, 16, 18, 13.6, 4.2], 1: [1, 7, 8, 12, 14, 18, 22, 14.4, 4.7], 2: [6, 8, 10, 12, 15, 18, 23, 15.1, 4.6], 3: [6, 11, 12, 17, 20, 22, 25, 19.5, 5.1] },
+  '75-79': { 0: [0, 4, 7, 10, 12, 15, 18, 12.2, 4.3], 1: [1, 8, 9, 11, 14, 17, 22, 14.1, 5.0], 2: [7, 8, 10, 11, 14, 16, 21, 14.4, 4.2], 3: [7, 10, 12, 16, 18, 21, 26, 18.5, 4.5] },
+  '80+': { 0: [0, 5, 7, 10, 12, 18, 19, 12.6, 4.7], 1: [0, 7, 8, 10, 13, 15, 18, 12.8, 4.3], 2: [4, 7, 9, 11, 14, 19, 21, 14.6, 4.9], 3: [8, 8, 12, 13, 16, 19, 21, 17.0, 6.4] },
+};
+const ESCOLARIDAD_FLUENCIA = [
+  { texto: 'Sin escolaridad', valor: 0, hasta: 0 },
+  { texto: '1 a 5 años', valor: 1, hasta: 5 },
+  { texto: '6 a 8 años', valor: 2, hasta: 8 },
+  { texto: '9 años o más', valor: 3, hasta: 99 },
+];
+const grupoEdad = (e) => (e >= 80 ? '80+' : e >= 75 ? '75-79' : e >= 70 ? '70-74' : '65-69');
+export function percentilFluencia(animales, edad, escolaridad) {
+  if (!Number.isFinite(edad) || edad < 65 || escolaridad == null) return null;
+  const fila = NORMAS_FLUENCIA[grupoEdad(edad)][escolaridad];
+  const [, p5, p10, p25, p50, p75, p90, media, de] = fila;
+  const rango = animales < p5 ? 'menor del percentil 5' : animales < p10 ? 'percentil 5 a 9' : animales < p25 ? 'percentil 10 a 24' : animales < p50 ? 'percentil 25 a 49' : animales < p75 ? 'percentil 50 a 74' : animales < p90 ? 'percentil 75 a 89' : 'percentil 90 o más';
+  const id = animales < p5 ? 'p5' : animales < p10 ? 'p10' : animales < p25 ? 'p25' : 'normal';
+  return { grupo: grupoEdad(edad), rango, id, p10, p50, media, de };
+}
+const BF = {
+  p5: { id: 'p5', rango: 'Menor del percentil 5', etiqueta: 'Muy por debajo de lo esperado para su edad y escolaridad', nivel: 'grave', hallazgo: true, texto: 'Menos animales que el 95 % de las personas mayores mexicanas sin deterioro de su edad y escolaridad.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
+  p10: { id: 'p10', rango: 'Percentil 5 a 9', etiqueta: 'Por debajo de lo esperado para su edad y escolaridad', nivel: 'moderado', hallazgo: true, texto: 'Por debajo del percentil 10 de su grupo de edad y escolaridad.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
+  p25: { id: 'p25', rango: 'Percentil 10 a 24', etiqueta: 'Límite bajo para su edad y escolaridad', nivel: 'leve', texto: 'Entre los percentiles 10 y 24 de su grupo: interpreta con la queja cognitiva y otras pruebas.', sugerencias: [] },
+  normal: { id: 'normal', rango: 'Percentil 25 o más', etiqueta: 'Dentro de lo esperado para su edad y escolaridad', nivel: 'bien', texto: 'En el percentil 25 o más de su grupo de edad y escolaridad.', sugerencias: [] },
+  bajo: { id: 'bajo', rango: '0 a 10', etiqueta: 'Por debajo del punto de corte', nivel: 'moderado', hallazgo: true, texto: '10 animales o menos: punto de corte usado en estudios españoles para demencia (sensibilidad alta, especificidad moderada). Sin edad y escolaridad no se usan las normas mexicanas.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
+  alto: { id: 'alto', rango: '11 o más', etiqueta: 'Por encima del punto de corte', nivel: 'bien', texto: 'Más de 10 animales. No descarta deterioro cognitivo, sobre todo con escolaridad alta.', sugerencias: [] },
+};
+
 export const fluencia = {
   id: 'fluencia',
   nombre: 'Fluencia verbal semántica (animales en 1 minuto)',
   corto: 'Fluencia semántica',
   dominio: 'cognitivo',
   tipo: 'tamizaje',
-  aliases: ['fluidez verbal', 'animales', 'fluencia categorial', 'FVS', 'set test', 'evocación categorial'],
+  aliases: ['fluidez verbal', 'animales', 'fluencia categorial', 'FVS', 'evocación categorial'],
   problemas: ['deterioro cognitivo', 'demencia', 'memoria semántica', 'función ejecutiva'],
-  descripcion: 'Número de animales distintos que la persona dice en 60 segundos.',
-  objetivo: 'Tamizaje breve de deterioro cognitivo que explora memoria semántica, velocidad de procesamiento y función ejecutiva.',
-  poblacion: 'Personas mayores con sospecha de deterioro cognitivo. Muy influida por la edad y la escolaridad.',
+  descripcion: 'Animales distintos en 60 segundos, interpretados con percentiles de personas mayores mexicanas por edad y escolaridad.',
+  objetivo: 'Evaluar la producción espontánea de palabras: explora lenguaje, memoria semántica y función ejecutiva.',
+  poblacion: 'Personas mayores. Muy influida por la edad, la escolaridad, el sexo y la ocupación; la guía del INGER (2022) indica interpretarla con tablas normativas por edad y escolaridad.',
   aplicacion: [
-    'Instrucción: «Dígame todos los nombres de animales que se le ocurran, de cualquier tipo, lo más rápido que pueda. Tiene un minuto». Cronometra 60 segundos.',
-    'Cuenta los animales distintos. No cuentan las repeticiones ni las variaciones de un mismo animal (perro y perrito cuentan como uno); sí cuentan una categoría y sus ejemplares (ave y canario).',
-    'No des pistas; si se detiene, puedes animarla una vez a seguir.',
+    'Pide que diga todos los animales que pueda, de cualquier tipo (del aire, del agua, del bosque), en un minuto. Cronometra 60 segundos y anota las respuestas.',
+    'Cuentan los animales válidos, incluidos los extintos, imaginarios o mágicos. No cuentan los nombres propios, las palabras incorrectas, las variaciones de un mismo animal ni las repeticiones.',
+    'Registra la edad y la escolaridad para compararla con las normas mexicanas.',
   ],
   tiempo: '1 a 2 min',
   direccionClinica: 'mayor_mejor',
@@ -150,21 +183,39 @@ export const fluencia = {
   barra: false,
   min: 0,
   max: 60,
-  campos: [{ id: 'animales', tipo: 'numero', texto: 'Animales distintos en 60 segundos', unidad: 'animales', min: 0, max: 60, entero: true }],
-  bandas: [
-    { min: 0, max: 10, etiqueta: 'Por debajo del punto de corte', nivel: 'moderado', hallazgo: true, texto: '10 animales o menos: punto de corte usado en estudios españoles para demencia (sensibilidad alta, especificidad moderada). Con escolaridad baja hay más falsos positivos.', sugerencias: [SUG.cognitivaCompleta, SUG.descartarDelirium] },
-    { min: 11, max: 60, etiqueta: 'Por encima del punto de corte', nivel: 'bien', texto: 'Más de 10 animales. No descarta deterioro cognitivo, sobre todo con escolaridad alta.', sugerencias: [] },
+  campos: [
+    { id: 'animales', tipo: 'numero', texto: 'Animales distintos en 60 segundos', unidad: 'animales', min: 0, max: 60, entero: true },
+    { id: 'edad', tipo: 'numero', texto: 'Edad', unidad: 'años', min: 18, max: 120, entero: true, prefill: 'edad', opcional: true, ayuda: 'Las normas son para 65 años o más.' },
+    { id: 'escolaridad', texto: 'Escolaridad', textoCorto: 'escolaridad', puntua: false, prefill: 'escolaridadRango', opcional: true, opciones: ESCOLARIDAD_FLUENCIA },
   ],
-  calcular: ({ v }) => ({ puntaje: v.animales, mostrar: String(v.animales), sufijo: 'animales en 1 min' }),
-  resumen: (res) => `Fluencia semántica: ${res.puntaje} animales en 1 minuto (${res.banda.etiqueta.toLowerCase()}).`,
+  bandas: [BF.p5, BF.p10, BF.p25, BF.normal, BF.bajo, BF.alto],
+  calcular({ v }) {
+    const n = v.animales;
+    const esc = v.escolaridad ? v.escolaridad.valor : null;
+    const norma = percentilFluencia(n, v.edad, esc);
+    const lineas = [];
+    let banda;
+    if (norma) {
+      banda = BF[norma.id];
+      const grupo = norma.grupo === '80+' ? '80 años o más' : `${norma.grupo.replace('-', ' a ')} años`;
+      lineas.push(`Normas mexicanas (${grupo}, ${minusculaEsc(v.escolaridad.texto)}): ${norma.rango}; mediana ${norma.p50}, percentil 10: ${norma.p10} (media ${norma.media.toFixed(1)} ± ${norma.de.toFixed(1)}).`);
+    } else {
+      banda = n <= 10 ? BF.bajo : BF.alto;
+      lineas.push(Number.isFinite(v.edad) && v.edad < 65 ? 'Menor de 65 años: las normas mexicanas no aplican; se usa el punto de corte de 10.' : 'Sin edad y escolaridad: se usa el punto de corte de 10; regístralas para interpretar con las normas mexicanas.');
+    }
+    return { puntaje: n, mostrar: String(n), sufijo: 'animales en 1 min', banda, lineas, lineasNota: lineas, extras: { norma: norma ? norma.rango : null } };
+  },
+  resumen: (res) => `Fluencia semántica: ${res.puntaje} animales en 1 minuto (${res.banda.etiqueta.toLowerCase()}${res.extras?.norma ? `; ${res.extras.norma}` : ''}).`,
   resumenBreve: (res) => `Fluencia semántica ${res.puntaje} animales/min`,
   notas: [
-    'Punto de corte ≤10 animales (Barrero-Hernández, 2006, con el modelo de Carnero-Pardo, 2000): sensibilidad 93.9 % y especificidad cercana a 64 % para demencia.',
-    'El desempeño esperado depende de la edad y de la escolaridad; para una interpretación individual usa normas por edad y escolaridad de tu población.',
+    'Percentiles de Chávez-Oliveros et al. (2015) en 1,233 personas mayores mexicanas sin deterioro cognitivo ni síntomas depresivos, por edad (65 a 69, 70 a 74, 75 a 79 y 80 o más) y escolaridad (0, 1 a 5, 6 a 8 y 9 años o más). Es la referencia que cita la guía del INGER.',
+    'Los autores no fijan un punto de corte: el percentil 10 se usa con frecuencia como límite bajo. Sin edad o escolaridad, Huella usa el corte de 10 animales (Barrero-Hernández, 2006).',
     'Útil para el seguimiento: compara siempre con la misma categoría (animales) y el mismo tiempo.',
   ],
-  licencia: { texto: 'Prueba de dominio público.' },
+  licencia: { texto: 'Prueba de dominio público. Los valores normativos se citan como datos publicados.' },
   referencias: [
+    { texto: 'Chávez-Oliveros M, Rodríguez-Agudelo Y, Acosta-Castillo I, García-Ramírez N, Rojas de la Torre G, Sosa-Ortiz AL. Fluidez verbal-semántica en adultos mayores mexicanos: valores normativos. Neurología. 2015;30(4):189-94.', doi: '10.1016/j.nrl.2013.12.013' },
+    { texto: 'Instituto Nacional de Geriatría. Guía de instrumentos de evaluación de la capacidad funcional. Fluencia verbal semántica (animales). Ciudad de México: INGER; 2022.', enlace: 'https://www.gob.mx/cms/uploads/attachment/file/813747/Guia_InstrumentosEvaluacion_2022_31oct.pdf' },
     { texto: 'Carnero-Pardo C, Maestre-Moreno JF, Marta-Moreno J, et al. Validación de un modelo de predicción de fluidez verbal semántica. Rev Neurol. 2000;30(11):1012-5.', doi: '10.33588/rn.3011.2000068' },
     { texto: 'Barrero-Hernández FJ, Vives-Montero F, Morales-Gordo B. Evaluación de la versión española del Memory Impairment Screen. Rev Neurol. 2006;43(1):15-9.' },
   ],

@@ -47,7 +47,7 @@ Estados:
 | Lawton-Brody | Reactivos, versión del INGER | Lawton y Brody, 1969; sin titular de licencias identificado | Cumple. Ver versión del INGER |
 | Mini-Cog | Puntuación; no reproduce las series de palabras ni la hoja | © S. Borson; uso clínico y educativo; sin modificar; no comercial | Cumple |
 | MoCA | Registro del puntaje por sección o total; reglas de puntuación con redacción propia, sin láminas, palabras, series ni frases | MoCA Cognition; la hoja oficial requiere la capacitación y certificación del evaluador | Cumple |
-| MMSE | Registro del puntaje por dominio; reglas de puntuación con redacción propia, sin preguntas, palabras, frase, órdenes ni dibujo | Folstein y colaboradores (MiniMental LLC); hojas y MMSE-2 (incluida versión en español para Latinoamérica) distribuidas por PAR | Cumple (solo registro) |
+| MMSE | Versión mexicana del INGER (Reyes de Beaman, 2004): registro del puntaje por dominio, forma abreviada con 8 puntos de entrada si la escolaridad es de 3 años o menos, corte ≤24; reglas con redacción propia, sin preguntas, palabras, frase, órdenes ni dibujo | Original: Folstein y colaboradores (MiniMental LLC; distribuye PAR). Versión mexicana publicada por el INGER (CC BY-NC-ND 4.0; formatos reproducibles completos con fines asistenciales sin ánimo de lucro) | Cumple (solo registro; versión INGER desde el 12/10/2026) |
 | Prueba del reloj | Criterios de aplicación y puntuación de Cacho et al. (1999) con redacción propia | Prueba sin titular de derechos; criterios publicados | Cumple |
 | RUDAS | Registro por dominio | Storey et al. | Cumple |
 | CDR | Registro | Washington University (Knight ADRC) | Cumple |
@@ -93,7 +93,7 @@ Estados:
 | CKD-EPI 2021, Cockcroft-Gault | Fórmulas | Referencias citadas | Cumple |
 | FAQ de Pfeffer | Actividades del cuestionario con redacción en español propia | Pfeffer et al., 1982; sin titular de licencias identificado | Cumple |
 | GDS de Reisberg | Registro del estadio con descripciones breves propias | © B. Reisberg | Cumple (solo registro) |
-| Fluencia semántica | Consigna y cortes publicados | Prueba de dominio público | Cumple |
+| Fluencia semántica | Consigna y percentiles mexicanos por edad y escolaridad (Chávez-Oliveros, 2015) citados como datos | Prueba de dominio público | Cumple |
 | GAD-7 | Reactivos | Pfizer: no requiere permiso para reproducir, traducir ni distribuir | Cumple |
 | CES-D 7 | Reactivos de la versión mexicana (ENASEM/ENSANUT) | CES-D de dominio público (Radloff, 1977); versión breve de Salinas-Rodríguez et al. (2014) | Cumple |
 | Soledad 3 reactivos | Reactivos con traducción propia | Hughes et al. (2004), derivada de la escala UCLA (Russell) | Cumple, confirmar |
@@ -108,7 +108,7 @@ Estados:
 | Lubben LSNS-6 | Reactivos con traducción propia | © J. Lubben | Cumple, confirmar |
 | Maltrato (EGM) | Registro de respuestas afirmativas por tipo; no reproduce reactivos | Giraldo-Rodríguez y Rosas-Carrasco (2013), INCMNSZ | Cumple (solo registro) |
 | VES-13 | Reactivos con traducción propia | © RAND: uso no comercial sin costo ni permiso, con reconocimiento a RAND y cita de Saliba et al. (2001) | Cumple |
-| Isaacs | Consigna y cortes publicados | Isaacs y Akhtar, 1972; sin titular de derechos identificado | Cumple |
+| Isaacs | Consigna y corte del INGER (≤25) | Isaacs y Akhtar, 1972; sin titular de derechos identificado | Cumple |
 | GPCOG | Registro de los totales y algoritmo publicado; no reproduce reactivos | © University of New South Wales; hoja oficial gratuita para uso individual no comercial | Cumple (solo registro) |
 | GOHAI | Registro del total | Atchison y Dolan, 1990; versión mexicana de Sánchez-García (2010) | Cumple (solo registro) |
 | MOS apoyo social | Reactivos con traducción propia | © RAND: uso no comercial libre, sin costo ni permiso, con cita; traducir no requiere permiso | Cumple |
@@ -121,14 +121,15 @@ Estados:
 | Equivalente de morfina | Factores de conversión de los CDC (2022) | Dominio público (gobierno de EE. UU.) | Cumple |
 | Beers 2023 | No se reproducen las tablas | American Geriatrics Society | Cumple |
 
-## Pendiente principal: versiones en español del INGER
+## Versiones en español del INGER (licencia comprobada el 12/10/2026)
 
-Huella usa las versiones en español de la *Guía de instrumentos de evaluación de la capacidad funcional* (INGER, 2022) en los textos o notas de Barthel, Katz, Lawton, Gijón, FRAIL, SARC-F, SPPB, TUG, velocidad de marcha, Braden, GDS-15, PHQ-9, Mini-Cog, MoCA y MNA-SF.
+Huella usa la *Guía de instrumentos de evaluación de la capacidad funcional* (INGER, 2022) en los textos, cortes o notas de Barthel, Katz, Lawton, Gijón, FRAIL, SARC-F, SPPB, TUG, velocidad de marcha, Braden, GDS-15, PHQ-9, Mini-Cog, MoCA, MNA-SF, MMSE (versión mexicana), fluencia semántica, Isaacs, GPCOG, CES-D 7, LSNS-6 y MUST.
 
-- La edición de 2020 de la guía de instrumentos del INGER dice: «Esta obra está bajo una licencia de Creative Commons Reconocimiento-NoComercial-SinObraDerivada 4.0 Internacional». También incluye un aviso que prohíbe la reproducción sin consentimiento previo por escrito.
-- La licencia de la edición de 2022 no pudo comprobarse desde aquí (el sitio gob.mx no permite descargarla de forma automática). Revisa la página legal del PDF de 2022.
-- Si es «SinObraDerivada», Huella solo puede reproducir los textos sin cambios. Cualquier ajuste de redacción para la app sería una obra derivada.
-- **Acción recomendada:** pedir al INGER autorización por escrito para usar sus versiones en español en Huella, sin fines de lucro, en formato digital y citando la fuente. Hay un borrador al final de este documento.
+- **Página legal de la edición 2022** (PDF del 31/10/2022 en gob.mx): «Todos los derechos reservados… Queda prohibida la reproducción o transmisión total o parcial… sin el consentimiento previo o por escrito del Instituto Nacional de Geriatría. Este manual solo tiene fines educativos. Esta obra está bajo una licencia de Creative Commons Reconocimiento-NoComercial-SinObraDerivada 4.0 Internacional». El aviso es contradictorio, igual que en la edición de 2020.
+- **Formatos de los anexos**: cada uno dice que está «registrado bajo licencia Creative Commons International, con permiso para reproducirlo, publicarlo, descargarlo y/o distribuirlo en su totalidad únicamente con fines educativos y/o asistenciales sin ánimo de lucro, siempre que se cite como fuente al Instituto Nacional de Geriatría». El médico puede guardar esos formatos en «Tu hoja oficial».
+- Ese permiso no cubre derechos de terceros: en el MMSE, los derechos del original siguen siendo de MiniMental LLC (PAR), por eso Huella registra los puntos por dominio y no reproduce los reactivos.
+- «SinObraDerivada» impide adaptar los textos; Huella usa redacción propia para reglas y descripciones y cita al INGER.
+- **Acción recomendada:** pedir al INGER autorización por escrito para el uso digital en Huella. Hay un borrador al final de este documento.
 
 ## Confirmaciones recomendadas (no bloquean el uso actual)
 
@@ -143,7 +144,7 @@ Huella usa las versiones en español de la *Guía de instrumentos de evaluación
 
 ## Hojas oficiales del médico (solo en su dispositivo)
 
-En los instrumentos de registro (MoCA, MMSE y los demás con titular), el médico puede guardar su propia copia de la hoja oficial (PDF o imagen) para abrirla desde el instrumento. La copia se guarda solo en ese navegador (IndexedDB): Huella no la publica, no la sube a ningún servidor y no la incluye en las exportaciones. Usar esa copia es responsabilidad del médico, que debe tener derecho a usarla (p. ej., la hoja que entrega MoCA Cognition al certificarse o las hojas compradas a PAR). Ninguna hoja oficial forma parte del repositorio.
+En los instrumentos de registro (MoCA, MMSE y los demás con titular), el médico puede guardar su propia copia de la hoja oficial (PDF o imagen) para abrirla desde el instrumento. La copia se guarda solo en ese navegador (IndexedDB): Huella no la publica, no la sube a ningún servidor y no la incluye en las exportaciones. Usar esa copia es responsabilidad del médico, que debe tener derecho a usarla (p. ej., la hoja que entrega MoCA Cognition al certificarse o los formatos de los anexos de la guía del INGER). Ninguna hoja oficial forma parte del repositorio.
 
 ## Si se quisiera mostrar el cuestionario completo dentro de Huella
 

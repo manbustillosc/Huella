@@ -76,27 +76,47 @@ test('MoCA: el modo «solo el total» y los resultados antiguos siguen calculand
 
 const MMSE_23 = { tiempo: '4', lugar: '5', fijacion: '3', atencion: '2', recuerdo: '1', denominacion: '2', repeticion: 'Correcta (1)', orden: '3', lectura: 'Correcta (1)', escritura: 'Incorrecta (0)', copia: 'Correcta (1)' };
 
-test('MMSE: el mismo puntaje se interpreta con el corte de su escolaridad', () => {
-  const baja = calc('mmse', { ...MMSE_23, escolaridad: '0 a 4 años' });
-  const alta = calc('mmse', { ...MMSE_23, escolaridad: '5 años o más' });
-  assert.equal(baja.puntaje, 23);
-  assert.equal(alta.puntaje, 23);
-  assert.equal(baja.extras.corte, 22);
-  assert.equal(alta.extras.corte, 24);
-  assert.equal(baja.banda.id, 'normal');
-  assert.equal(alta.banda.id, 'leve');
-  assert.deepEqual(alta.extras.dominios, { orientacion: 9, fijacion: 3, atencion: 2, recuerdo: 1, lenguaje: 8 });
-  assert.match(porId.mmse.comparable(guardado('mmse', resp('mmse', { ...MMSE_23, escolaridad: '0 a 4 años' })), guardado('mmse', resp('mmse', { ...MMSE_23, escolaridad: '5 años o más' }))).advertencia, /puntos de corte distintos/);
+test('MMSE versión mexicana del INGER: corte de 24 o menos para todos', () => {
+  const r23 = calc('mmse', { ...MMSE_23, escolaridad: '4 años o más' });
+  assert.equal(r23.puntaje, 23);
+  assert.equal(r23.banda.etiqueta, 'Probable deterioro cognitivo');
+  assert.deepEqual(r23.extras.dominios, { orientacion: 9, fijacion: 3, atencion: 2, recuerdo: 1, lenguaje: 8 });
+  assert.ok(r23.lineas.some((l) => /Gravedad orientativa .*: leve/.test(l)));
+  const r24 = calc('mmse', { ...MMSE_23, escolaridad: '4 años o más', escritura: 'Correcta (1)' });
+  assert.equal(r24.puntaje, 24);
+  assert.equal(r24.banda.etiqueta, 'Probable deterioro cognitivo', '24 es probable deterioro según el INGER');
+  assert.ok(r24.lineas.some((l) => /24 está en el límite/.test(l)));
+  const r25 = calc('mmse', { ...MMSE_23, escolaridad: '4 años o más', escritura: 'Correcta (1)', atencion: '3' });
+  assert.equal(r25.banda.etiqueta, 'Sin deterioro cognitivo probable');
+  assert.match(porId.mmse.licencia.texto, /INGER/);
+  assert.match(porId.mmse.nombre, /versión mexicana del INGER/);
 });
 
-test('MMSE: gravedad moderada y grave, limitaciones y recuerdo nulo con orientación conservada', () => {
-  const mod = calc('mmse', { ...MMSE_23, escolaridad: '5 años o más', atencion: '0', lugar: '2', orden: '1' });
+test('MMSE INGER: con 3 años o menos de escolaridad, 8 puntos de entrada y forma abreviada', () => {
+  const base = { tiempo: '4', lugar: '5', fijacion: '3', recuerdo: '1', denominacion: '2', repeticion: 'Correcta (1)', orden: '3' };
+  const baja = calcular(porId.mmse, resp('mmse', { ...base, escolaridad: '3 años o menos' }));
+  assert.equal(baja.completo, true, 'no pide resta, lectura, escritura ni copia');
+  assert.equal(baja.puntaje, 19 + 8);
+  assert.equal(baja.banda.etiqueta, 'Sin deterioro cognitivo probable');
+  assert.ok(baja.lineas.some((l) => /19 puntos aplicados \+ 8 de entrada = 27/.test(l)));
+  // Respuestas antiguas de esos reactivos no suman en la forma abreviada
+  const conExtras = calc('mmse', { ...base, ...MMSE_23, escolaridad: '3 años o menos' });
+  assert.equal(conExtras.puntaje, 27);
+  assert.equal(calcular(porId.mmse, resp('mmse', { ...base, escolaridad: '4 años o más' })).completo, false, 'la forma completa pide los cuatro reactivos');
+  const a = guardado('mmse', resp('mmse', { ...base, escolaridad: '3 años o menos' }));
+  const b = guardado('mmse', resp('mmse', { ...MMSE_23, escolaridad: '4 años o más' }));
+  assert.match(porId.mmse.comparable(a, b).advertencia, /forma abreviada/);
+  assert.match(a.resumen, /forma abreviada por escolaridad \(8 puntos de entrada\)/);
+});
+
+test('MMSE: gravedad orientativa, limitaciones y recuerdo nulo con orientación conservada', () => {
+  const mod = calc('mmse', { ...MMSE_23, escolaridad: '4 años o más', atencion: '0', lugar: '2', orden: '1' });
   assert.equal(mod.puntaje, 16);
-  assert.equal(mod.banda.id, 'moderada');
-  const grave = calc('mmse', { ...MMSE_23, escolaridad: '5 años o más', tiempo: '0', lugar: '0', atencion: '0' });
+  assert.ok(mod.lineas.some((l) => /Gravedad orientativa .*: moderada/.test(l)));
+  const grave = calc('mmse', { ...MMSE_23, escolaridad: '4 años o más', tiempo: '0', lugar: '0', atencion: '0' });
   assert.equal(grave.puntaje, 12);
-  assert.equal(grave.banda.id, 'grave');
-  const lim = calc('mmse', { ...MMSE_23, escolaridad: '5 años o más', recuerdo: '0', limitacion: ['vision'] });
+  assert.ok(grave.lineas.some((l) => /Gravedad orientativa .*: grave/.test(l)));
+  const lim = calc('mmse', { ...MMSE_23, escolaridad: '4 años o más', recuerdo: '0', limitacion: ['vision'] });
   assert.ok(lim.lineas.some((l) => /Limitaciones durante la aplicación: déficit visual/.test(l)));
   assert.ok(lim.lineas.some((l) => /Recuerdo diferido nulo con orientación conservada/.test(l)));
   assert.ok(porId.mmse.registro && porId.mmse.hojaOficial);
