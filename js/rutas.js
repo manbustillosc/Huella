@@ -122,7 +122,10 @@ export const RUTAS = [
       { id: 'harp', nota: 'Al ingreso: riesgo de pérdida de autonomía por edad, actividades previas y estado mental.' },
       { id: 'sppicees', nota: 'Detección de síndromes geriátricos: piel, nutrición, dolor, movilidad, confusión, eliminación, apoyo y sueño.' },
     ],
-    herramientas: [{ id: 'medicacion', nota: 'Revisión de la medicación al ingreso o al egreso con STOPP/START v3 y Beers 2023.' }],
+    herramientas: [
+      { id: 'medicacion', nota: 'Revisión de la medicación al ingreso o al egreso con STOPP/START v3 y Beers 2023.' },
+      { id: 'infusiones', nota: 'Sedantes, bloqueo neuromuscular y vasoactivos: velocidad de la bomba, ajuste y bolos.' },
+    ],
   },
   {
     id: 'cognitiva', nombre: 'Evaluación cognitiva', icono: 'cognitivo',
@@ -237,6 +240,10 @@ export const RUTAS = [
       { id: 'ckdepi', grupo: 'Función renal', nota: 'TFG estimada indexada (mL/min/1.73 m²): categoría KDIGO; no confirma enfermedad renal crónica por sí sola.' },
       { id: 'cockcroft', grupo: 'Función renal', nota: 'Depuración de creatinina (mL/min): la estimación que piden muchas fichas técnicas para dosificar.' },
       { id: 'mme', grupo: 'Opioides', nota: 'Carga total de opioides en MME/día (CDC 2022); no calcula dosis para cambiar de opioide.' },
+    ],
+    herramientas: [
+      { id: 'infusiones', nota: 'Velocidad de la bomba para la dosis que quieres, dosis de una velocidad, ajuste, titulación y bolos.' },
+      { id: 'unidades', nota: 'Conversión de masa, volumen, concentración, dosis, goteo, electrolitos y laboratorio.' },
     ],
   },
 ];

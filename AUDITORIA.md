@@ -86,6 +86,18 @@ Fuente: *Guía de instrumentos de evaluación de la capacidad funcional* (INGER,
 | Zarit, Gijón, MNA-SF, SARC-F, CES-D 7, LSNS-6, MUST, GPCOG | Cortes revisados: coinciden con la guía del INGER (en Gijón, con su anexo). |
 | Norton | El texto principal del INGER describe por error la escala de Barthel (0 a 100); Huella conserva la escala original de 5 a 20. |
 
+## Versión 2.8: tabla de infusiones del HG30, 12/10/2026
+
+Revisión de los mL/h impresos contra la dosis y la preparación de la misma tabla:
+
+| Medicamento | Revisión |
+|---|---|
+| Propofol | 1 g/100 mL = 10 mg/mL: 5 a 80 mcg/kg/min son 1.5 a 24 mL/h en 50 kg. La tabla imprime el doble (3 a 48 y 120 mL/h), como si la preparación fuera de 5 mg/mL. |
+| Midazolam | 30 mg/100 mL: 0.01 a 0.1 mg/kg/h son 1.7 a 16.7 mL/h en 50 kg; el máximo impreso (5 mL/h) corresponde a 0.03 mg/kg/h. |
+| Rocuronio | 200 mg/100 mL: en 100 kg, 3 a 8 mcg/kg/min son 9 a 24 mL/h; la tabla repite el rango del vecuronio (12 a 18). |
+| Adrenalina | La dosis impresa «0.5 a 1 mcg/kg/min» no coincide con sus mL/h, que corresponden a 0.05 a 1. |
+| Dexmedetomidina, vecuronio, dobutamina, vasopresina | Coinciden. |
+
 ## Versión 2.7: escala de Rankin modificada, 12/10/2026
 
 | Instrumento | Revisión |

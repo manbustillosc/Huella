@@ -163,6 +163,12 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 
 - Grados 0 a 6 con figuras originales, descripción de cada grado y una secuencia de preguntas para decidir entre dos grados. Se puede registrar el Rankin premórbido (momento «Basal») y compararlo con el actual; está en los complementarios de la valoración hospitalaria. Total: 109 instrumentos.
 
+## Calculadoras de infusiones y de unidades (versión 2.8)
+
+- **Infusiones** (`#/infusiones`): con la preparación y el peso calcula los mL/h para una dosis, la dosis que lleva una velocidad, cuánto subir o bajar para una nueva dosis, una tabla de titulación y los bolos. Incluye la tabla de referencia «Medicamentos en paro, preparo y postparo» (HG30): propofol, dexmedetomidina, midazolam, diazepam, vecuronio, rocuronio, adrenalina, norepinefrina, dobutamina, dopamina, vasopresina y terlipresina, más un modo de preparación libre.
+- Huella recalcula cada velocidad y señala dónde los mL/h impresos no coinciden con la dosis (propofol, midazolam, rocuronio en 100 kg y la dosis impresa de adrenalina).
+- **Conversión de unidades** (`#/unidades`): masa, volumen, concentración, presión, longitud, tiempo, temperatura, diluciones 1:1000, velocidad de dosis, goteo, electrolitos (mg, mmol y mEq; contenido por gramo de sal) y laboratorio en unidades SI.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

@@ -1751,3 +1751,46 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .hoja-visor img { display: block; width: 100%; height: auto; }
 .hoja-visor p { padding: var(--space-3); }
 @media print { .hoja-oficial { display: none !important; } }
+
+/* ---------- Calculadoras: infusiones y conversión de unidades ---------- */
+:is(.infusiones, .unidades, .vpo) .tarjeta { margin-bottom: var(--space-4); }
+:is(.infusiones, .unidades, .vpo) .titulo-tarjeta { font-size: 16px; margin-top: 0; }
+:is(.infusiones, .unidades) .campos { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.infusiones .campo-farmaco { grid-column: span 2; }
+@media (max-width: 480px) { .infusiones .campo-farmaco { grid-column: 1 / -1; } }
+.infusiones .campos + .campos { margin-top: var(--space-3); }
+.concentracion { margin: var(--space-3) 0 0; font-size: 15px; }
+.resultado-inf { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-3); margin: var(--space-3) 0 0; font-size: 15px; line-height: 22px; }
+.resultado-inf:empty, .equivalencia:empty { display: none; }
+.cifra-inf { font-family: var(--font-serif); font-size: 34px; line-height: 40px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cifra-inf small { font-family: var(--font-sans, inherit); font-size: 15px; color: var(--ink-muted); }
+.fuera-rango, .en-rango { flex-basis: 100%; display: flex; align-items: flex-start; gap: 6px; font-size: 14px; line-height: 20px; }
+.fuera-rango { color: var(--orange-deep); font-weight: 600; }
+.en-rango { color: var(--green-deep); }
+.fuera-rango .ico, .en-rango .ico { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.equivalencia { margin: var(--space-3) 0 0; font-size: 14px; color: var(--ink-muted); }
+.chips-prep { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.chip-prep { min-height: 36px; padding: 0 var(--space-3); border: 1px solid var(--acento-borde); border-radius: var(--radius-pill); background: var(--surface-100); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.chip-prep:hover { border-color: var(--acento); }
+.aviso-inline { display: flex; gap: 6px; align-items: flex-start; margin: var(--space-3) 0 0; font-size: 14px; line-height: 20px; color: var(--orange-deep); }
+.aviso-inline .ico { width: 18px; height: 18px; flex: none; }
+.tabla-titulacion { max-width: 420px; }
+.fichas { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.fichas .tarjeta { margin-bottom: 0; }
+.ficha-datos { margin: 0; display: grid; gap: var(--space-2); font-size: 14px; line-height: 20px; }
+.ficha-datos > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: var(--space-3); }
+.ficha-datos dt { color: var(--ink-muted); font-weight: 600; }
+.ficha-datos dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 420px) { .ficha-datos > div { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+.revision-huella { display: flex; gap: var(--space-2); align-items: flex-start; margin: var(--space-3) 0 0; padding: var(--space-3); border-radius: var(--radius-sm); border: 1px dashed var(--orange); font-size: 14px; line-height: 20px; }
+.revision-huella .ico { width: 18px; height: 18px; flex: none; color: var(--orange-deep); margin-top: 1px; }
+.ficha-farmaco .btn { margin-top: var(--space-3); }
+.nota-seguridad { display: flex; gap: var(--space-2); align-items: flex-start; font-size: 13px; line-height: 19px; color: var(--ink-muted); margin: var(--space-4) 0 0; }
+.nota-seguridad .ico { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+.conversiones { margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); gap: var(--space-2); }
+.conversiones > div { padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--surface-100); border: 1px solid var(--line); }
+.conversiones dt { font-size: 12px; color: var(--ink-muted); }
+.conversiones dd { margin: 0; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.conv .discreto { margin: 0 0 var(--space-3); }
+.conv .salida + .discreto, .conv .tabla-envoltura + .discreto { margin: var(--space-3) 0 0; }
+.infusiones .chips-prep + .campos { margin-top: var(--space-3); }
