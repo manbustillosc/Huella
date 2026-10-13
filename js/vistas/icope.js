@@ -5,7 +5,7 @@ import { porId } from '../datos.js';
 import {
   DOMINIOS_ICOPE, FACTORES, ESTADOS_ICOPE, NECESIDADES_ICOPE, LICENCIA_ICOPE, ENLACE_ICOPE, RUTA_ICOPE,
   estadosIcope, estadoFactores, avanceBasica, textoIcope, ambitoIcope, nombreAmbitoIcope, icopeDe, dominioIcope,
-  confirmarReutilizacion, retirarReutilizacion,
+  confirmarReutilizacion, retirarReutilizacion, opcionesDetallada,
 } from '../icope.js';
 import {
   planDe, ESTADOS_PROBLEMA, PRIORIDADES, ESTADOS_OBJETIVO, ESTADOS_INTERVENCION, CATEGORIAS_INTERVENCION, CAMPOS_OBJETIVO,
@@ -27,6 +27,14 @@ export const PESTANAS_ICOPE = [
 const urlEscala = (id) => `#/r/${RUTA_ICOPE}/${id}`;
 const urlPestana = (p) => `#/icope/${p}`;
 const fechaDMA = (f) => (f ? fechaCorta(f) : '');
+// Texto solo para lectores de pantalla: da contexto a botones repetidos («Repetir», «Agregar»…) sin cambiar lo visible.
+const ctx = (t) => `<span class="solo-lector"> ${esc(t)}</span>`;
+
+// Aviso de discordancia entre tamizajes cognitivos (instrumento y fecha); no cambia el estado del dominio.
+function avisoDiscordancia(x) {
+  if (!x.discordancia) return '';
+  return `<p class="icope-discordancia" role="note">${icono('alerta')}<span>${esc(x.discordancia.texto)}</span></p>`;
+}
 
 function chipEstado(estado) {
   const e = ESTADOS_ICOPE[estado];
@@ -72,14 +80,14 @@ function filaDato(titulo, contenido) {
 
 function tarjetaPanel(x) {
   const accion = x.estado === 'pendiente'
-    ? `<a class="btn btn-chico btn-primario" href="${urlEscala(x.dom.escala)}">${icono('iniciar')} Aplicar</a>`
-    : `<a class="btn btn-chico" href="${urlEscala(x.dom.escala)}">${icono('reiniciar')} Repetir</a>`;
+    ? `<a class="btn btn-chico btn-primario" href="${urlEscala(x.dom.escala)}">${icono('iniciar')} Aplicar${ctx(`la evaluación básica de ${x.dom.nombre.toLowerCase()}`)}</a>`
+    : `<a class="btn btn-chico" href="${urlEscala(x.dom.escala)}">${icono('reiniciar')} Repetir${ctx(`la evaluación básica de ${x.dom.nombre.toLowerCase()}`)}</a>`;
   const necesidad = ['detallada', 'confirmar', 'no_realizable'].includes(x.necesidad.tipo)
     ? `${chipVigencia(x)} ${esc(x.necesidad.texto)} <a href="${urlPestana('detallada')}#d-${x.dom.id}">Ver opciones</a>`
     : `${chipVigencia(x)} ${esc(x.necesidad.texto)}`;
   const objetivos = x.objetivos.length
     ? `${esc(x.objetivos[0].texto)}${x.objetivos.length > 1 ? ` <span class="discreto">y ${plural(x.objetivos.length - 1, 'objetivo más', 'objetivos más')}</span>` : ''}`
-    : x.estado === 'alterado' ? `<span class="discreto">Sin objetivos.</span> <a href="${urlPestana('plan')}#p-${x.dom.id}">Agregar</a>` : '';
+    : x.estado === 'alterado' ? `<span class="discreto">Sin objetivos.</span> <a href="${urlPestana('plan')}#p-${x.dom.id}">Agregar${ctx(`un objetivo de ${x.dom.nombre.toLowerCase()}`)}</a>` : '';
   return `
     <article class="icope-dom est-${x.estado}" id="panel-${x.dom.id}">
       <header class="icope-dom-cab">
@@ -91,6 +99,7 @@ function tarjetaPanel(x) {
         ${filaDato('Instrumento', x.instrumento ? `${esc(x.instrumento)}${x.fecha ? ` · ${esc(fechaDMA(x.fecha))}` : ''}` : '')}
         ${filaDato('Hallazgo principal', esc(x.hallazgo))}
         ${filaDato('Evaluación adicional', necesidad)}
+        ${x.discordancia ? filaDato('Aviso', avisoDiscordancia(x)) : ''}
         ${filaDato('Valoración del médico', x.problema ? `${esc(nombreDe(ESTADOS_PROBLEMA, x.problema.estado))}${x.problema.nota ? ` · ${esc(x.problema.nota)}` : ''}` : '')}
         ${filaDato('Prioridad', x.prioridad ? esc(nombreDe(PRIORIDADES, x.prioridad)) : '')}
         ${filaDato('Objetivo del plan', objetivos)}
@@ -118,7 +127,7 @@ function tarjetaFactores(f) {
       </header>
       <p class="icope-nota">Apoyo social, persona a cargo del cuidado e incontinencia urinaria (cuadro 3.2), riesgo cardiovascular, caídas y riesgo social. No son dominios de la capacidad intrínseca.</p>
       ${lista || extra || rel ? `<ul class="icope-lista">${lista}${extra}${rel}</ul>` : ''}
-      <div class="icope-dom-acciones"><a class="btn btn-chico${f.estado === 'pendiente' ? ' btn-primario' : ''}" href="${urlEscala(FACTORES.escala)}">${icono(f.estado === 'pendiente' ? 'iniciar' : 'reiniciar')} ${f.estado === 'pendiente' ? 'Preguntar' : 'Repetir'}</a></div>
+      <div class="icope-dom-acciones"><a class="btn btn-chico${f.estado === 'pendiente' ? ' btn-primario' : ''}" href="${urlEscala(FACTORES.escala)}">${icono(f.estado === 'pendiente' ? 'iniciar' : 'reiniciar')} ${f.estado === 'pendiente' ? 'Preguntar' : 'Repetir'}${ctx('las necesidades adicionales')}</a></div>
     </article>`;
 }
 
@@ -208,24 +217,27 @@ function panelBasica(v, hoy) {
 
 function tarjetaDetallada(x) {
   const det = x.dom.detallada;
-  const fila = (id, nota = '') => filaRelacionado(id, nota || porId[id].descripcion);
+  const op = opcionesDetallada(x.dom);
+  const fila = (a) => filaRelacionado(a.id, a.nota || porId[a.id].descripcion);
+  const lista = (titulo, xs) => (xs.length ? `<p class="icope-sub">${titulo}</p><ul class="icope-rels">${xs.map(fila).join('')}</ul>` : '');
   const grupos = [
-    det.antes?.length ? `<p class="icope-sub">Antes de interpretar</p><ul class="icope-rels">${det.antes.map((a) => fila(a.id, a.nota)).join('')}</ul>` : '',
-    det.elegir.length ? `<p class="icope-sub">${det.elegir.length > 1 ? 'Elige un instrumento' : 'Instrumento sugerido'}</p><ul class="icope-rels">${det.elegir.map((id) => fila(id)).join('')}</ul>` : '',
-    det.alternativas?.length ? `<p class="icope-sub">Alternativas</p><ul class="icope-rels">${det.alternativas.map((id) => fila(id)).join('')}</ul>` : '',
-    det.complementarios?.length ? `<p class="icope-sub">Complementarios</p><ul class="icope-rels">${det.complementarios.map((c) => fila(c.id, c.nota)).join('')}</ul>` : '',
-    det.planeadas?.length ? `<p class="icope-sub">Próximamente en Huella</p><ul class="chips">${det.planeadas.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '',
+    lista('Antes de interpretar', op.antes),
+    lista(op.elegir.length > 1 ? 'Elige un instrumento' : 'Instrumento sugerido', op.elegir),
+    lista('Alternativas, según el contexto', op.alternativas),
+    lista('Complementarios', op.complementarios),
+    op.proximamente.length ? `<p class="icope-sub">Próximamente en Huella</p><ul class="chips">${op.proximamente.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '',
   ].join('');
   const externas = x.externas.map((e) => `
     <li class="icope-externa">
       <span><strong>${esc(e.prueba)}</strong> · ${esc(fechaDMA(e.fecha))}${e.hallazgo ? ` · ${esc(e.hallazgo)}` : ''}</span>
       <button class="btn-icono" type="button" data-quitar-externa="${esc(x.dom.id)}:${esc(e.id)}" aria-label="Quitar registro ${esc(e.prueba)}">${icono('cerrar')}</button>
     </li>`).join('');
-  const abierta = ['alterado', 'no_evaluable'].includes(x.estado) || x.externas.length || x.problema || x.hechas.length;
+  const abierta = ['alterado', 'no_evaluable'].includes(x.estado) || x.externas.length || x.problema || x.hechas.length || x.discordancia;
   return `
     <details class="tarjeta icope-det est-${x.estado}" id="d-${x.dom.id}"${abierta ? ' open' : ''}>
       <summary><span class="ico-dominio">${icono(x.dom.icono)}</span><span class="icope-det-nombre">${esc(x.dom.nombre)}</span>${chipEstado(x.estado)}</summary>
       ${x.estado === 'conservado' ? '<p class="discreto">La evaluación básica no indica evaluación detallada; puedes hacerla si hay sospecha clínica.</p>' : ''}
+      ${avisoDiscordancia(x)}
       ${x.estado === 'pendiente' ? `<p class="discreto">Sin evaluación básica. <a href="${urlEscala(x.dom.escala)}">Aplicarla</a>.</p>` : ''}
       ${x.estado === 'alterado' ? `<div class="icope-vigencia">${chipVigencia(x)}<p>${esc(x.necesidad.texto)}</p>${accionesVigencia(x)}</div>` : ''}
       <p>${esc(det.texto)}</p>
@@ -233,7 +245,7 @@ function tarjetaDetallada(x) {
       <p class="icope-sub">${det.externo ? esc(det.externo) : 'Evaluación realizada fuera de Huella'}</p>
       ${externas ? `<ul class="icope-externas">${externas}</ul>` : ''}
       <details class="icope-form-externa">
-        <summary>${icono('mas')} Registrar resultado</summary>
+        <summary>${icono('mas')} Registrar resultado${ctx(`de ${x.dom.nombre.toLowerCase()}`)}</summary>
         <form data-form-externa="${esc(x.dom.id)}" novalidate>
           <div class="campos">
             <label class="campo"><span>Fecha</span><input name="fecha" type="date" max="${hoyISO()}" value="${hoyISO()}" required></label>
@@ -330,7 +342,7 @@ function tarjetaPlan(ambito, nombre, estadoChip, sugeridas, plan) {
       <ul class="icope-sugeridas">${sugeridas.map((s) => `
         <li>
           <span><span class="cat-int">${esc(nombreDe(CATEGORIAS_INTERVENCION, s.categoria))}</span> ${esc(s.texto)}</span>
-          ${enPlan.has(s.texto) ? '<span class="vin-usado">En el plan</span>' : `<button class="btn btn-chico" type="button" data-agregar-int="${esc(ambito)}" data-categoria="${s.categoria}" data-texto="${esc(s.texto)}">Agregar</button>`}
+          ${enPlan.has(s.texto) ? '<span class="vin-usado">En el plan</span>' : `<button class="btn btn-chico" type="button" data-agregar-int="${esc(ambito)}" data-categoria="${s.categoria}" data-texto="${esc(s.texto)}">Agregar${ctx(`al plan: ${s.texto}`)}</button>`}
         </li>`).join('')}</ul>
       <details class="icope-form-int">
         <summary>${icono('mas')} Otra intervención</summary>
@@ -390,7 +402,7 @@ function panelSeguimiento(v, hoy) {
     const dias = fecha ? diasEntre(hoy, fecha) : null;
     const estado = fecha ? (dias < 0 ? `<span class="vencida">vencida hace ${plural(-dias, 'día', 'días')}</span>` : dias === 0 ? 'hoy' : `en ${plural(dias, 'día', 'días')}`) : '<span class="discreto">sin fecha</span>';
     const sugerida = !fecha && x.necesidad.proxima ? ` · evaluación básica a partir del ${esc(fechaDMA(x.necesidad.proxima))}` : '';
-    return `<tr><th scope="row">${esc(x.dom.nombre)}</th><td>${fecha ? esc(fechaDMA(fecha)) : '—'}</td><td>${estado}${sugerida}</td><td><a href="${urlEscala(x.dom.escala)}">Repetir</a></td></tr>`;
+    return `<tr><th scope="row">${esc(x.dom.nombre)}</th><td>${fecha ? esc(fechaDMA(fecha)) : '—'}</td><td>${estado}${sugerida}</td><td><a href="${urlEscala(x.dom.escala)}">Repetir${ctx(`la evaluación básica de ${x.dom.nombre.toLowerCase()}`)}</a></td></tr>`;
   }).join('');
   const objetivos = plan.objetivos.map((o) => `
     <li class="icope-seg">

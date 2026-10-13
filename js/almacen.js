@@ -3,7 +3,7 @@
 //
 // localStorage (permanece al cerrar el navegador): favoritas, tema, formato de nota, usos,
 //   valoración en curso (datos clínicos opcionales, resultados, respuestas y rutas omitidas) y
-//   episodios cerrados (hasta MAX_EPISODIOS), que se pueden exportar o borrar.
+//   episodios archivados (hasta MAX_EPISODIOS): cerrados o importados con su estado; se pueden exportar o borrar.
 // sessionStorage (se borra al cerrar la pestaña): respuestas en edición, ligadas al id de la valoración.
 
 import { codigoEpisodio, asegurarEpisodio, tieneContenido, MAX_EPISODIOS } from './episodio.js';
@@ -52,8 +52,8 @@ if (local === enMemoria) fijarEstado('sesion', 'no_disponible');
 // Mensaje para el médico según el motivo del fallo.
 export function mensajeFallo(motivo) {
   return {
-    limite: `Hay ${MAX_EPISODIOS} episodios cerrados en este navegador. Exporta y borra alguno antes de continuar: Huella no borra episodios por su cuenta.`,
-    lleno: 'El almacenamiento del navegador está lleno y no se guardó el cambio. Exporta el episodio y libera espacio borrando episodios cerrados que ya hayas exportado.',
+    limite: `Hay ${MAX_EPISODIOS} episodios archivados en este navegador. Exporta y borra alguno antes de continuar: Huella no borra episodios por su cuenta.`,
+    lleno: 'El almacenamiento del navegador está lleno y no se guardó el cambio. Exporta el episodio y libera espacio borrando episodios archivados que ya hayas exportado.',
     bloqueado: 'El navegador bloqueó el almacenamiento y no se guardó el cambio. Revisa la configuración de privacidad o exporta el episodio.',
     verificacion: 'No se pudo comprobar que el cambio quedara guardado, así que no se hizo ningún cambio. Exporta el episodio por seguridad.',
     desconocido: 'No se pudo guardar el cambio y no se hizo ningún cambio. Exporta el episodio por seguridad.',
@@ -173,7 +173,7 @@ export const almacen = {
   estadoGuardado: () => ({ ...estado, texto: ESTADOS_GUARDADO[estado.estado], pendientes: [...respaldo.keys()], ultimoOk }),
   alCambiarGuardado(fn) { oyentes.add(fn); return () => oyentes.delete(fn); },
 
-  /* Episodios cerrados (solo en este navegador). Nunca se descartan solos: al llegar al límite, archivar o importar
+  /* Episodios archivados (solo en este navegador). Nunca se descartan solos: al llegar al límite, archivar o importar
      se rechaza hasta que el médico exporte y borre alguno. Cada operación devuelve { ok, motivo }. */
   episodios: () => leer(local, 'episodios', []).filter((e) => e && Array.isArray(e.resultados)),
   limiteEpisodios: () => MAX_EPISODIOS,

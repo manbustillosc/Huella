@@ -1,40 +1,44 @@
-// Pantalla de infusiones: calculadora (preparación, dosis ↔ velocidad, ajuste, titulación y bolo) y tabla de referencia.
+// Pantalla de infusiones: calculadora (preparación, dosis ↔ velocidad, ajuste, titulación por perfil y pautas de dosis
+// única) y fichas de referencia con su fuente. Toda cifra mostrada sale de las funciones de js/infusiones.js.
 import {
-  FARMACOS, GRUPOS_INFUSION, UNIDADES_DOSIS, UNIDADES_CANTIDAD, FUENTE_TABLA, farmacoDe, concentracion, velocidadMlH,
-  dosisDesdeVelocidad, bolo, fmtNum, textoConcentracion, pasosTitulacion,
+  FARMACOS, GRUPOS_INFUSION, FAMILIAS, UNIDADES_CANTIDAD, FUENTES_INFUSION, TIPOS_FUENTE, REVISION_INFUSIONES, LIMITES_ENTRADA,
+  farmacoDe, concentracion, velocidadMlH, dosisDesdeVelocidad, convertirDosis, fmtNum, textoConcentracion, leerEntrada,
+  clasificarDosis, tablaTitulacion, pasosTitulacion, leerUnidadDosis, familiaDeUnidad, textoPauta, dosisPauta, concPauta,
+  pautaNoAplica, volumenDeDosis, ejemplosPerfil,
 } from '../infusiones.js';
 import { $, $$, esc, icono } from '../ui.js';
 
-export const PESTANAS_INFUSION = [['calcular', 'Calcular'], ['tabla', 'Tabla de referencia']];
+export const PESTANAS_INFUSION = [['calcular', 'Calcular'], ['tabla', 'Fichas de referencia']];
 const OTRO = 'otro';
 
 // Estado de la sesión (solo en memoria): el peso se conserva al cambiar de medicamento.
-const estado = { peso: '', farmaco: null, prep: null, unidadDosis: null };
-
-const numero = (v) => {
-  const n = Number(String(v ?? '').trim().replace(',', '.'));
-  return String(v ?? '').trim() === '' || !Number.isFinite(n) ? null : n;
-};
+const estado = { peso: '', farmaco: null, familia: '', prep: null, perfil: null, pauta: null, unidadDosis: null };
 
 function prepInicial(f) {
-  if (f?.preparacion) return { cantidad: String(f.preparacion.cantidad), unidad: f.preparacion.unidad, volumen: String(f.preparacion.volumen) };
-  return { cantidad: '', unidad: 'mg', volumen: '' };
+  const p = f?.preparaciones?.[0];
+  if (p) return { cantidad: String(p.cantidad), unidad: p.unidad, volumen: String(p.volumen) };
+  return { cantidad: '', unidad: f ? FAMILIAS[f.familia].cantidades[1] || FAMILIAS[f.familia].cantidades[0] : '', volumen: '' };
 }
 
 function asegurarEstado(id) {
   const f = farmacoDe(id);
   if (estado.farmaco !== id) {
     estado.farmaco = id;
+    estado.familia = f ? f.familia : '';
     estado.prep = prepInicial(f);
-    estado.unidadDosis = f?.infusion?.unidad || 'mcg/kg/min';
+    estado.perfil = f?.infusiones?.[0]?.id || null;
+    estado.pauta = f?.pautas?.[0]?.id || null;
+    estado.unidadDosis = f?.infusiones?.[0]?.unidad || null;
   }
   return f;
 }
 
 /* ---------- Fragmentos ---------- */
 
+// El mensaje de error vive dentro de la etiqueta, justo debajo de su campo, y se anuncia al aparecer.
 const campo = (id, etiqueta, valor, extra = '') => `
-  <label class="campo"><span>${esc(etiqueta)}</span><input id="${id}" type="text" inputmode="decimal" autocomplete="off" value="${esc(valor ?? '')}"${extra}></label>`;
+  <label class="campo"><span>${esc(etiqueta)}</span><input id="${id}" type="text" inputmode="decimal" autocomplete="off" value="${esc(valor ?? '')}" aria-describedby="${id}-e"${extra}><span class="error-campo" id="${id}-e" aria-live="polite" hidden></span></label>`;
+const fuenteCorta = (k) => `${TIPOS_FUENTE[FUENTES_INFUSION[k].tipo]}`;
 
 function selectorFarmaco(idActual) {
   return `
@@ -46,19 +50,27 @@ function selectorFarmaco(idActual) {
     </label>`;
 }
 
-function opcionesUnidadDosis(base, actual) {
-  return (UNIDADES_DOSIS[base] || UNIDADES_DOSIS.mcg).map((u) => `<option value="${u}"${u === actual ? ' selected' : ''}>${u}</option>`).join('');
+const fila = (t, v) => (v ? `<div><dt>${esc(t)}</dt><dd>${v}</dd></div>` : '');
+
+function textoPerfil(f, p) {
+  const intervalo = p.fija != null ? `Dosis fija de ${fmtNum(p.fija)} ${p.unidad}` : p.max ? `${fmtNum(p.min)} a ${fmtNum(p.max)} ${p.unidad}` : `Inicio ${fmtNum(p.inicio)}${p.inicioMax ? ` a ${fmtNum(p.inicioMax)}` : ''} ${p.unidad}`;
+  const ej = ejemplosPerfil(f, p);
+  return `
+    <li class="perfil-ficha">
+      <p><strong>${esc(p.indicacion)}</strong> · ${esc(p.poblacion)} <span class="chip-fuente fuente-${FUENTES_INFUSION[p.fuente].tipo}">${esc(fuenteCorta(p.fuente))}</span></p>
+      <p>${esc(intervalo)}.${p.titulacion ? ` ${esc(p.titulacion)}` : ''}</p>
+      ${ej ? `<p class="discreto">Con ${esc(ej.prep.texto)}: ${esc(ej.texto)} (calculado).</p>` : ''}
+      ${p.nota ? `<p class="discreto">${esc(p.nota)}</p>` : ''}
+    </li>`;
 }
 
-const fila = (t, v) => (v ? `<div><dt>${esc(t)}</dt><dd>${esc(v)}</dd></div>` : '');
-
-function textoBolo(f) {
-  if (f.bolo) return `${f.bolo.nota} ${f.bolo.tabla ? `Tabla: ${f.bolo.tabla}` : ''}`.trim();
-  return f.boloNota || '';
-}
-function textoInfusion(f) {
-  if (f.infusion) return `${fmtNum(f.infusion.min)} a ${fmtNum(f.infusion.max)} ${f.infusion.unidad}${f.infusion.extra ? ` (${f.infusion.extra.nota})` : ''}. ${f.infusion.tabla ? `Tabla: ${f.infusion.tabla}` : ''}`.trim();
-  return f.infusionNota || '';
+function textoPautaFicha(f, pa) {
+  return `
+    <li class="perfil-ficha${pa.especializada ? ' especializada' : ''}">
+      <p><strong>${esc(pa.indicacion)}</strong> · ${esc(pa.poblacion)} <span class="chip-fuente fuente-${FUENTES_INFUSION[pa.fuente].tipo}">${esc(fuenteCorta(pa.fuente))}</span></p>
+      <p>${esc(textoPauta(f, pa))}. Vía: ${esc(pa.via)}.${pa.frecuencia ? ` ${esc(pa.frecuencia)}.` : ''}${pa.maximo ? ` ${esc(pa.maximo)}.` : ''}</p>
+      ${pa.nota ? `<p class="discreto">${esc(pa.nota)}</p>` : ''}
+    </li>`;
 }
 
 function fichaFarmaco(f, { enlace = false } = {}) {
@@ -66,53 +78,84 @@ function fichaFarmaco(f, { enlace = false } = {}) {
     <article class="tarjeta ficha-farmaco" id="ficha-${f.id}">
       <h3 class="titulo-tarjeta">${esc(f.nombre)}</h3>
       <dl class="ficha-datos">
-        ${fila('Efectos', f.efectos)}
-        ${fila('Presentación', f.presentacion?.texto || 'No indicada en la tabla')}
-        ${fila('Preparación', f.preparacion?.texto || f.preparacionNota)}
-        ${fila('Bolo', textoBolo(f))}
-        ${fila('Infusión (sostén)', textoInfusion(f))}
-        ${(f.rangos || []).length ? fila('Rangos', f.rangos.map((r) => `${fmtNum(r.min)} a ${fmtNum(r.max)}: ${r.efecto}`).join(' ')) : ''}
-        ${fila('Perfil', f.perfil)}
-        ${fila('Otros usos', f.otros)}
-        ${fila('Consideraciones', f.consideraciones)}
-        ${fila('Ajuste y notas', f.ajuste)}
+        ${fila('Efectos', esc(f.efectos))}
+        ${fila('Presentación', esc(f.presentacion?.texto || '—'))}
+        ${fila('Preparaciones', f.preparaciones.length ? f.preparaciones.map((p) => `${esc(p.texto)} <span class="chip-fuente fuente-${FUENTES_INFUSION[p.fuente].tipo}">${esc(fuenteCorta(p.fuente))}</span>${p.nota ? `<br><span class="discreto">${esc(p.nota)}</span>` : ''}`).join('<br>') : esc(f.sinPreparacion || f.sinInfusion || '—'))}
       </dl>
-      ${f.revision ? `<p class="revision-huella">${icono('alerta')}<span><strong>Revisión de Huella:</strong> ${esc(f.revision)}</span></p>` : ''}
-      ${enlace && (f.infusion || f.bolo) ? `<a class="btn btn-chico" href="#/infusiones/calcular/${f.id}">${icono('calculadoras')} Calcular</a>` : ''}
+      <p class="ficha-sub">Infusión continua</p>
+      ${f.infusiones.length ? `<ul class="perfiles-ficha">${f.infusiones.map((p) => textoPerfil(f, p)).join('')}</ul>` : `<p class="discreto">${esc(f.sinInfusion || 'Sin infusión continua.')}</p>`}
+      <p class="ficha-sub">Dosis únicas</p>
+      ${f.pautas.length ? `<ul class="perfiles-ficha">${f.pautas.map((pa) => textoPautaFicha(f, pa)).join('')}</ul>` : `<p class="discreto">${esc(f.sinBolo || 'Sin dosis única de referencia.')}</p>`}
+      <dl class="ficha-datos">
+        ${fila('Contraindicaciones', (f.contraindicaciones || []).map(esc).join(' '))}
+        ${fila('Advertencias', f.advertencias.map(esc).join(' '))}
+        ${fila('Ajustes', f.ajustes.map(esc).join(' '))}
+        ${fila('Fuentes', f.fuentes.map((k) => `${esc(FUENTES_INFUSION[k].texto)}${FUENTES_INFUSION[k].url ? ` <a href="${esc(FUENTES_INFUSION[k].url)}" target="_blank" rel="noopener">Enlace</a>` : ''}`).join('<br>'))}
+        ${fila('Revisión', esc(REVISION_INFUSIONES.split('-').reverse().join('/')))}
+      </dl>
+      <details class="historica">
+        <summary>Tabla original del HG30 (histórica; no usar para indicar)</summary>
+        <dl class="ficha-datos">
+          ${fila('Bolo', esc(f.historica.bolo))}
+          ${fila('Infusión', esc(f.historica.infusion))}
+          ${fila('Otros', esc(f.historica.otros))}
+          ${fila('Revisión de Huella', esc(f.historica.discrepancia))}
+        </dl>
+      </details>
+      ${enlace ? `<a class="btn btn-chico" href="#/infusiones/calcular/${f.id}">${icono('calculadoras')} Calcular</a>` : ''}
     </article>`;
 }
 
 /* ---------- Calcular ---------- */
 
+function opciones(lista, actual, vacio = '') {
+  return `${vacio ? `<option value="">${esc(vacio)}</option>` : ''}${lista.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(actual) ? ' selected' : ''}>${esc(t)}</option>`).join('')}`;
+}
+
 function panelCalcular(id) {
   const f = asegurarEstado(id);
   const p = estado.prep;
-  const alternas = f ? [f.preparacion, ...(f.preparacionesAlternas || [])].filter(Boolean) : [];
-  const sinInfusion = f && !f.infusion;
+  const fam = estado.familia;
+  const famDef = FAMILIAS[fam];
+  const sinInfusion = f && !f.infusiones.length;
+  const perfilActual = f?.infusiones.find((x) => x.id === estado.perfil) || null;
   return `
     <section class="tarjeta" aria-labelledby="inf-prep-t">
       <h2 class="titulo-tarjeta" id="inf-prep-t">Paciente y preparación</h2>
       <div class="campos campos-inf">
         ${selectorFarmaco(id)}
-        ${campo('inf-peso', 'Peso (kg)', estado.peso, ' aria-describedby="inf-peso-e"')}
+        ${campo('inf-peso', 'Peso (kg)', estado.peso)}
       </div>
-      <p class="error-campo" id="inf-peso-e" hidden></p>
-      ${f?.preparacion?.ejemplo ? `<p class="aviso-inline">${icono('alerta')} ${esc(f.preparacion.texto)}</p>` : ''}
-      ${alternas.length > 1 ? `<div class="chips-prep" role="group" aria-label="Preparaciones de la tabla">${alternas.map((x, i) => `<button class="chip-prep" type="button" data-prep="${i}">${esc(`${fmtNum(x.cantidad)} ${x.unidad}/${fmtNum(x.volumen)} mL`)}</button>`).join('')}</div>` : ''}
-      ${sinInfusion ? `<p class="discreto">${esc(f.preparacionNota || f.infusionNota || 'Sin infusión continua.')}</p>` : `
+      ${!f ? `
+        <div class="campos campos-inf">
+          <label class="campo"><span>Familia de unidades</span><select id="inf-familia">${opciones(Object.entries(FAMILIAS).map(([k, x]) => [k, x.nombre]), fam, 'Elige la familia de unidades')}</select></label>
+        </div>
+        <p class="discreto">Masa y unidades internacionales no se convierten entre sí: elige la familia del medicamento.</p>` : ''}
+      ${f && f.preparaciones.length > 1 ? `<div class="chips-prep" role="group" aria-label="Preparaciones de referencia">${f.preparaciones.map((x, i) => `<button class="chip-prep" type="button" data-prep="${i}">${esc(`${fmtNum(x.cantidad)} ${x.unidad}/${fmtNum(x.volumen)} mL`)}</button>`).join('')}</div>` : ''}
+      ${sinInfusion ? `<p class="discreto">${esc(f.sinInfusion || 'Sin infusión continua.')}</p>` : famDef ? `
       <div class="campos campos-prep">
         ${campo('inf-cantidad', 'Cantidad del medicamento', p.cantidad)}
-        <label class="campo"><span>Unidad</span><select id="inf-unidad">${Object.keys(UNIDADES_CANTIDAD).map((u) => `<option value="${u}"${u === p.unidad ? ' selected' : ''}>${u}</option>`).join('')}</select></label>
+        <label class="campo"><span>Unidad</span><select id="inf-unidad">${opciones(famDef.cantidades.map((u) => [u, u]), p.unidad)}</select></label>
         ${campo('inf-volumen', 'Volumen total (mL)', p.volumen)}
       </div>
-      <p class="concentracion" id="inf-conc" aria-live="polite"></p>`}
+      ${f?.sinPreparacion ? `<p class="aviso-inline">${icono('alerta')} ${esc(f.sinPreparacion)}</p>` : ''}
+      <p class="aviso-inline" id="inf-prep-nota" hidden></p>
+      <p class="concentracion" id="inf-conc" aria-live="polite"></p>` : ''}
     </section>
-    ${sinInfusion ? '' : `
+    ${sinInfusion || !famDef ? '' : `
+    <section class="tarjeta" aria-labelledby="inf-perfil-t">
+      <h2 class="titulo-tarjeta" id="inf-perfil-t">Perfil de dosis</h2>
+      ${f ? `
+        <label class="campo"><span>Indicación y fuente</span><select id="inf-perfil">${opciones(f.infusiones.map((x) => [x.id, `${x.indicacion} · ${TIPOS_FUENTE[FUENTES_INFUSION[x.fuente].tipo]}`]), estado.perfil)}</select></label>
+        <p class="discreto" id="inf-perfil-desc">${perfilActual ? esc(`${perfilActual.poblacion}. ${perfilActual.fija != null ? `Dosis fija: ${fmtNum(perfilActual.fija)} ${perfilActual.unidad}.` : perfilActual.max ? `Intervalo: ${fmtNum(perfilActual.min)} a ${fmtNum(perfilActual.max)} ${perfilActual.unidad}.` : ''} ${perfilActual.titulacion || ''}`) : ''}</p>` : `
+        <p class="discreto">Sin perfil validado para «otro medicamento». Si quieres una tabla de titulación, escribe los límites: son parámetros tuyos, no una recomendación.</p>
+        <div class="campos campos-dosis">${campo('inf-lim-min', 'Límite inferior (tuyo)', '')}${campo('inf-lim-max', 'Límite superior (tuyo)', '')}</div>`}
+    </section>
     <section class="tarjeta" aria-labelledby="inf-ini-t">
       <h2 class="titulo-tarjeta" id="inf-ini-t">Dosis → velocidad</h2>
       <div class="campos campos-dosis">
         ${campo('inf-dosis', 'Dosis deseada', '')}
-        <label class="campo"><span>Unidad de dosis</span><select id="inf-udosis"></select></label>
+        <label class="campo"><span>Unidad de dosis</span><select id="inf-udosis">${opciones(famDef.dosis.map((u) => [u, u]), estado.unidadDosis || famDef.dosis[0])}</select></label>
       </div>
       <p class="resultado-inf" id="inf-r-vel" aria-live="polite"></p>
     </section>
@@ -129,21 +172,23 @@ function panelCalcular(id) {
       <h2 class="titulo-tarjeta" id="inf-tit-t">Tabla de titulación <span id="inf-tit-sub"></span></h2>
       <div id="inf-titulacion"></div>
     </section>`}
-    ${f?.bolo ? `
+    ${f?.pautas.length ? `
     <section class="tarjeta" aria-labelledby="inf-bolo-t">
-      <h2 class="titulo-tarjeta" id="inf-bolo-t">Bolo <span>${esc(f.bolo.nota)}</span></h2>
-      <div class="campos campos-dosis">${campo('inf-bolo', `Dosis (${f.bolo.unidad}/kg)`, '')}</div>
+      <h2 class="titulo-tarjeta" id="inf-bolo-t">Dosis única</h2>
+      <label class="campo"><span>Indicación</span><select id="inf-pauta">${opciones(f.pautas.map((x) => [x.id, `${x.indicacion} · ${x.poblacion}`]), estado.pauta)}</select></label>
+      <div id="inf-pauta-desc"></div>
+      <div class="campos campos-dosis">${campo('inf-bolo', 'Dosis a administrar (opcional)', '')}<p class="campo-unidad" id="inf-bolo-u"></p></div>
       <div id="inf-r-bolo" aria-live="polite"></div>
-    </section>` : f?.boloNota ? `<section class="tarjeta"><h2 class="titulo-tarjeta">Bolo</h2><p>${esc(f.boloNota)}</p></section>` : ''}
+    </section>` : f?.sinBolo ? `<section class="tarjeta"><h2 class="titulo-tarjeta">Dosis única</h2><p>${esc(f.sinBolo)}</p></section>` : ''}
     ${f ? fichaFarmaco(f) : ''}
-    <p class="nota-seguridad">${icono('info')} Apoyo de cálculo: verifica la indicación, la dosis y la preparación con tu protocolo y en doble chequeo. ${esc(FUENTE_TABLA)}</p>`;
+    <p class="nota-seguridad">${icono('info')} Apoyo de cálculo: verifica la indicación, la dosis y la preparación con tu protocolo y en doble chequeo. Las referencias no son órdenes automáticas.</p>`;
 }
 
-/* ---------- Tabla de referencia ---------- */
+/* ---------- Fichas ---------- */
 
 function panelTabla() {
   return `
-    <p class="discreto">${esc(FUENTE_TABLA)} Las velocidades se recalculan en «Calcular» con tu preparación y el peso; donde los mL/h impresos no coinciden con la dosis, Huella lo señala.</p>
+    <p class="discreto">Cada perfil indica su fuente: ficha técnica, guía internacional o la tabla institucional del HG30. Las velocidades de ejemplo se calculan con la misma función que la calculadora. La tabla original queda en un apartado histórico de cada ficha, con sus discrepancias.</p>
     ${GRUPOS_INFUSION.map((g) => `
       <h2 class="seccion">${esc(g.nombre)}</h2>
       <div class="fichas">${FARMACOS.filter((f) => f.grupo === g.id).map((f) => fichaFarmaco(f, { enlace: true })).join('')}</div>`).join('')}`;
@@ -157,7 +202,7 @@ export function renderInfusiones({ pestana, farmaco }) {
       <header class="cabecera">
         <p class="ceja">Calculadoras · Calculadora clínica</p>
         <h1>Infusiones</h1>
-        <p class="entradilla">Escribe la preparación y el peso: Huella calcula la velocidad (mL/h) para la dosis que quieres, la dosis que lleva una velocidad, cómo ajustar y los bolos. Incluye la tabla de sedantes, bloqueo neuromuscular y vasoactivos.</p>
+        <p class="entradilla">Escribe la preparación y el peso: Huella calcula la velocidad (mL/h) para la dosis que quieres, la dosis que lleva una velocidad, cómo ajustar y las dosis únicas, con perfiles de dosis por indicación y su fuente.</p>
       </header>
       <nav class="pestanas-med" aria-label="Secciones de infusiones">
         ${PESTANAS_INFUSION.map(([pid, nombre]) => `<a href="#/infusiones/${pid}${pid === 'calcular' ? `/${id}` : ''}"${pid === pestana ? ' aria-current="page" class="activo"' : ''}>${esc(nombre)}</a>`).join('')}
@@ -168,144 +213,186 @@ export function renderInfusiones({ pestana, farmaco }) {
 
 /* ---------- Cálculo en vivo ---------- */
 
-function rangoEn(f, unidad, peso, conc) {
-  // Rango de la tabla convertido a la unidad elegida (pasando por mL/h).
-  if (!f?.infusion) return null;
-  const a = velocidadMlH(f.infusion.min, f.infusion.unidad, peso, conc);
-  const b = velocidadMlH(f.infusion.max, f.infusion.unidad, peso, conc);
-  if (a == null || b == null) return null;
-  return { min: dosisDesdeVelocidad(a, unidad, peso, conc), max: dosisDesdeVelocidad(b, unidad, peso, conc), mlhMin: a, mlhMax: b };
-}
-
-function avisoRango(f, dosisEnUnidad, rango, unidad) {
-  if (!rango || dosisEnUnidad == null) return '';
-  const extra = f.infusion.extra;
-  if (dosisEnUnidad < rango.min * 0.999) return `<span class="fuera-rango">${icono('alerta')} Por debajo del rango de la tabla (${fmtNum(rango.min)} a ${fmtNum(rango.max)} ${unidad}).</span>`;
-  if (dosisEnUnidad > rango.max * 1.001) return `<span class="fuera-rango">${icono('alerta')} Por encima del rango de la tabla (${fmtNum(rango.min)} a ${fmtNum(rango.max)} ${unidad})${extra ? `; ${extra.nota}` : ''}.</span>`;
-  return `<span class="en-rango">${icono('check')} Dentro del rango de la tabla (${fmtNum(rango.min)} a ${fmtNum(rango.max)} ${unidad}).</span>`;
-}
+const CLASE_ESTADO = { dentro: 'en-rango', fija: 'en-rango', sin_intervalo: 'info-rango', no_comparable: 'info-rango' };
+const avisoClasif = (c) => (c ? `<span class="${CLASE_ESTADO[c.estado] || 'fuera-rango'}">${icono(CLASE_ESTADO[c.estado] === 'en-rango' ? 'check' : CLASE_ESTADO[c.estado] === 'info-rango' ? 'info' : 'alerta')} ${esc(c.texto)}</span>` : '');
 
 export function montarInfusiones({ pestana }) {
   const sel = $('#inf-farmaco');
   if (sel) sel.addEventListener('change', () => { location.hash = `#/infusiones/calcular/${sel.value}`; });
   if (pestana !== 'calcular' || !sel) return;
   const f = farmacoDe(estado.farmaco);
-  const valor = (id) => numero($(`#${id}`)?.value);
+
+  // Lee un campo con sus límites y muestra el error junto a él. Devuelve el número válido o null.
+  function leer(id, limites) {
+    const el = $(`#${id}`);
+    const err = $(`#${id}-e`);
+    if (!el) return null;
+    const r = leerEntrada(el.value, limites);
+    if (err) {
+      err.hidden = r.estado !== 'error';
+      err.textContent = r.estado === 'error' ? r.mensaje : '';
+    }
+    el.setAttribute('aria-invalid', String(r.estado === 'error'));
+    return r.estado === 'ok' ? r.valor : null;
+  }
+  const hayError = (id) => $(`#${id}`)?.getAttribute('aria-invalid') === 'true';
 
   function actualizar() {
     estado.peso = $('#inf-peso').value;
-    const peso = valor('inf-peso');
-    const errPeso = $('#inf-peso-e');
-    const pesoMal = peso != null && (peso < 1 || peso > 350);
-    errPeso.hidden = !pesoMal;
-    errPeso.textContent = pesoMal ? 'Peso fuera del rango posible (1 a 350 kg).' : '';
-    const pesoOk = pesoMal ? null : peso;
-    if (!$('#inf-cantidad')) {
-      actualizarBolo(null, pesoOk);
-      return;
-    }
+    const peso = leer('inf-peso', LIMITES_ENTRADA.peso);
+    if (!$('#inf-cantidad')) { actualizarPauta(peso, null); return; }
     estado.prep = { cantidad: $('#inf-cantidad').value, unidad: $('#inf-unidad').value, volumen: $('#inf-volumen').value };
-    const conc = concentracion(valor('inf-cantidad'), estado.prep.unidad, valor('inf-volumen'));
-    $('#inf-conc').innerHTML = conc ? `Concentración: <strong>${esc(textoConcentracion(conc))}</strong>` : 'Escribe la cantidad y el volumen para calcular la concentración.';
+    const cant = leer('inf-cantidad', LIMITES_ENTRADA.cantidad);
+    const vol = leer('inf-volumen', LIMITES_ENTRADA.volumen);
+    const conc = concentracion(cant, estado.prep.unidad, vol);
+    const prepRef = f?.preparaciones.find((x) => String(x.cantidad) === estado.prep.cantidad && x.unidad === estado.prep.unidad && String(x.volumen) === estado.prep.volumen);
+    const nota = $('#inf-prep-nota');
+    nota.hidden = !prepRef?.nota;
+    nota.innerHTML = prepRef?.nota ? `${icono('alerta')} ${esc(prepRef.nota)}` : '';
+    $('#inf-conc').innerHTML = conc ? `Concentración: <strong>${esc(textoConcentracion(conc))}</strong>` : hayError('inf-cantidad') || hayError('inf-volumen') ? 'Corrige la preparación.' : 'Escribe la cantidad y el volumen para calcular la concentración.';
 
-    // Unidades de dosis disponibles según la preparación (masa o UI).
-    const udSel = $('#inf-udosis');
-    const base = conc?.base || UNIDADES_CANTIDAD[estado.prep.unidad]?.base || 'mcg';
-    const opciones = UNIDADES_DOSIS[base];
-    if (!opciones.includes(estado.unidadDosis)) estado.unidadDosis = f?.infusion && UNIDADES_DOSIS[base].includes(f.infusion.unidad) ? f.infusion.unidad : opciones[0];
-    if (udSel.dataset.base !== base) { udSel.innerHTML = opcionesUnidadDosis(base, estado.unidadDosis); udSel.dataset.base = base; }
-    udSel.value = estado.unidadDosis;
-    const u = estado.unidadDosis;
-    const necesitaPeso = u.includes('/kg/');
-    const faltaPeso = necesitaPeso && pesoOk == null;
-    const rango = conc && !faltaPeso ? rangoEn(f, u, pesoOk, conc) : null;
+    const u = $('#inf-udosis').value;
+    estado.unidadDosis = u;
+    const perfil = f?.infusiones.find((x) => x.id === estado.perfil) || null;
+    // Compatibilidad de unidades: la dosis y la preparación deben ser de la misma familia (y del medicamento).
+    const famMed = f ? f.familia : estado.familia;
+    const incompatible = (conc && conc.familia !== famMed) || familiaDeUnidad(u) !== famMed;
+    const porKg = leerUnidadDosis(u).porKg;
+    const faltaPeso = porKg && peso == null;
+    const listo = conc && !incompatible && !faltaPeso;
+    const motivo = incompatible ? '<span class="fuera-rango">' + icono('alerta') + ' Unidades incompatibles con el medicamento: corrige la preparación o la unidad de dosis.</span>'
+      : !conc ? '' : faltaPeso ? `<span class="discreto">${hayError('inf-peso') ? 'Corrige el peso' : 'Escribe el peso'} para dosis por kg.</span>` : '';
 
     // Dosis → velocidad
-    const d = valor('inf-dosis');
+    const d = leer('inf-dosis', LIMITES_ENTRADA.dosis);
     const rVel = $('#inf-r-vel');
-    if (!conc) rVel.innerHTML = '';
-    else if (faltaPeso) rVel.innerHTML = '<span class="discreto">Escribe el peso para dosis por kg.</span>';
-    else if (d == null) rVel.innerHTML = rango ? `<span class="discreto">Rango de la tabla: ${fmtNum(rango.min)} a ${fmtNum(rango.max)} ${esc(u)} = ${fmtNum(rango.mlhMin)} a ${fmtNum(rango.mlhMax)} mL/h.</span>` : '';
+    if (!listo) rVel.innerHTML = motivo;
+    else if (d == null) rVel.innerHTML = perfil ? `<span class="discreto">${esc(perfil.fija != null ? `Dosis fija del perfil: ${fmtNum(perfil.fija)} ${perfil.unidad}.` : perfil.max ? `Intervalo del perfil: ${fmtNum(perfil.min)} a ${fmtNum(perfil.max)} ${perfil.unidad}.` : '')}</span>` : '';
     else {
-      const mlh = velocidadMlH(d, u, pesoOk, conc);
-      rVel.innerHTML = `<span class="cifra-inf">${fmtNum(mlh)} <small>mL/h</small></span>${avisoRango(f, d, rango, u)}`;
+      const mlh = velocidadMlH(d, u, peso, conc);
+      rVel.innerHTML = mlh == null ? '<span class="fuera-rango">No se pudo calcular con estos datos.</span>' : `<span class="cifra-inf">${fmtNum(mlh)} <small>mL/h</small></span>${avisoClasif(clasificarDosis(d, u, perfil))}`;
     }
 
-    // Ajuste
-    const actual = valor('inf-actual');
-    const nueva = valor('inf-nueva');
+    // Ajuste: solo con números válidos; nunca se resta un null.
+    const actual = leer('inf-actual', LIMITES_ENTRADA.velocidad);
+    const nueva = leer('inf-nueva', LIMITES_ENTRADA.dosis);
     const rAj = $('#inf-r-aj');
     const partes = [];
-    if (conc && !faltaPeso && actual != null) {
-      const dosisAct = dosisDesdeVelocidad(actual, u, pesoOk, conc);
-      partes.push(`<span>A ${fmtNum(actual)} mL/h lleva <strong>${fmtNum(dosisAct)} ${esc(u)}</strong>.</span>${avisoRango(f, dosisAct, rango, u)}`);
+    if (listo && actual != null) {
+      const dosisAct = dosisDesdeVelocidad(actual, u, peso, conc);
+      if (dosisAct != null) partes.push(`<span>A ${fmtNum(actual)} mL/h lleva <strong>${fmtNum(dosisAct)} ${esc(u)}</strong>.</span>${actual > 0 ? avisoClasif(clasificarDosis(dosisAct, u, perfil)) : ''}`);
     }
-    if (conc && !faltaPeso && nueva != null) {
-      const mlhNueva = velocidadMlH(nueva, u, pesoOk, conc);
-      const cambio = actual != null ? mlhNueva - actual : null;
-      partes.push(`<span class="cifra-inf">${fmtNum(mlhNueva)} <small>mL/h</small></span><span>para ${fmtNum(nueva)} ${esc(u)}${cambio != null ? ` (${cambio >= 0 ? 'subir' : 'bajar'} ${fmtNum(Math.abs(cambio))} mL/h)` : ''}.</span>${avisoRango(f, nueva, rango, u)}`);
+    if (listo && nueva != null) {
+      const mlhNueva = velocidadMlH(nueva, u, peso, conc);
+      if (mlhNueva != null) {
+        const cambio = actual != null ? mlhNueva - actual : null;
+        const texto = cambio == null ? '' : Math.abs(cambio) < 0.005 ? ' (sin cambio)' : ` (${cambio > 0 ? 'subir' : 'bajar'} ${fmtNum(Math.abs(cambio))} mL/h)`;
+        partes.push(`<span class="cifra-inf">${fmtNum(mlhNueva)} <small>mL/h</small></span><span>para ${fmtNum(nueva)} ${esc(u)}${texto}.</span>${avisoClasif(clasificarDosis(nueva, u, perfil))}`);
+      }
     }
-    rAj.innerHTML = faltaPeso && (actual != null || nueva != null) ? '<span class="discreto">Escribe el peso para dosis por kg.</span>' : partes.join('');
-    $('#inf-equiv').innerHTML = conc && !faltaPeso ? `Equivalencia: cada 1 mL/h = <strong>${fmtNum(dosisDesdeVelocidad(1, u, pesoOk, conc))} ${esc(u)}</strong>.` : '';
+    rAj.innerHTML = !listo && ($('#inf-actual').value || $('#inf-nueva').value) ? motivo : partes.join('');
+    $('#inf-equiv').innerHTML = listo ? `Equivalencia: cada 1 mL/h = <strong>${fmtNum(dosisDesdeVelocidad(1, u, peso, conc))} ${esc(u)}</strong>.` : '';
 
-    // Titulación
+    // Titulación: solo con un intervalo validado del perfil, o con límites explícitos de la persona (otro medicamento).
     const tit = $('#inf-titulacion');
-    $('#inf-tit-sub').textContent = conc && !faltaPeso ? `· ${u}${necesitaPeso ? ` · ${fmtNum(pesoOk)} kg` : ''}` : '';
-    if (!conc || faltaPeso) tit.innerHTML = `<p class="discreto">${faltaPeso ? 'Escribe el peso' : 'Escribe la preparación'} para ver la tabla.</p>`;
-    else {
-      const r = rango || { min: d || 1, max: (d || 1) * 10 };
-      const filas = pasosTitulacion(redondeoBonito(r.min), redondeoBonito(r.max));
-      const extra = f?.infusion?.extra && u === f.infusion.unidad ? [f.infusion.extra.valor] : [];
-      tit.innerHTML = `
-        <div class="tabla-envoltura"><table class="tabla tabla-titulacion">
-          <thead><tr><th scope="col">Dosis (${esc(u)})</th><th scope="col" class="num-col">mL/h</th></tr></thead>
-          <tbody>${[...filas, ...extra].map((x) => {
-            const mlh = velocidadMlH(x, u, pesoOk, conc);
-            const act = actual != null && Math.abs(mlh - actual) < 0.05;
-            return `<tr${act ? ' class="actual"' : ''}><th scope="row">${fmtNum(x)}${extra.includes(x) ? ' <span>(máximo especial)</span>' : ''}</th><td class="num-col">${fmtNum(mlh)}</td></tr>`;
-          }).join('')}</tbody>
-        </table></div>
-        ${rango ? '' : '<p class="discreto">Sin rango de la tabla para este medicamento: los pasos son orientativos.</p>'}`;
+    const sub = $('#inf-tit-sub');
+    sub.textContent = '';
+    if (!conc || incompatible) { tit.innerHTML = `<p class="discreto">${incompatible ? 'Unidades incompatibles.' : 'Escribe una preparación válida.'}</p>`; }
+    else if (f) {
+      if (!perfil || perfil.fija != null || perfil.titular === false || !perfil.max) {
+        tit.innerHTML = `<p class="discreto">${perfil?.fija != null ? 'Este perfil es de dosis fija: no se titula.' : 'Este perfil no fija un intervalo de titulación.'}</p>`;
+      } else {
+        const filas = tablaTitulacion(perfil, peso, conc);
+        sub.textContent = `· ${perfil.unidad}${leerUnidadDosis(perfil.unidad).porKg && peso ? ` · ${fmtNum(peso)} kg` : ''} · ${TIPOS_FUENTE[FUENTES_INFUSION[perfil.fuente].tipo]}`;
+        tit.innerHTML = filas ? tablaHtml(filas, perfil.unidad, actual) : `<p class="discreto">${hayError('inf-peso') ? 'Corrige el peso' : 'Escribe el peso'} para ver la tabla.</p>`;
+      }
+    } else {
+      const lmin = leer('inf-lim-min', LIMITES_ENTRADA.limite);
+      const lmax = leer('inf-lim-max', LIMITES_ENTRADA.limite);
+      const errLim = $('#inf-lim-max-e');
+      if (lmin != null && lmax != null && !(lmax > lmin)) { errLim.hidden = false; errLim.textContent = 'El límite superior debe ser mayor que el inferior.'; }
+      if (lmin == null || lmax == null || !(lmax > lmin) || faltaPeso) tit.innerHTML = '<p class="discreto">Sin límites definidos: no se genera tabla.</p>';
+      else {
+        const filas = pasosTitulacion(lmin, lmax).map((x) => ({ dosis: x, mlh: velocidadMlH(x, u, peso, conc) }));
+        sub.textContent = `· ${u} · límites definidos por ti`;
+        tit.innerHTML = tablaHtml(filas, u, actual);
+      }
     }
-    actualizarBolo(conc, pesoOk);
+    actualizarPauta(peso, conc);
   }
 
-  function actualizarBolo(conc, peso) {
+  function tablaHtml(filas, unidad, actual) {
+    return `
+      <div class="tabla-envoltura"><table class="tabla tabla-titulacion">
+        <thead><tr><th scope="col">Dosis (${esc(unidad)})</th><th scope="col" class="num-col">mL/h</th></tr></thead>
+        <tbody>${filas.map((x) => `<tr${actual != null && x.mlh != null && Math.abs(x.mlh - actual) < 0.05 ? ' class="actual"' : ''}><th scope="row">${fmtNum(x.dosis)}</th><td class="num-col">${fmtNum(x.mlh)}</td></tr>`).join('')}</tbody>
+      </table></div>`;
+  }
+
+  function actualizarPauta(peso, conc) {
     const caja = $('#inf-r-bolo');
-    if (!caja || !f?.bolo) return;
-    const dk = valor('inf-bolo');
-    const pres = f.presentacion ? concentracion(f.presentacion.cantidad, f.presentacion.unidad, f.presentacion.volumen) : null;
-    if (peso == null) { caja.innerHTML = '<p class="discreto">Escribe el peso.</p>'; return; }
-    const rango = (x) => {
-      const b1 = bolo(x, f.bolo.unidad, peso, pres);
-      return b1 ? `${fmtNum(b1.total)} ${f.bolo.unidad}${pres ? ` = ${fmtNum(b1.ml)} mL de la presentación (${esc(f.presentacion.texto)})` : ''}` : '';
-    };
-    const filas = dk != null
-      ? [`<p class="resultado-inf"><span class="cifra-inf">${fmtNum(dk * peso)} <small>${f.bolo.unidad}</small></span><span>${pres ? `${fmtNum(bolo(dk, f.bolo.unidad, peso, pres).ml)} mL de la presentación (${esc(f.presentacion.texto)})` : ''}${conc ? `; ${fmtNum(bolo(dk, f.bolo.unidad, peso, conc).ml)} mL de tu preparación` : ''}.</span>${dk < f.bolo.min * 0.999 || dk > f.bolo.max * 1.001 ? `<span class="fuera-rango">${icono('alerta')} Fuera del rango de la tabla (${fmtNum(f.bolo.min)} a ${fmtNum(f.bolo.max)} ${f.bolo.unidad}/kg).</span>` : ''}</p>`]
-      : [];
-    filas.push(`<p class="discreto">Rango de la tabla para ${fmtNum(peso)} kg: ${rango(f.bolo.min)} a ${rango(f.bolo.max)}.</p>`);
-    caja.innerHTML = filas.join('');
+    if (!caja || !f?.pautas.length) return;
+    const pauta = f.pautas.find((x) => x.id === estado.pauta) || f.pautas[0];
+    const prep = estado.prep && conc ? { ...estado.prep, cantidad: Number(estado.prep.cantidad.replace(',', '.')), volumen: Number(estado.prep.volumen.replace(',', '.')), texto: 'tu preparación' } : null;
+    $('#inf-pauta-desc').innerHTML = `
+      <p class="pauta-texto"><strong>${esc(pauta.indicacion)}</strong> · ${esc(pauta.poblacion)}${pauta.especializada ? ' <span class="chip-fuente fuente-institucional">Uso especializado</span>' : ''}</p>
+      <p>${esc(textoPauta(f, pauta, null, prep))}. Vía: ${esc(pauta.via)}.${pauta.frecuencia ? ` ${esc(pauta.frecuencia)}.` : ''}${pauta.maximo ? ` ${esc(pauta.maximo)}.` : ''}</p>
+      <p class="discreto">Fuente: ${esc(FUENTES_INFUSION[pauta.fuente].texto)}${pauta.nota ? ` ${esc(pauta.nota)}` : ''}</p>`;
+    const unidad = pauta.porPeso ? 'mg' : pauta.dosis.unidad;
+    $('#inf-bolo-u').textContent = `Total en ${unidad}`;
+    const noAplica = pautaNoAplica(pauta, peso);
+    const rango = dosisPauta(pauta, peso);
+    const { conc: cPauta, texto: cTexto } = concPauta(f, pauta, prep);
+    const dosis = leer('inf-bolo', LIMITES_ENTRADA.bolo);
+    const partes = [];
+    if (noAplica) partes.push(`<p class="fuera-rango">${icono('alerta')} ${esc(noAplica)}</p>`);
+    else if (!rango) partes.push(`<p class="discreto">${hayError('inf-peso') ? 'Corrige el peso' : 'Escribe el peso'} para calcular esta pauta.</p>`);
+    else {
+      const r = (a, b, s) => (Math.abs(a - b) < 1e-9 ? `${fmtNum(a)} ${s}` : `${fmtNum(a)} a ${fmtNum(b)} ${s}`);
+      const vMin = volumenDeDosis(rango.min, rango.unidad, cPauta);
+      const vMax = volumenDeDosis(rango.max, rango.unidad, cPauta);
+      partes.push(`<p class="discreto">Dosis de la pauta${peso ? ` para ${fmtNum(peso)} kg` : ''}: ${r(rango.min, rango.max, rango.unidad)}${vMin != null ? ` = ${r(vMin, vMax, 'mL')} de ${esc(cTexto)}` : ''}${pauta.duracionMin && vMax != null ? ` en ${pauta.duracionMin} min (${r(vMin * 60 / pauta.duracionMin, vMax * 60 / pauta.duracionMin, 'mL/h')})` : ''}.</p>`);
+      if (dosis != null) {
+        const vol = volumenDeDosis(dosis, rango.unidad, cPauta);
+        const fuera = dosis < rango.min * 0.999 || dosis > rango.max * 1.001;
+        partes.unshift(`<p class="resultado-inf"><span class="cifra-inf">${fmtNum(vol)} <small>mL</small></span><span>para ${fmtNum(dosis)} ${esc(rango.unidad)} de ${esc(cTexto)}${pauta.duracionMin ? ` en ${pauta.duracionMin} min (${fmtNum(vol * 60 / pauta.duracionMin)} mL/h)` : ''}.</span>${fuera ? `<span class="fuera-rango">${icono('alerta')} Fuera de la dosis de la pauta (${r(rango.min, rango.max, rango.unidad)}).</span>` : ''}</p>`);
+      }
+    }
+    caja.innerHTML = partes.join('');
   }
 
   $$('#panel-inf input, #panel-inf select').forEach((el) => {
     if (el.id === 'inf-farmaco') return;
     el.addEventListener('input', () => {
-      if (el.id === 'inf-udosis') estado.unidadDosis = el.value;
+      if (el.id === 'inf-perfil') {
+        estado.perfil = el.value;
+        const p = f.infusiones.find((x) => x.id === el.value);
+        // La unidad pasa a la del perfil para que la comparación sea directa.
+        if (p) { $('#inf-udosis').value = p.unidad; estado.unidadDosis = p.unidad; }
+        $('#inf-perfil-desc').textContent = p ? `${p.poblacion}. ${p.fija != null ? `Dosis fija: ${fmtNum(p.fija)} ${p.unidad}.` : p.max ? `Intervalo: ${fmtNum(p.min)} a ${fmtNum(p.max)} ${p.unidad}.` : ''} ${p.titulacion || ''}` : '';
+      }
+      if (el.id === 'inf-pauta') estado.pauta = el.value;
+      if (el.id === 'inf-familia') {
+        // Cambiar de familia rehace el panel en el sitio (sin tocar la ruta) con unidades de esa familia.
+        estado.peso = $('#inf-peso').value;
+        estado.familia = el.value;
+        const fam = FAMILIAS[el.value];
+        estado.prep = { cantidad: $('#inf-cantidad')?.value || '', unidad: fam ? fam.cantidades[1] || fam.cantidades[0] : '', volumen: $('#inf-volumen')?.value || '' };
+        estado.unidadDosis = fam ? fam.dosis[0] : null;
+        $('#panel-inf').innerHTML = panelCalcular(OTRO);
+        montarInfusiones({ pestana: 'calcular' });
+        $('#inf-familia')?.focus();
+        return;
+      }
       actualizar();
     });
   });
   $$('[data-prep]').forEach((b) => b.addEventListener('click', () => {
-    const x = [f.preparacion, ...(f.preparacionesAlternas || [])][Number(b.dataset.prep)];
+    const x = f.preparaciones[Number(b.dataset.prep)];
     $('#inf-cantidad').value = String(x.cantidad);
     $('#inf-unidad').value = x.unidad;
     $('#inf-volumen').value = String(x.volumen);
     actualizar();
   }));
   actualizar();
-}
-
-// Extremos de la tabla de titulación con pocas cifras significativas (p. ej., 0.0526 → 0.05).
-function redondeoBonito(x) {
-  if (!(x > 0)) return x;
-  return Number(x.toPrecision(2));
 }

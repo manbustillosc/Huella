@@ -80,6 +80,35 @@ function textoCambioVigente(g) {
   return t;
 }
 
+/* ---------- Discordancia entre tamizajes cognitivos ---------- */
+
+// La evaluación básica ICOPE de cognición conservada no anula otro tamizaje cognitivo positivo del mismo episodio:
+// se muestran ambos, con instrumento y fecha, sin cambiar puntajes, sin sumar pruebas y sin diagnóstico automático.
+export const DISCORDANCIA_COGNITIVA = {
+  base: 'icope-cog',
+  ids: ['minicog', 'moca', 'mmse', 'gpcog', 'rudas', 'reloj', 'fluencia', 'isaacs'],
+  texto: 'El tamizaje básico ICOPE está conservado, pero existe un tamizaje cognitivo positivo en este episodio',
+};
+
+export function discordanciaCognitiva(valoracion, escalasPorId) {
+  const rs = (id) => valoracion.resultados.filter((r) => r.escalaId === id);
+  const base = rs(DISCORDANCIA_COGNITIVA.base);
+  const vb = base.length ? vigenteDe(base) : null;
+  if (!vb || vb.noEvaluable || vb.hallazgo) return null;
+  const positivos = DISCORDANCIA_COGNITIVA.ids.filter((id) => escalasPorId[id] && rs(id).length)
+    .map((id) => vigenteDe(rs(id)))
+    .filter((r) => r && !r.noEvaluable && r.hallazgo)
+    .sort((a, b) => ((a.fecha || '') < (b.fecha || '') ? -1 : 1));
+  if (!positivos.length) return null;
+  const lista = positivos.map((r) => `${escalasPorId[r.escalaId].corto}, ${fechaCorta(r.fecha)}: ${valorGuardado(r)}`);
+  return {
+    icope: { id: vb.id, fecha: vb.fecha },
+    positivos: positivos.map((r) => ({ id: r.id, escalaId: r.escalaId, fecha: r.fecha, texto: `${escalasPorId[r.escalaId].corto} ${valorGuardado(r)}` })),
+    lista,
+    texto: `${DISCORDANCIA_COGNITIVA.texto} (ICOPE del ${fechaCorta(vb.fecha)}): ${lista.join('; ')}. Revisar la discordancia y considerar evaluación adicional.`,
+  };
+}
+
 /* ---------- Hallazgos, cambios y avisos ---------- */
 
 export function hallazgosYSugerencias(valoracion, escalasPorId, hoy = null) {
@@ -120,6 +149,8 @@ export function hallazgosYSugerencias(valoracion, escalasPorId, hoy = null) {
       hallazgos.push(`${escala.corto}: ${textoCambio(u.vsRef, textoRespectoA(cmp.ref))}${u.empeoradas.length ? `; ${escala.textoEmpeoradas || 'reactivos que empeoraron'}: ${u.empeoradas.map(minusculaInicial).join(', ')}` : ''}. La causa y la reversibilidad requieren valoración clínica.`);
     }
   }
+  const disc = discordanciaCognitiva(valoracion, escalasPorId);
+  if (disc) avisos.push(disc.texto);
   const dias = amplitudDias(valoracion.resultados);
   if (dias > DIAS_EPISODIO) avisos.push(`Las aplicaciones abarcan ${dias} días: verifica que pertenezcan al mismo episodio clínico.`);
   return { hallazgos, sugerencias, noEvaluables, cambios, avisos, aplicados, alertas };

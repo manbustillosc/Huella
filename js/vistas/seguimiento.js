@@ -115,6 +115,14 @@ function tarjetaEpisodio(v) {
     </section>`;
 }
 
+// Estado de un episodio archivado: cerrado (con su fecha) o abierto (p. ej., importado sin cerrar). No se inventa
+// una fecha de cierre.
+function chipEstadoEpisodio(ep) {
+  return ep.estado === 'cerrado'
+    ? `<span class="chip-ep ep-cerrado">Cerrado${ep.cerrado ? ` el ${esc(fechaCorta(ep.cerrado))}` : ''}</span>`
+    : '<span class="chip-ep ep-abierto">Abierto, sin cierre</span>';
+}
+
 function htmlSeguimiento() {
   const v = almacen.valoracion();
   const hoy = hoyISO();
@@ -151,15 +159,16 @@ function htmlSeguimiento() {
       </div>
       <input id="importar" class="sr" type="file" accept="application/json,.json">
       <div id="vista-importacion" hidden></div>
-      <p class="discreto">La importación agrega el episodio a los episodios cerrados; nunca reemplaza el episodio en curso. No hay sincronización con ningún servidor.</p>
+      <p class="discreto">La importación agrega el episodio a los episodios archivados con el estado que traía el archivo (abierto o cerrado) y sin cambiar sus fechas; nunca reemplaza el episodio en curso. No hay sincronización con ningún servidor.</p>
     </section>
-    <h2 class="seccion">${icono('archivo')} Episodios cerrados</h2>
+    <h2 class="seccion">${icono('archivo')} Episodios archivados</h2>
+    <p class="discreto">Episodios guardados en este navegador fuera del episodio en curso: los que cerraste y los importados, cada uno con su estado.</p>
     ${archivados.length ? `<ul class="lista-episodios">${archivados.map((e) => {
       const ep = episodioDe(e);
       const f = fechasEvaluacion(e);
       return `
         <li class="tarjeta episodio-arch">
-          <div><span class="ep-codigo chico">${esc(ep.codigo)}</span>${ep.etiqueta ? ` <span class="discreto">${esc(ep.etiqueta)}</span>` : ''}
+          <div><span class="ep-codigo chico">${esc(ep.codigo)}</span> ${chipEstadoEpisodio(ep)}${ep.etiqueta ? ` <span class="discreto">${esc(ep.etiqueta)}</span>` : ''}
             <span class="discreto ep-fechas">${ep.abierto ? `desde ${esc(fechaCorta(ep.abierto))}` : ''}${ep.cerrado ? ` hasta ${esc(fechaCorta(ep.cerrado))}` : ''} · ${plural(e.resultados.length, 'resultado', 'resultados')}${f.length ? ` · ${plural(f.length, 'fecha de evaluación', 'fechas de evaluación')}` : ''}</span></div>
           <div class="ep-acciones">
             <button class="btn btn-chico" type="button" data-abrir-ep="${esc(e.id)}">${icono('carpeta')} Abrir</button>
@@ -169,7 +178,7 @@ function htmlSeguimiento() {
         </li>`;
     }).join('')}</ul>
       <p class="discreto">Se conservan hasta ${MAX_EPISODIOS} episodios en este navegador. Al abrir uno, el episodio en curso pasa a esta lista si tiene contenido.</p>`
-      : '<p class="vacio-texto">Sin episodios cerrados en este navegador.</p>'}`;
+      : '<p class="vacio-texto">Sin episodios archivados en este navegador.</p>'}`;
 }
 
 export function renderSeguimiento() {
@@ -291,7 +300,7 @@ export function montarSeguimiento(rerender, alCambiar) {
           <div class="importacion">
             <p><strong>${esc(r.resumen.codigo)}</strong> · ${plural(r.resumen.resultados, 'resultado', 'resultados')}${r.resumen.fechas.length ? ` · ${esc(r.resumen.fechas.map(fechaCorta).join(', '))}` : ''}</p>
             ${r.avisos.length ? `<ul>${r.avisos.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
-            <button class="btn btn-chico btn-primario" type="button" id="confirmar-importacion">${icono('subir')} Agregar a episodios cerrados</button>
+            <button class="btn btn-chico btn-primario" type="button" id="confirmar-importacion">${icono('subir')} Agregar a episodios archivados</button>
           </div>`;
         const b = $('#confirmar-importacion', caja);
         confirmarEnDosToques(b, {
@@ -301,7 +310,7 @@ export function montarSeguimiento(rerender, alCambiar) {
             const r2 = almacen.importarEpisodio(importable);
             if (!r2.ok) { avisoFallo(r2.motivo); return; }
             redibujar();
-            aviso('Episodio importado a episodios cerrados');
+            aviso('Episodio importado a episodios archivados, con su estado original');
           },
         });
       };

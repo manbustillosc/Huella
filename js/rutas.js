@@ -86,7 +86,7 @@ export const RUTAS = [
   },
   {
     id: 'hospital', nombre: 'Valoración hospitalaria', icono: 'hospital',
-    descripcion: 'Funcionalidad basal y actual, delirium, fragilidad basal, riesgo de lesiones por presión, dolor y nutrición; RASS y CAM-ICU en UCI.',
+    descripcion: 'Funcionalidad basal y actual, delirium, fragilidad basal, riesgo de lesiones por presión, dolor (autorreferido o PAINAD, según la comunicación) y nutrición; RASS y CAM-ICU en UCI.',
     momento: 'ingreso',
     momentos: ['ingreso', 'actual', 'egreso'],
     pasos: [
@@ -95,7 +95,8 @@ export const RUTAS = [
       { id: '4at', nota: 'Tamizaje de delirium; repítelo si cambia el estado mental.' },
       { id: 'cfs', momento: 'basal', nota: 'Fragilidad basal: puntúa el estado de 2 semanas antes del ingreso.' },
       { id: 'braden', nota: 'Riesgo de lesiones por presión.' },
-      { id: 'painad', nota: 'Si la persona no puede comunicar su dolor (demencia avanzada); si puede, registra la intensidad que refiere.' },
+      { id: 'dolorint', eleccion: 'dolor', nota: 'Si la persona puede comunicar su dolor: intensidad referida con la escala numérica o la EVA.' },
+      { id: 'painad', eleccion: 'dolor', nota: 'Si no puede comunicarlo (demencia avanzada u otra incapacidad para comunicarse): conductas observadas con PAINAD.' },
       { id: 'mnasf', nota: 'Tamizaje nutricional.' },
     ],
     complementarios: [
@@ -116,12 +117,15 @@ export const RUTAS = [
       { id: 'downton', nota: 'Riesgo de caídas durante la hospitalización.' },
       { id: 'must', nota: 'Registro del MUST aplicado con la herramienta oficial de BAPEN.' },
       { id: 'norton', nota: 'Alternativa a Braden para el riesgo de lesiones por presión.' },
-      { id: 'dolorint', nota: 'Intensidad del dolor si la persona puede referirlo.' },
       { id: 'lace', nota: 'Al egreso: riesgo de reingreso o muerte a 30 días; reutiliza el Charlson.' },
       { id: 'isarhp', nota: 'Al ingreso: riesgo de deterioro funcional durante la hospitalización (4 preguntas).' },
       { id: 'harp', nota: 'Al ingreso: riesgo de pérdida de autonomía por edad, actividades previas y estado mental.' },
       { id: 'sppicees', nota: 'Detección de síndromes geriátricos: piel, nutrición, dolor, movilidad, confusión, eliminación, apoyo y sueño.' },
     ],
+    // Elección explícita entre pasos alternativos: basta con uno; el otro queda como «no necesario».
+    elecciones: {
+      dolor: { titulo: 'Dolor: elige la escala según la comunicación', nota: 'La valoración autorreferida va primero cuando la persona puede comunicar su dolor; PAINAD es para quien no puede hacerlo. No es necesario aplicar ambas.' },
+    },
     herramientas: [
       { id: 'medicacion', nota: 'Revisión de la medicación al ingreso o al egreso con STOPP/START v3 y Beers 2023.' },
       { id: 'infusiones', nota: 'Sedantes, bloqueo neuromuscular y vasoactivos: velocidad de la bomba, ajuste y bolos.' },

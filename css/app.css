@@ -1258,7 +1258,11 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .estado { flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 26px; padding: 0 var(--space-2); border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; white-space: nowrap; }
 .estado .ico { width: 14px; height: 14px; }
 .estado-completo { background: var(--surface-200); color: var(--green-deep); }
-.estado-omitido { background: var(--surface-300); color: var(--ink-muted); }
+.estado-omitido, .estado-alternativa { background: var(--surface-300); color: var(--ink-muted); }
+.grupo-pasos.eleccion-pasos { display: grid; gap: 2px; text-transform: none; letter-spacing: 0; }
+.grupo-pasos.eleccion-pasos strong { color: var(--ink); font-size: 14px; }
+.grupo-pasos.eleccion-pasos span { font-size: 13px; line-height: 18px; color: var(--ink-muted); font-weight: 400; }
+.tira-eleccion a { font-weight: 600; }
 .estado-pendiente { border: 1px solid var(--line); color: var(--ink-muted); }
 .estado-plan { border: 1px dashed var(--line); color: var(--ink-muted); }
 .paso .btn-icono { margin-right: var(--space-1); }
@@ -1661,6 +1665,15 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .lista-episodios { list-style: none; margin: 0 0 var(--space-3); padding: 0; display: grid; gap: var(--space-2); }
 .episodio-arch { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: 0 !important; }
 .ep-fechas { display: block; margin-top: 2px; }
+.chip-ep { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: var(--radius-pill); font-size: 12px; line-height: 20px; font-weight: 600; border: 1px solid var(--line); vertical-align: 2px; }
+.chip-ep.ep-cerrado { color: var(--ink-muted); background: var(--surface-200); }
+.chip-ep.ep-abierto { color: var(--green-deep); border-color: var(--acento-borde); background: var(--surface-100); }
+dialog.copia-manual { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-100); color: var(--ink); }
+dialog.copia-manual::backdrop { background: rgba(0, 0, 0, 0.45); }
+dialog.copia-manual h2 { margin: 0 0 var(--space-2); font-size: 18px; }
+dialog.copia-manual p { margin: 0 0 var(--space-3); font-size: 14px; line-height: 20px; }
+dialog.copia-manual textarea { width: 100%; box-sizing: border-box; font: 14px/20px var(--font-mono); padding: var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-200); color: var(--ink); resize: vertical; }
+dialog.copia-manual .acciones { margin-top: var(--space-3); }
 .ep-acciones { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .ep-acciones .btn { margin-top: 0 !important; }
 
@@ -1794,6 +1807,38 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .conv .discreto { margin: 0 0 var(--space-3); }
 .conv .salida + .discreto, .conv .tabla-envoltura + .discreto { margin: var(--space-3) 0 0; }
 .infusiones .chips-prep + .campos { margin-top: var(--space-3); }
+.infusiones .chip-prep { min-height: 44px; }
+.infusiones .error-campo { display: block; margin: 2px 0 0; font-size: 13px; line-height: 18px; }
+.infusiones .error-campo[hidden] { display: none; }
+.infusiones .campos { align-items: start; }
+.infusiones .campo > span:first-child { min-height: 18px; }
+.infusiones input[aria-invalid='true'] { border-color: var(--orange-deep); box-shadow: inset 0 0 0 1px var(--orange-deep); }
+.info-rango { flex-basis: 100%; display: flex; align-items: flex-start; gap: 6px; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.info-rango .ico { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.campo-unidad { align-self: end; margin: 0 0 12px; font-size: 14px; color: var(--ink-muted); }
+.perfiles-ficha { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.perfil-ficha { padding: var(--space-2) var(--space-3); border-left: 3px solid var(--acento-borde); background: var(--surface-100); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 14px; line-height: 20px; }
+.perfil-ficha.especializada { border-left-color: var(--orange); }
+.perfil-ficha p { margin: 0; }
+.perfil-ficha p + p { margin-top: 2px; }
+.ficha-farmaco .ficha-sub { padding: var(--space-3) 0 0; margin: 0; }
+.ficha-farmaco .ficha-datos { margin-top: var(--space-3); }
+.chip-fuente { display: inline-block; padding: 0 8px; border-radius: var(--radius-pill); font-size: 12px; line-height: 20px; font-weight: 600; white-space: nowrap; border: 1px solid var(--line); color: var(--ink-muted); background: var(--surface-200); }
+.chip-fuente.fuente-ficha { border-color: var(--acento-borde); color: var(--green-deep); }
+.chip-fuente.fuente-guia { border-color: var(--acento-borde); color: var(--ink); }
+.chip-fuente.fuente-institucional { border-color: var(--orange); color: var(--orange-deep); }
+.pauta-texto { margin: var(--space-3) 0 0; }
+#inf-pauta-desc p { margin: var(--space-2) 0 0; font-size: 15px; line-height: 22px; }
+details.historica { margin-top: var(--space-3); border: 1px dashed var(--line); border-radius: var(--radius-sm); padding: 0 var(--space-3); }
+details.historica summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink-muted); }
+details.historica[open] { padding-bottom: var(--space-3); }
+details.historica .ficha-datos { margin-top: 0; }
+
+/* Texto solo para lectores de pantalla (contexto de botones repetidos). */
+.solo-lector { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+.icope-discordancia { display: flex; gap: 8px; align-items: flex-start; margin: var(--space-2) 0; padding: var(--space-2) var(--space-3); border: 1px solid var(--orange); border-radius: var(--radius-sm); background: var(--surface-100); color: var(--ink); font-size: 14px; line-height: 20px; }
+.icope-discordancia .ico { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--orange-deep); }
+.icope-datos .icope-discordancia { margin: 0; }
 
 /* ---------- Diagramas de flujo (VPO) ---------- */
 .destacada-ruta { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-4) 0 0; padding: var(--space-4); border: 1px solid var(--acento-borde); border-radius: var(--radius-md); background: var(--surface-200); color: var(--ink); text-decoration: none; }
@@ -1839,14 +1884,34 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .ramas { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 16px; margin-top: 18px; }
 .ramas::before { content: ''; position: absolute; left: 24px; top: -18px; height: 18px; border-left: 2px solid var(--line); }
 .rama { min-width: 0; padding-left: 12px; border-left: 2px solid var(--line); transition: opacity 0.15s; }
-.rama-etiqueta { display: inline-flex; align-items: center; min-height: 36px; margin-bottom: 12px; padding: 0 14px; border: 1px solid var(--acento-borde); border-radius: var(--radius-pill); background: var(--surface-100); color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.rama-etiqueta { display: inline-flex; align-items: center; min-height: 44px; min-width: 64px; justify-content: center; margin-bottom: 12px; padding: 0 14px; border: 1px solid var(--acento-borde); border-radius: var(--radius-pill); background: var(--surface-100); color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
 .rama.tono-bien { border-left-color: var(--green); }
 .rama.tono-bien > .rama-etiqueta { border-color: var(--green); }
 .rama.tono-alerta { border-left-color: var(--orange); }
 .rama.tono-alerta > .rama-etiqueta { border-color: var(--orange); }
 .rama.elegida > .rama-etiqueta { background: var(--acento); border-color: var(--acento); color: var(--on-acento); }
 .rama.elegida { border-left-color: var(--acento); }
-.rama.atenuada { opacity: 0.35; }
-.rama.atenuada:hover, .rama.atenuada:focus-within { opacity: 0.75; }
+/* Ramas no elegidas: sin opacidad (el texto conserva su contraste); se distinguen por borde punteado y caja sin relleno.
+   El modo «solo el camino seleccionado» oculta su contenido y deja el botón para cambiar de respuesta. */
+.rama.atenuada { border-left-style: dashed; border-left-color: var(--line); }
+.rama.atenuada > .rama-etiqueta { border-style: dashed; background: transparent; }
+.rama.atenuada .nodo-caja { background: transparent; border-style: dashed; }
+.rama.atenuada .nodo-texto { color: var(--ink-muted); font-weight: 400; }
+.rama.atenuada .nodo-inicio .nodo-caja { background: transparent; color: var(--ink); }
+.solo-camino .rama.atenuada > .flujo { display: none; }
+.solo-camino .rama.atenuada > .rama-etiqueta { margin-bottom: 0; }
+.herramientas-vpo { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 var(--space-4); }
+.herramientas-vpo .btn { min-height: 44px; }
+.herramientas-vpo [aria-pressed='true'] { background: var(--acento); border-color: var(--acento); color: var(--on-acento); }
+.nodo-origen { display: flex; gap: 6px; align-items: flex-start; margin: 8px 0 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.nodo-origen .ico { width: 15px; height: 15px; flex: none; margin-top: 2px; }
+.fuentes-vpo { margin-top: var(--space-4); padding: var(--space-3) var(--space-4); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-200); }
+.fuentes-vpo .ficha-sub { padding: 0; margin: 0 0 var(--space-2); }
+.fuentes-vpo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); font-size: 14px; line-height: 20px; }
+.chip-fuente.origen-lineamiento { border-color: var(--orange); color: var(--orange-deep); }
+.chip-fuente.origen-guia { border-color: var(--acento-borde); color: var(--green-deep); }
+.chip-fuente.origen-propia { border-color: var(--line); color: var(--ink-muted); }
+.documento-vpo { margin-top: var(--space-4); }
+.vpo .chip-escala { min-height: 40px; padding: 0 12px; }
 .rama-etiqueta:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 @media (max-width: 480px) { .nodo-caja { padding: 10px 12px; } .rama { padding-left: 10px; } }

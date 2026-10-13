@@ -4,6 +4,22 @@
 
 export const FUENTE_VPO = 'Instituto Mexicano del Seguro Social, Dirección de Prestaciones Médicas. Lineamiento para Valoración Preoperatoria para Cirugía Electiva no Cardiaca. México: IMSS; agosto 2026.';
 
+// Documento contrastado: el PDF que compartió el médico. No se localizó un enlace público; las páginas son las impresas
+// en el documento (la portada no se numera).
+export const DOCUMENTO_VPO = {
+  cita: FUENTE_VPO,
+  version: 'Fecha de publicación: agosto 2026. Archivo LINEAMIENTO_VPO_27082026_VF.pdf (23 páginas, creado el 27/08/2026).',
+  huella: 'SHA-256 9cff2109…a563bb6d76',
+  enlace: 'Sin enlace público localizado: contrastado con el PDF proporcionado por el médico (no incluido en Huella).',
+};
+
+// Origen de cada contenido: lineamiento institucional, guía internacional o adaptación propia de Huella.
+export const ORIGENES_VPO = {
+  lineamiento: 'Lineamiento institucional (IMSS)',
+  guia: 'Guía internacional',
+  propia: 'Adaptación propia de Huella',
+};
+
 const inicio = (texto, extra = {}) => ({ tipo: 'inicio', texto, ...extra });
 const paso = (texto, extra = {}) => ({ tipo: 'paso', texto, ...extra });
 const alerta = (texto, extra = {}) => ({ tipo: 'alerta', texto, ...extra });
@@ -23,6 +39,11 @@ export const DIAGRAMAS = [
     id: 'general',
     nombre: 'Quién necesita VPO',
     resumen: 'Algoritmo general: clasificación ASA, riesgo del procedimiento y a quién solicitar la VPO.',
+    fuentes: [
+      { origen: 'lineamiento', texto: 'Actividades 1 a 7', paginas: '4' },
+      { origen: 'lineamiento', texto: 'Algoritmo 1. Valoración preoperatoria', paginas: '8' },
+      { origen: 'lineamiento', texto: 'Cuadro 1 (ASA) y cuadro 2 (riesgo del procedimiento)', paginas: '10 y 11' },
+    ],
     nodos: [
       inicio('Persona con indicación de cirugía electiva no cardiaca.'),
       paso('Cirugía hace la evaluación integral.', {
@@ -35,7 +56,10 @@ export const DIAGRAMAS = [
           'Explica el procedimiento, sus alternativas y riesgos.',
         ],
       }),
-      alerta('Sin importar la clase ASA, solicita VPO a Medicina Interna si hay fragilidad, deterioro funcional, multimorbilidad, polifarmacia clínicamente relevante, síndromes geriátricos que requieran optimización o capacidad funcional deficiente (DASI <34).', { escalas: ['cfs', 'dasi'], tono: 'info' }),
+      alerta('Sin importar la clase ASA, solicita VPO a Medicina Interna si hay fragilidad, deterioro funcional, multimorbilidad, polifarmacia clínicamente relevante, síndromes geriátricos que requieran optimización o capacidad funcional deficiente (DASI, cuadro 3).', {
+        escalas: ['cfs', 'dasi'], tono: 'info',
+        origen: 'Lineamiento, actividad 5 (p. 4). Umbral del DASI: la guía AHA/ACC 2024 considera baja una puntuación ≤34; el cuadro 3 del lineamiento usa <34. Solo difieren con 34 exactos.',
+      }),
       paso('Clasificar el estado físico con la ASA y el riesgo del procedimiento.', { escalas: ['asa', 'riesgoqx'] }),
       decision('¿Qué clase ASA tiene?', [
         rama('ASA I o II', [
@@ -67,6 +91,12 @@ export const DIAGRAMAS = [
     id: 'cardio',
     nombre: 'Riesgo cardiovascular',
     resumen: 'Estratificación escalonada: condición cardiaca activa, riesgo del procedimiento, DASI, RCRI y cuándo referir a Cardiología.',
+    fuentes: [
+      { origen: 'lineamiento', texto: 'Actividades 7 a 10 y 15 a 18', paginas: '4 a 6' },
+      { origen: 'lineamiento', texto: 'Algoritmo 2. Valoración preoperatoria por Cardiología', paginas: '9' },
+      { origen: 'lineamiento', texto: 'Cuadro 3 (DASI) y cuadro 4 (RCRI)', paginas: '12 y 13' },
+      { origen: 'guia', texto: 'Guía AHA/ACC 2024 de cirugía no cardiaca, sección 3.2 (capacidad funcional; DASI ≤34)' },
+    ],
     nodos: [
       inicio('Persona con indicación de cirugía electiva no cardiaca.'),
       paso('Identificar el riesgo del procedimiento quirúrgico.', { escalas: ['riesgoqx'] }),
@@ -77,7 +107,16 @@ export const DIAGRAMAS = [
           }),
         ], 'alerta'),
         rama('No', [
-          paso('Evaluar la capacidad funcional con el DASI (≥34 puntos equivale a ≥4 MET).', { escalas: ['dasi'] }),
+          paso('Evaluar y documentar la capacidad funcional con el DASI.', {
+            escalas: ['dasi'],
+            detalle: [
+              'Guía AHA/ACC 2024: capacidad funcional baja con <4 MET o DASI ≤34.',
+              'Lineamiento (cuadro 3): <34 mayor riesgo; ≥34 menor riesgo. Con 34 exactos los criterios difieren y Huella lo señala.',
+              'El umbral de 34 es pronóstico, no una conversión a MET: 34 puntos son ≈6.9 MET estimados con la fórmula de Hlatky.',
+              'Un DASI aislado no indica una prueba de esfuerzo; se integra con el RCRI y el tipo de cirugía.',
+            ],
+            origen: 'Lineamiento, actividad 9 y cuadro 3 (pp. 5 y 12); guía AHA/ACC 2024, sección 3.2.',
+          }),
           paso('Calcular el RCRI y registrar que no es una autorización ni predice todos los riesgos.', { escalas: ['rcri'] }),
           decision('¿Requiere valoración directa por Cardiología?', [
             rama('Sí', [
@@ -112,6 +151,10 @@ export const DIAGRAMAS = [
     id: 'ecg',
     nombre: 'Electrocardiograma',
     resumen: 'Cuándo pedir el ECG y qué hallazgos requieren Cardiología o Urgencias.',
+    fuentes: [
+      { origen: 'lineamiento', texto: 'Cuadro 9 (criterios para solicitar ECG) y cuadro 10 (alteraciones que requieren valoración)', paginas: '18' },
+      { origen: 'lineamiento', texto: 'Recomendaciones sobre estudios de rutina (rendimiento del ECG)', paginas: '7' },
+    ],
     nodos: [
       decision('¿Síntomas o signos cardiovasculares activos?', [
         rama('Sí', [fin('Pedir ECG de 12 derivaciones.')]),
@@ -149,6 +192,11 @@ export const DIAGRAMAS = [
     id: 'estudios',
     nombre: 'Estudios',
     resumen: 'Qué no pedir de rutina y cuándo sí solicitar laboratorio, radiografía o ecocardiograma.',
+    fuentes: [
+      { origen: 'lineamiento', texto: 'Actividades 6 y 12 (estudios complementarios)', paginas: '4 y 5' },
+      { origen: 'lineamiento', texto: 'Ecocardiograma y pruebas cardiológicas (actividades 15 a 18)', paginas: '6' },
+      { origen: 'lineamiento', texto: 'Recomendaciones sobre estudios de rutina', paginas: '7' },
+    ],
     nodos: [
       alerta('No pedir de rutina en personas asintomáticas con cirugía electiva de bajo riesgo.', {
         detalle: [
@@ -170,6 +218,7 @@ export const DIAGRAMAS = [
     id: 'dispositivos',
     nombre: 'Marcapasos y DAI',
     resumen: 'Cuándo enviar a Cardiología o a la clínica de marcapasos antes de la cirugía.',
+    fuentes: [{ origen: 'lineamiento', texto: 'Cuadro 11. Dispositivos de estimulación cardiaca', paginas: '19' }],
     nodos: [
       paso('Ser portador de marcapasos no contraindica la cirugía: el manejo se individualiza según el dispositivo, la dependencia de la estimulación y el procedimiento.'),
       decision('¿Qué dispositivo tiene?', [
@@ -196,6 +245,10 @@ export const DIAGRAMAS = [
     id: 'despues',
     nombre: 'Después de la VPO',
     resumen: 'Segunda valoración, sesión colegiada y cierre con Cirugía.',
+    fuentes: [
+      { origen: 'lineamiento', texto: 'Actividades 14 y 20 (segunda valoración y sesión colegiada)', paginas: '6' },
+      { origen: 'lineamiento', texto: 'Actividades 21 a 25 (cierre con Cirugía)', paginas: '7' },
+    ],
     nodos: [
       decision('¿Hace falta una segunda valoración?', [
         rama('Sí', [fin('Programarla solo para lo que haya que comprobar.')]),
@@ -220,7 +273,8 @@ export const DIAGRAMAS = [
   },
 ];
 
-// Lista de lo que revisa la VPO por Medicina Interna (actividades 8 a 13 del lineamiento).
+// Lista de lo que revisa la VPO por Medicina Interna (actividades 8 a 13 del lineamiento, pp. 5 y 6).
+export const FUENTE_LISTA_VPO = { origen: 'lineamiento', texto: 'Actividades 8 a 13', paginas: '5 y 6' };
 export const LISTA_VPO = [
   { texto: 'Estabilidad de las comorbilidades y síntomas cardiopulmonares.' },
   { texto: 'Capacidad funcional con el DASI.', escalas: ['dasi'] },

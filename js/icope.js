@@ -3,7 +3,7 @@
 // Sin puntaje global: cada dominio se informa por separado (manual ICOPE, OPS 2025).
 import { porId } from './datos.js';
 import { ordenarCronologico, vigenteDe, compararResultados, textoCambio, textoRespectoA, fechaCorta, diasEntre } from './comparacion.js';
-import { valorGuardado } from './nota.js';
+import { valorGuardado, discordanciaCognitiva, DISCORDANCIA_COGNITIVA } from './nota.js';
 import { minusculaInicial } from './motor.js';
 import { planDe, problemaDe, lineasPlan, ESTADOS_PROBLEMA, PRIORIDADES, nombreDe } from './plan.js';
 import { NECESIDADES_ICOPE, LICENCIA_ICOPE } from '../escalas/icope.js';
@@ -26,9 +26,14 @@ export const DOMINIOS_ICOPE = [
       texto: 'Usa una herramienta validada localmente (cuadro 5.1 del manual): elige una según la escolaridad y el idioma; no apliques varias de forma automática.',
       elegir: ['minicog', 'moca', 'rudas'],
       antes: [{ id: '4at', nota: 'Si hay un cambio agudo o fluctuante del estado mental, descarta delirium antes de interpretar la cognición.' }],
+      alternativas: [
+        { id: 'mmse', nota: 'Alternativa si usas la versión mexicana del INGER: registro del puntaje aplicado con el formato oficial (10 min), con ajuste para 3 años o menos de escolaridad. Útil para seguimiento; menos sensible que el MoCA al deterioro leve.' },
+        { id: 'gpcog', nota: 'Alternativa breve de atención primaria: registro con la hoja oficial (4 a 6 min); con 5 a 8 puntos requiere entrevistar a un informante.' },
+      ],
       complementarios: [{ id: 'lawton', nota: 'Repercusión en las actividades instrumentales.' }],
-      planeadas: ['MMSE (registro)', 'GPCOG'],
     },
+    // Tamizajes cognitivos del episodio que, si son positivos con ICOPE conservado, se muestran como discordancia.
+    discordancia: DISCORDANCIA_COGNITIVA,
     intervenciones: [
       { categoria: 'ejercicio', texto: 'Ejercicio físico multimodal, que también favorece la cognición.' },
       { categoria: 'cognicion', texto: 'Estimulación cognitiva o entrenamiento cognitivo si el deterioro es probable.' },
@@ -43,13 +48,12 @@ export const DOMINIOS_ICOPE = [
     detallada: {
       texto: 'El manual usa como ejemplo la SPPB: 0 a 9 puntos, movilidad limitada; 10 a 12, movilidad normal. Si ya está registrada, se reutiliza.',
       elegir: ['sppb'],
-      alternativas: ['velocidad', 'tug'],
+      alternativas: [{ id: 'velocidad' }, { id: 'tug' }],
       complementarios: [
         { id: 'tinetti', nota: 'Equilibrio y marcha por separado si hay caídas o inestabilidad.' },
         { id: 'equilibrio4', nota: 'Equilibrio estático en 4 etapas (CDC STEADI); reutiliza el equilibrio del SPPB.' },
         { id: 'dinamometria', nota: 'Fuerza de prensión, si hay debilidad o sospecha de sarcopenia.' },
       ],
-      planeadas: [],
     },
     intervenciones: [
       { categoria: 'ejercicio', texto: 'Programa de ejercicio multimodal (con supervisión estrecha si la movilidad es limitada).' },
@@ -71,7 +75,7 @@ export const DOMINIOS_ICOPE = [
         { id: 'bucal', nota: 'Problemas para masticar, dolor o prótesis: revisión bucal.' },
         { id: 'eat10', nota: 'Si hay síntomas al tragar: tamizaje de disfagia.' },
       ],
-      planeadas: ['MUST'],
+      alternativas: [{ id: 'must', nota: 'Alternativa citada por el manual: registro del puntaje con la herramienta oficial de BAPEN (requiere IMC, pérdida de peso y efecto de enfermedad aguda). En personas mayores, el MNA-SF es la específica.' }],
     },
     intervenciones: [
       { categoria: 'nutricion', texto: 'Asesoramiento dietético personalizado y registro de los patrones alimentarios.' },
@@ -88,7 +92,6 @@ export const DOMINIOS_ICOPE = [
       texto: 'La evaluación detallada es una evaluación integral visual y ocular por personal capacitado. Huella registra la agudeza visual con las categorías de la OMS; el examen ocular se registra aquí cuando lo tengas.',
       elegir: ['agudeza'],
       externo: 'Evaluación integral visual y ocular',
-      planeadas: [],
     },
     intervenciones: [
       { categoria: 'referencia', texto: 'Referencia para evaluación integral visual y ocular, y revisión de la graduación de las gafas.' },
@@ -105,7 +108,6 @@ export const DOMINIOS_ICOPE = [
       elegir: ['audiometria'],
       complementarios: [{ id: 'hhies', nota: 'Discapacidad auditiva percibida; complementa, no sustituye, a la audiometría.' }],
       externo: 'Otoscopia y audiometría diagnóstica',
-      planeadas: [],
     },
     intervenciones: [
       { categoria: 'referencia', texto: 'Referencia para otoscopia y audiometría diagnóstica.' },
@@ -121,7 +123,6 @@ export const DOMINIOS_ICOPE = [
       texto: 'Evalúa los síntomas depresivos con una herramienta (el manual cita el PHQ-9; la GDS-15 es una alternativa): elige una. Un tamizaje positivo no es un diagnóstico; sigue la guía mhGAP.',
       elegir: ['phq9', 'gds15'],
       complementarios: [{ id: 'cornell', nota: 'Con informante si el deterioro cognitivo impide responder la GDS-15 o el PHQ-9.' }],
-      planeadas: [],
     },
     intervenciones: [
       { categoria: 'mental', texto: 'Manejo del estrés y técnicas de relajación.' },
@@ -134,6 +135,26 @@ export const DOMINIOS_ICOPE = [
   },
 ];
 export const dominioIcope = (id) => DOMINIOS_ICOPE.find((d) => d.id === id) || null;
+
+// Instrumentos del paso 2 de un dominio, con la disponibilidad derivada del catálogo central (porId): lo que existe se
+// ofrece; lo que aún no existe se lista como «próximamente». Así no quedan listas obsoletas.
+export function opcionesDetallada(dom) {
+  const det = dom.detallada;
+  const norm = (x) => (typeof x === 'string' ? { id: x } : x);
+  const proximamente = [];
+  const filtrar = (lista = []) => lista.map(norm).filter((x) => {
+    if (porId[x.id]) return true;
+    proximamente.push(x.nombre || x.id);
+    return false;
+  });
+  return {
+    antes: filtrar(det.antes),
+    elegir: filtrar(det.elegir),
+    alternativas: filtrar(det.alternativas),
+    complementarios: filtrar(det.complementarios),
+    proximamente,
+  };
+}
 
 // Necesidades adicionales (no son dominios de la capacidad intrínseca).
 export const FACTORES = {
@@ -206,6 +227,10 @@ function textoInstrumento(r) {
   return `${e.corto} ${valorGuardado(r)}${extra ? `; ${extra}` : ''} (${fechaCorta(r.fecha)})`;
 }
 
+export function discordanciaDe(dom, v) {
+  return dom.discordancia === DISCORDANCIA_COGNITIVA ? discordanciaCognitiva(v, porId) : null;
+}
+
 // Estado completo de un dominio ICOPE en la valoración en curso.
 export function estadoDominio(dom, v, hoy) {
   const rs = v.resultados.filter((r) => r.escalaId === dom.escala);
@@ -217,9 +242,11 @@ export function estadoDominio(dom, v, hoy) {
   const plan = planDe(v);
   const ambito = ambitoIcope(dom.id);
   const det = dom.detallada;
-  const ids = [...(det.antes || []).map((x) => x.id), ...det.elegir, ...(det.alternativas || []), ...(det.complementarios || []).map((x) => x.id)];
-  const detallada = ids.filter((id) => porId[id]).map((id) => ({ id, r: vigente(v, id) }));
-  const hechas = detallada.filter((x) => x.r && !x.r.noEvaluable && (det.elegir.includes(x.id) || (det.alternativas || []).includes(x.id)));
+  const op = opcionesDetallada(dom);
+  const principales = [...op.elegir, ...op.alternativas].map((x) => x.id);
+  const ids = [...op.antes, ...op.elegir, ...op.alternativas, ...op.complementarios].map((x) => x.id);
+  const detallada = ids.map((id) => ({ id, r: vigente(v, id) }));
+  const hechas = detallada.filter((x) => x.r && !x.r.noEvaluable && principales.includes(x.id));
   const externas = (icopeDe(v).detalle[dom.id] || []).slice().sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
   const problema = problemaDe(plan, ambito);
 
@@ -229,7 +256,7 @@ export function estadoDominio(dom, v, hoy) {
   const fechaTam = vig?.fecha || '';
   const abierto = v.episodio?.abierto || '';
   const candidatos = [
-    ...detallada.filter((x) => x.r && (det.elegir.includes(x.id) || (det.alternativas || []).includes(x.id)))
+    ...detallada.filter((x) => x.r && principales.includes(x.id))
       .map((x) => ({ tipo: 'resultado', id: x.r.id, fecha: x.r.fecha || '', texto: textoInstrumento(x.r), noEvaluable: Boolean(x.r.noEvaluable) })),
     ...externas.map((x) => ({ tipo: 'externa', id: x.id, fecha: x.fecha || '', texto: `${x.prueba} (${fechaCorta(x.fecha)})` })),
   ];
@@ -270,6 +297,10 @@ export function estadoDominio(dom, v, hoy) {
     if (cmp?.ultima) evolucion.push(`${porId[x.id].corto}: ${textoCambio(cmp.ultima.vsRef, textoRespectoA(cmp.ref))}.`);
   }
 
+  // Discordancia: ICOPE conservado con un tamizaje del mismo ámbito positivo en el episodio. Se muestra con instrumento y
+  // fecha; no cambia el estado del dominio, no suma pruebas ni genera un diagnóstico.
+  const discordancia = estado === 'conservado' ? discordanciaDe(dom, v) : null;
+
   const revaloracion = plan.revaloraciones[ambito] || null;
   return {
     dom, ambito, estado, vigente: vig, previo, aplicaciones: lista.length,
@@ -277,7 +308,7 @@ export function estadoDominio(dom, v, hoy) {
     porFiltro: Boolean(vig?.extras?.filtro),
     hallazgo: vig ? hallazgoDe(vig) : '',
     instrumento: vig ? (vig.noEvaluable ? `${porId[dom.escala].corto}: no evaluable` : `${porId[dom.escala].corto}${vig.extras?.filtro ? ' (pregunta de filtro)' : ''}`) : '',
-    detallada, hechas, externas, necesidad, vigencia, evolucion, problema,
+    detallada, hechas, externas, necesidad, vigencia, evolucion, problema, discordancia,
     prioridad: plan.prioridades[ambito] || null,
     objetivos: plan.objetivos.filter((o) => o.ambito === ambito),
     intervenciones: plan.intervenciones.filter((i) => i.ambito === ambito),
@@ -309,6 +340,7 @@ function lineaDominio(x) {
   if (x.estado === 'pendiente') return `- ${x.dom.nombre}: pendiente de evaluación básica.`;
   const partes = [`${ESTADOS_ICOPE[x.estado].nombre.toLowerCase()} (${fechaCorta(x.fecha)}): ${x.hallazgo}`];
   if (x.estado === 'alterado') partes.push(x.necesidad.tipo === 'pendiente' || x.necesidad.tipo === 'detallada' ? 'evaluación detallada pendiente' : minusculaInicial(x.necesidad.texto.replace(/\.$/, '')));
+  if (x.discordancia) partes.push(`aviso: ${minusculaInicial(x.discordancia.texto.replace(/\.$/, ''))}`);
   if (x.problema) partes.push(`valoración del médico: ${nombreDe(ESTADOS_PROBLEMA, x.problema.estado).toLowerCase()}${x.problema.nota ? ` (${x.problema.nota})` : ''}`);
   return `- ${x.dom.nombre}: ${partes.join('; ')}.`;
 }
@@ -347,7 +379,8 @@ export function textoIcope(v, hoy) {
 export function resumenIcope(v, hoy) {
   const estados = estadosIcope(v, hoy).filter((x) => x.estado !== 'pendiente');
   if (!estados.length) return '';
-  return `ICOPE (capacidad intrínseca, sin puntaje global): ${estados.map((x) => `${x.dom.nombre.toLowerCase()} ${ESTADOS_ICOPE[x.estado].nombre.toLowerCase()}`).join(', ')}.`;
+  const avisos = estados.filter((x) => x.discordancia).map((x) => ` Aviso en ${x.dom.nombre.toLowerCase()}: ${minusculaInicial(x.discordancia.texto)}`);
+  return `ICOPE (capacidad intrínseca, sin puntaje global): ${estados.map((x) => `${x.dom.nombre.toLowerCase()} ${ESTADOS_ICOPE[x.estado].nombre.toLowerCase()}`).join(', ')}.${avisos.join('')}`;
 }
 
 export const prioridadTexto = (id) => nombreDe(PRIORIDADES, id);

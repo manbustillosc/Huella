@@ -134,27 +134,74 @@ export function aviso(mensaje) {
   temporizadorAviso = setTimeout(() => el.classList.remove('visible'), 2400);
 }
 
+// Copia al portapapeles y solo anuncia éxito si se pudo confirmar. Si el navegador lo impide, abre un cuadro con el
+// texto seleccionado para copiarlo a mano. Devuelve true si la copia se confirmó.
 export async function copiar(texto, mensaje = 'Copiado al portapapeles') {
+  let ok = false;
   try {
-    await navigator.clipboard.writeText(texto);
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(texto);
+      ok = true;
+    }
   } catch {
+    ok = false;
+  }
+  if (!ok) {
     const ta = document.createElement('textarea');
     ta.value = texto;
     ta.setAttribute('readonly', '');
     ta.style.position = 'fixed';
     ta.style.opacity = '0';
     document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
+    try {
+      ta.select();
+      ok = document.execCommand('copy') === true;
+    } catch {
+      ok = false;
+    } finally {
+      ta.remove();
+    }
   }
-  aviso(mensaje);
+  if (ok) aviso(mensaje);
+  else copiaManual(texto);
+  return ok;
 }
 
-// Botón que pide un segundo toque para confirmar una acción destructiva.
+// Cuadro de copia manual: el texto queda seleccionado para copiarlo con el menú del sistema o el teclado.
+export function copiaManual(texto) {
+  const previo = document.activeElement;
+  $('#copia-manual')?.remove();
+  const d = document.createElement('dialog');
+  d.id = 'copia-manual';
+  d.className = 'copia-manual';
+  d.setAttribute('aria-labelledby', 'copia-manual-t');
+  d.innerHTML = `
+    <h2 id="copia-manual-t">No se pudo copiar automáticamente</h2>
+    <p>El navegador no permitió confirmar la copia. El texto está seleccionado: cópialo con el menú del sistema (mantén presionado y elige «Copiar») o con Ctrl+C / ⌘+C.</p>
+    <textarea readonly rows="8" aria-label="Texto para copiar"></textarea>
+    <div class="acciones"><button class="btn btn-primario" type="button" data-cerrar-copia>${icono('cerrar')} Cerrar</button></div>`;
+  d.querySelector('textarea').value = texto;
+  document.body.appendChild(d);
+  const cerrar = () => { if (d.open && d.close) d.close(); d.remove(); previo?.focus?.(); };
+  d.querySelector('[data-cerrar-copia]').addEventListener('click', cerrar);
+  d.addEventListener('cancel', (ev) => { ev.preventDefault(); cerrar(); });
+  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+  const ta = d.querySelector('textarea');
+  ta.focus();
+  ta.select();
+  aviso('No se pudo copiar: el texto quedó seleccionado para copiarlo a mano');
+}
+
+// Botón que pide un segundo toque para confirmar una acción destructiva. Al confirmar, la etiqueta vuelve a la
+// original antes de ejecutar; la acción anuncia su resultado y, si falla de forma inesperada, se muestra el error.
 export function confirmarEnDosToques(boton, { texto, accion, espera = 4000 }) {
   let armado = null;
   const original = boton.innerHTML;
+  const restaurar = () => {
+    boton.innerHTML = original;
+    boton.classList.remove('armado');
+  };
+  const fallo = (e) => aviso(`No se pudo completar la acción${e?.message ? `: ${e.message}` : ''}. No se hizo ningún cambio adicional.`);
   boton.addEventListener('click', (ev) => {
     if (!armado) {
       ev.preventDefault();
@@ -162,14 +209,18 @@ export function confirmarEnDosToques(boton, { texto, accion, espera = 4000 }) {
       boton.classList.add('armado');
       armado = setTimeout(() => {
         armado = null;
-        boton.innerHTML = original;
-        boton.classList.remove('armado');
+        restaurar();
       }, espera);
       return;
     }
     clearTimeout(armado);
     armado = null;
-    boton.classList.remove('armado');
-    accion(ev);
+    restaurar();
+    try {
+      const r = accion(ev);
+      if (r && typeof r.then === 'function') r.then(null, fallo);
+    } catch (e) {
+      fallo(e);
+    }
   });
 }

@@ -12,16 +12,18 @@ const ESTADOS = {
   completo: ['completo', 'Completo'],
   omitido: ['omitido', 'Omitido'],
   pendiente: ['pendiente', 'Pendiente'],
+  alternativa: ['omitido', 'No necesaria'],
 };
 
 function filaPaso(ruta, p, n) {
+  const num = p.complementario ? '+' : n;
   const [ico, etq] = ESTADOS[p.estado];
   const m = p.momento ? ` · ${momentoDe(p.momento).nombre}` : '';
   const resultado = p.resultado ? `${valorGuardado(p.resultado)}${p.resultado.fecha ? ` · ${etiquetaAplicacion({ ...p.resultado, momento: undefined }).replace(/^del /, '')}` : ''}` : '';
   return `
     <li class="paso ${p.estado}${p.complementario ? ' complementario' : ''}">
       <a class="paso-enlace" href="${urlPaso(ruta, p, p.estado === 'completo')}">
-        <span class="paso-num" aria-hidden="true">${p.complementario ? '+' : n}</span>
+        <span class="paso-num" aria-hidden="true">${num}</span>
         <span class="paso-texto">
           <span class="paso-nombre">${esc(p.escala.corto)}${esc(m)}</span>
           ${p.nota ? `<span class="paso-nota">${esc(p.nota)}</span>` : ''}
@@ -36,12 +38,28 @@ function filaPaso(ruta, p, n) {
 function listaPasos(ruta, pasos) {
   let n = 0;
   let grupo = null;
+  let eleccion = null;
+  let letra = 0;
   const partes = [];
   for (const p of pasos) {
     if (p.grupo && p.grupo !== grupo) {
       grupo = p.grupo;
       partes.push(`<li class="grupo-pasos" aria-hidden="true">${esc(grupo)}</li>`);
     }
+    // Elección explícita: un encabezado con la indicación y los pasos alternativos numerados 6a, 6b…
+    if (p.eleccion && !p.complementario) {
+      if (p.eleccion !== eleccion) {
+        eleccion = p.eleccion;
+        letra = 0;
+        n += 1;
+        const e = ruta.elecciones?.[p.eleccion];
+        partes.push(`<li class="grupo-pasos eleccion-pasos"><strong>${esc(e?.titulo || 'Elige una opción')}</strong>${e?.nota ? `<span>${esc(e.nota)}</span>` : ''}</li>`);
+      }
+      letra += 1;
+      partes.push(filaPaso(ruta, p, `${n}${'abcdefgh'[letra - 1]}`));
+      continue;
+    }
+    eleccion = null;
     n += 1;
     partes.push(filaPaso(ruta, p, n));
   }

@@ -14,7 +14,7 @@ import {
   $, $$, esc, icono, plural, aviso, copiar, botonEstrella, selectorFormato, alCambiarFormato,
   ETIQUETA_COPIAR, movimientoReducido, hoyISO, chipTipo, confirmarEnDosToques,
 } from '../ui.js';
-import { pasosConEstado, siguientePendiente, urlPaso } from './rutas-estado.js';
+import { pasosConEstado, siguientePendiente, urlPaso, unidadesNucleo } from './rutas-estado.js';
 import { hojaDe, guardarHoja, quitarHoja, tamanoLegible, TIPOS_HOJA } from '../documentos.js';
 
 /* ---------- Contexto y direcciones ---------- */
@@ -308,18 +308,25 @@ function tiraRuta(ctx) {
   if (!pa?.actual) return `<a class="migas" href="#/r/${ctx.ruta.id}">${icono('atras')} ${esc(ctx.ruta.nombre)}</a>`;
   const disponibles = pa.pasos.filter((p) => p.estado !== 'plan');
   const nucleo = disponibles.filter((p) => !p.complementario);
+  // Un grupo de elección (p. ej., dolor autorreferido o PAINAD) cuenta como un solo paso.
+  const unidades = unidadesNucleo(nucleo);
   const k = disponibles.indexOf(pa.actual) + 1;
-  const completos = nucleo.filter((p) => p.estado === 'completo').length;
-  const anterior = disponibles[k - 2];
-  const siguiente = disponibles[k];
+  const completos = unidades.filter((u) => u.estado === 'completo').length;
+  const posicion = unidades.findIndex((u) => u.miembros.includes(pa.actual)) + 1;
+  const mismoGrupo = (p) => pa.actual.eleccion && !pa.actual.complementario && p.eleccion === pa.actual.eleccion && !p.complementario;
+  const anterior = disponibles.slice(0, k - 1).reverse().find((p) => !mismoGrupo(p));
+  const siguiente = disponibles.slice(k).find((p) => !mismoGrupo(p));
+  const otras = pa.actual.eleccion && !pa.actual.complementario ? nucleo.filter((p) => p !== pa.actual && mismoGrupo(p)) : [];
+  const eleccion = otras.length ? ctx.ruta.elecciones?.[pa.actual.eleccion] : null;
   return `
     <nav class="tira-ruta" aria-label="Ruta: ${esc(ctx.ruta.nombre)}">
       <div class="tira-cab">
         <a class="tira-nombre" href="#/r/${ctx.ruta.id}">${icono('ruta')} ${esc(ctx.ruta.nombre)}</a>
-        <span class="tira-paso">${pa.actual.complementario ? 'Complementaria' : `Paso ${nucleo.indexOf(pa.actual) + 1} de ${nucleo.length}`} · ${completos} completos</span>
+        <span class="tira-paso">${pa.actual.complementario ? 'Complementaria' : `Paso ${posicion} de ${unidades.length}`} · ${completos} completos</span>
       </div>
-      <div class="tira-barra" aria-hidden="true"><span style="width:${nucleo.length ? (completos / nucleo.length) * 100 : 0}%"></span></div>
+      <div class="tira-barra" aria-hidden="true"><span style="width:${unidades.length ? (completos / unidades.length) * 100 : 0}%"></span></div>
       ${pa.actual.nota ? `<p class="tira-nota">${icono('info')} ${esc(pa.actual.nota)}</p>` : ''}
+      ${otras.length ? `<p class="tira-nota tira-eleccion">${icono('ruta')} <span>${esc(eleccion?.titulo || 'Elige una opción')}: ${otras.map((o) => `<a href="${urlPaso(ctx.ruta, o)}">usar ${esc(o.escala.corto)}</a>`).join(' · ')}${otras.some((o) => o.estado === 'completo') ? ' (ya registrada)' : ''}.</span></p>` : ''}
       <div class="tira-acciones">
         ${anterior ? `<a class="btn btn-chico" href="${urlPaso(ctx.ruta, anterior)}">${icono('atras')} Anterior</a>` : '<span></span>'}
         <button class="btn btn-chico" type="button" id="omitir-paso">${icono('omitir')} Omitir</button>

@@ -75,6 +75,14 @@ export const fmt = (n, decimales = 1) => {
   return String(f);
 };
 
+// Cifra tecleada por la persona: al menos los decimales del campo y nunca menos de los que escribió, para que la
+// respuesta mostrada no cruce un punto de corte (14.01 s no se muestra como «14 s»).
+export const fmtCrudo = (n, decimales = 2) => {
+  if (n == null || Number.isNaN(n)) return '';
+  const escritos = (String(n).split('.')[1] || '').length;
+  return fmt(n, Math.min(Math.max(decimales, escritos), 6));
+};
+
 // Cifra para mostrar: redondea a los decimales pedidos, pero agrega decimales si el redondeo
 // cambiaría la categoría (p. ej., TFG 59.6 no se muestra como «60» si se clasifica como G3a).
 export function mostrarSinCruzar(valor, decimales, clasificar) {
@@ -181,7 +189,7 @@ export function evaluarCampos(escala, r = {}) {
         continue;
       }
       if (requerido) contestadas += 1;
-      desglose.push({ campo: c, respuesta: `${fmt(leido.crudo, c.decimales ?? 2)} ${leido.etiqueta}`.trim(), valor: null, crudo: leido.valor });
+      desglose.push({ campo: c, respuesta: `${fmtCrudo(leido.crudo, c.decimales ?? 2)} ${leido.etiqueta}`.trim(), valor: null, crudo: leido.valor });
     } else if (c.tipo === 'checklist') {
       // Una lista sin marcas queda pendiente: «ninguno» debe confirmarse de forma explícita.
       const crudo = Array.isArray(r[c.id]) ? r[c.id] : [];

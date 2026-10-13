@@ -1,5 +1,5 @@
 // Validación de un episodio importado. Es estricta y no modifica nada: o el archivo completo es válido y se puede
-// agregar a los episodios cerrados, o se rechaza entero con la lista de problemas. Nunca se descartan resultados
+// agregar a los episodios archivados (con su estado original), o se rechaza entero con la lista de problemas. Nunca se descartan resultados
 // en silencio. Cuando un resultado trae sus respuestas, se recalcula con el motor actual y se compara.
 import { calcular, NIVELES, MOMENTOS, FUENTES } from './motor.js';
 import { FORMATO_EXPORTACION, VERSION_EXPORTACION, episodioDe, codigoEpisodio, fechasEvaluacion } from './episodio.js';
