@@ -103,6 +103,7 @@ Estados:
 | Norton | Categorías y puntuación publicadas | Norton, McLaren y Exton-Smith, 1962; sin titular de licencias identificado | Cumple |
 | Intensidad del dolor | Escala numérica y visual analógica | Dominio público | Cumple |
 | Karnofsky | Niveles parafraseados | Karnofsky y Burchenal, 1949; dominio público | Cumple |
+| Riesgo del procedimiento (ESC 2022) | Categorías y procedimientos con redacción propia | Guía ESC 2022; lineamiento de VPO del IMSS (2026) | Cumple |
 | Rankin modificada | Grados con redacción propia, secuencia de preguntas para decidir el grado y figuras originales de Huella | Rankin, 1957; van Swieten, 1988; se reproduce libremente, sin condiciones de uso publicadas | Cumple |
 | PPI | Criterios y puntuación publicados | Morita et al., 1999; sin titular de licencias identificado | Cumple |
 | ASA | Clases resumidas con redacción propia | © American Society of Anesthesiologists | Cumple, confirmar |

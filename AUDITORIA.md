@@ -86,6 +86,15 @@ Fuente: *Guía de instrumentos de evaluación de la capacidad funcional* (INGER,
 | Zarit, Gijón, MNA-SF, SARC-F, CES-D 7, LSNS-6, MUST, GPCOG | Cortes revisados: coinciden con la guía del INGER (en Gijón, con su anexo). |
 | Norton | El texto principal del INGER describe por error la escala de Barthel (0 a 100); Huella conserva la escala original de 5 a 20. |
 
+## Versión 2.9: lineamiento de VPO del IMSS (agosto 2026), 12/10/2026
+
+| Elemento | Revisión |
+|---|---|
+| Escalas del lineamiento | ASA, DASI (<34 = <4 MET), RCRI, ARISCAT, STOP-Bang, Caprini y CFS ya estaban en Huella con los mismos cortes; se agrega el riesgo del procedimiento (ESC 2022). |
+| Riesgo del procedimiento | La ESC 2022 lo define como riesgo a 30 días de muerte cardiovascular, infarto o EVC; el lineamiento lo describe como mortalidad a 30 días. Se conservan «menor» y «mayor» de la ESC en ginecológica, ortopédica y urológica. |
+| Algoritmo 1 | ASA I–II con cirugía de riesgo alto, ASA III con riesgo intermedio o alto y ASA IV controlada → VPO. La rama «enfermedad no controlada» en ASA IV no está explícita en el algoritmo; Huella indica mantener el control antes de la cirugía electiva. |
+| Cuadro 9 | Remite al «cuadro 1» para el riesgo de la cirugía; corresponde al cuadro 2. |
+
 ## Versión 2.8: tabla de infusiones del HG30, 12/10/2026
 
 Revisión de los mL/h impresos contra la dosis y la preparación de la misma tabla:

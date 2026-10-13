@@ -6,6 +6,7 @@ import { $, esc, icono, aviso, botonEstrella, nombreCorto, cuentaDominio } from 
 import { renderMedicacion, montarMedicacion } from './vistas/medicacion.js';
 import { renderInfusiones, montarInfusiones, PESTANAS_INFUSION } from './vistas/infusiones.js';
 import { renderUnidades, montarUnidades, PESTANAS_UNIDADES } from './vistas/unidades.js';
+import { renderVpo, montarVpo, PESTANAS_VPO } from './vistas/vpo.js';
 import { renderIcope, montarIcope, PESTANAS_ICOPE } from './vistas/icope.js';
 import { renderInicio, montarInicio, renderDominio, renderFavoritas } from './vistas/inicio.js';
 import { renderEscala, montarEscala, renderResultado, montarResultado, contexto } from './vistas/escala.js';
@@ -50,6 +51,7 @@ function ruta() {
   if (a === 'medicacion') return { vista: 'medicacion', pestana: ['medicamentos', 'stopp', 'beers', 'resumen'].includes(b) ? b : 'medicamentos' };
   if (a === 'infusiones') return { vista: 'infusiones', pestana: PESTANAS_INFUSION.some(([id]) => id === b) ? b : 'calcular', farmaco: c || null };
   if (a === 'unidades') return { vista: 'unidades', pestana: PESTANAS_UNIDADES.includes(b) ? b : 'lineales' };
+  if (a === 'vpo') return { vista: 'vpo', pestana: PESTANAS_VPO.includes(b) ? b : 'lista' };
   if (a === 'valoracion') return { vista: 'valoracion' };
   if (a === 'plan') return { vista: 'plan' };
   if (a === 'seguimiento') return { vista: 'seguimiento' };
@@ -80,6 +82,7 @@ function render() {
       medicacion: renderMedicacion,
       infusiones: renderInfusiones,
       unidades: renderUnidades,
+      vpo: renderVpo,
       icope: renderIcope,
       favoritas: renderFavoritas,
       acerca: renderAcerca,
@@ -113,6 +116,7 @@ function montar(r) {
   if (r.vista === 'medicacion') montarMedicacion(r, render, navegacion);
   if (r.vista === 'infusiones') montarInfusiones(r);
   if (r.vista === 'unidades') montarUnidades(r);
+  if (r.vista === 'vpo') montarVpo(r);
   if (r.vista === 'icope') montarIcope(r, render, navegacion);
   if (r.vista === 'acerca') montarAcerca(() => { aplicarTema(); navegacion(); }, navegacion);
   if (r.vista === 'plan') montarPlanAtencion(render, navegacion);
@@ -130,6 +134,7 @@ function titulo(r) {
   if (r.vista === 'medicacion') return `Revisión de medicamentos · ${base}`;
   if (r.vista === 'infusiones') return `Infusiones · ${base}`;
   if (r.vista === 'unidades') return `Conversión de unidades · ${base}`;
+  if (r.vista === 'vpo') return `Valoración preoperatoria · ${base}`;
   if (r.vista === 'icope') return `Valoración ICOPE · ${base}`;
   if (r.vista === 'favoritas') return `Favoritas · ${base}`;
   if (r.vista === 'acerca') return `Acerca de · ${base}`;
@@ -206,6 +211,7 @@ function renderNavegacion(r) {
   if (r.vista === 'medicacion') { tituloBarra = 'Medicamentos'; atras = '#/d/polifarmacia'; }
   if (r.vista === 'infusiones') { tituloBarra = 'Infusiones'; atras = '#/d/calculadoras'; }
   if (r.vista === 'unidades') { tituloBarra = 'Conversión de unidades'; atras = '#/d/calculadoras'; }
+  if (r.vista === 'vpo') { tituloBarra = 'VPO'; atras = '#/r/preqx'; }
   if (r.vista === 'icope') tituloBarra = 'ICOPE';
   if (r.vista === 'favoritas') tituloBarra = 'Favoritas';
   if (r.vista === 'acerca') tituloBarra = 'Acerca de';
@@ -228,12 +234,12 @@ function renderNavegacion(r) {
     : `<a class="btn-icono" href="${atras}" aria-label="Regresar">${icono('atras')}</a>
        <span class="barra-titulo">${esc(tituloBarra)}</span>
        ${almacen.estadoGuardado().estado === 'guardado' ? '' : senalGuardado('barra')}
-       ${esEscala ? botonEstrella(r.id) : ['medicacion', 'infusiones', 'unidades'].includes(r.vista) ? botonEstrella(r.vista) : ''}`;
+       ${esEscala ? botonEstrella(r.id) : ['medicacion', 'infusiones', 'unidades', 'vpo'].includes(r.vista) ? botonEstrella(r.vista) : ''}`;
 
   const tab = (href, ico, texto, activo, extra = '') =>
     `<a href="${href}"${activo ? ' class="activo" aria-current="page"' : ''}>${icono(ico)}<span>${texto}</span>${extra}</a>`;
   $('#pestanas').innerHTML = `
-    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion', 'infusiones', 'unidades', 'icope', 'favoritas', 'catalogo', 'pendientes'].includes(r.vista))}
+    ${tab('#/', 'inicio', 'Inicio', ['inicio', 'dominio', 'escala', 'resultado', 'acerca', 'ruta', 'medicacion', 'infusiones', 'unidades', 'vpo', 'icope', 'favoritas', 'catalogo', 'pendientes'].includes(r.vista))}
     ${tab('#/valoracion', 'valoracion', 'Valoración', r.vista === 'valoracion', nVal ? `<span class="insignia">${nVal}</span>` : '')}
     ${tab('#/plan', 'plan', 'Plan', ['plan', 'seguimiento'].includes(r.vista))}
     ${tab('#/informe', 'documento', 'Informes', r.vista === 'informe')}`;

@@ -124,6 +124,7 @@ export const EJEMPLOS = {
   dolorint: () => resp('dolorint', { escala: 'Numérica (0 a 10)', en: 6, contexto: 'Con el movimiento' }),
   karnofsky: () => resp('karnofsky', { nivel: '50 %' }),
   rankin: () => resp('rankin', { grado: '3 · Discapacidad moderada' }),
+  riesgoqx: () => resp('riesgoqx', { categoria: 'Riesgo intermedio (1 a 5 %)' }),
   ppi: () => resp('ppi', { pps: '30 a 50 %', ingesta: 'Moderadamente reducida (más que unos bocados)', edema: 'Presente', disnea: 'Ausente', delirium: 'Ausente' }),
   asa: () => resp('asa', { clase: 'ASA III · Enfermedad sistémica grave', urgencia: 'No' }),
   lsns6: () => resp('lsns6', { fam_ve: 'Dos', fam_privado: 'Uno', fam_ayuda: 'Uno', ami_ve: 'Uno', ami_privado: 'Ninguno', ami_ayuda: 'Uno' }),

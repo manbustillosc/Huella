@@ -95,6 +95,12 @@ export function renderRuta({ id }) {
           : `<a class="btn btn-primario" href="${urlPaso(ruta, sig)}">${icono('iniciar')} ${p.completos + p.omitidos ? `Continuar con ${esc(sig.escala.corto)}` : 'Comenzar'}</a>`}
         ${p.completos && !terminado ? `<a class="btn" href="#/valoracion">${icono('valoracion')} Ver la nota</a>` : ''}
       </div>
+      ${ruta.destacada ? `
+        <a class="destacada-ruta" href="${herramientaDe(ruta.destacada.id).href}">
+          ${icono('ruta')}
+          <span><strong>${esc(ruta.destacada.texto)}</strong><span>${esc(ruta.destacada.nota)}</span></span>
+          ${icono('adelante', 'chev')}
+        </a>` : ''}
       <h2 class="seccion">Núcleo</h2>
       <ol class="pasos">${listaPasos(ruta, nucleo)}</ol>
       ${p.complementarios.length ? `

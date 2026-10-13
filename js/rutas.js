@@ -202,8 +202,12 @@ export const RUTAS = [
       { id: 'fried', nota: 'Fenotipo de fragilidad si se dispone de dinamómetro y del recorrido de 4.57 m.' },
       { id: 'charlson', nota: 'Carga de comorbilidad; se informa por separado, no se combina con los riesgos quirúrgicos.' },
       { id: 'asa', nota: 'Estado físico preoperatorio de la ASA; no incluye la edad ni la fragilidad.' },
+      { id: 'riesgoqx', nota: 'Riesgo inherente al tipo de cirugía (ESC 2022); junto con la ASA define si hace falta VPO y ECG.' },
+      { id: 'stopbang', nota: 'Tamizaje de apnea obstructiva del sueño (registro del puntaje oficial).' },
       { id: 'caprini', nota: 'Riesgo de tromboembolia venosa y tromboprofilaxis sugerida, sin dosis.' },
     ],
+    destacada: { id: 'vpo', texto: 'Diagramas de flujo de la VPO', nota: 'Qué hacer y qué pedir según el lineamiento del IMSS (2026): quién necesita VPO, riesgo cardiovascular, ECG, estudios y dispositivos.' },
+    herramientas: [{ id: 'vpo', nota: 'Diagramas de flujo del lineamiento de VPO del IMSS (2026).' }],
   },
   {
     id: 'paliativa', nombre: 'Valoración paliativa', icono: 'paliativos',

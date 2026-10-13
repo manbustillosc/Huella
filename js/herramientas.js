@@ -37,6 +37,18 @@ export const HERRAMIENTAS = [
     aliases: ['convertir', 'unidades', 'mEq', 'mmol', 'mcg', 'gotas', 'goteo', 'SI', 'mg/dL', 'Fahrenheit', 'libras', 'proporcion 1:1000'],
     problemas: ['dosificación', 'electrolitos', 'laboratorio'],
   },
+  {
+    id: 'vpo',
+    nombre: 'Diagramas de la valoración preoperatoria (VPO)',
+    corto: 'Diagramas de VPO',
+    dominio: 'prequirurgica',
+    tipo: 'diagnostico',
+    href: '#/vpo',
+    descripcion: 'Qué hacer y qué pedir en cirugía electiva no cardiaca: quién necesita VPO, riesgo cardiovascular, ECG, estudios, marcapasos y DAI, y cierre (lineamiento del IMSS, 2026).',
+    tiempo: 'Consulta',
+    aliases: ['VPO', 'valoracion preoperatoria', 'preoperatorio', 'flujograma', 'algoritmo', 'electrocardiograma', 'marcapasos', 'DAI', 'cardiologia', 'IMSS'],
+    problemas: ['valoración preoperatoria', 'cirugía no cardiaca', 'riesgo cardiovascular perioperatorio'],
+  },
 ];
 export const herramientaDe = (id) => HERRAMIENTAS.find((h) => h.id === id) || null;
 export const herramientasDe = (dominioId) => HERRAMIENTAS.filter((h) => h.dominio === dominioId);

@@ -60,6 +60,7 @@ import ariscat from './ariscat.js';
 import dasi from './dasi.js';
 import pps from './pps.js';
 import rankin from './rankin.js';
+import riesgoqx from './riesgoqx.js';
 import {
   icopeCognicion, icopeLocomotora, icopeVitalidad, icopeVision, icopeAudicion, icopePsicologica, icopeFactores,
 } from './icope.js';
@@ -93,7 +94,7 @@ export const ESCALAS = [
   braden, norton,
   painad, dolorIntensidad,
   charlson, cirsg, news2, lace, isarhp, harp, sppicees,
-  rcri, ariscat, dasi, asa, caprini,
+  rcri, ariscat, dasi, asa, riesgoqx, caprini,
   pps, karnofsky, ppi, esasr, spict, necpal,
   icopeFactores, zarit, gijon, lsns6, soledad3, mos, oars, diazveiga, barreras, maltrato,
   ckdepi, cockcroft, mme,

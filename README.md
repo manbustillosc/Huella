@@ -169,6 +169,11 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - Huella recalcula cada velocidad y señala dónde los mL/h impresos no coinciden con la dosis (propofol, midazolam, rocuronio en 100 kg y la dosis impresa de adrenalina).
 - **Conversión de unidades** (`#/unidades`): masa, volumen, concentración, presión, longitud, tiempo, temperatura, diluciones 1:1000, velocidad de dosis, goteo, electrolitos (mg, mmol y mEq; contenido por gramo de sal) y laboratorio en unidades SI.
 
+## Diagramas de la valoración preoperatoria (versión 2.9)
+
+- **Diagramas de VPO** (`#/vpo`), destacados en la valoración prequirúrgica: lista de lo que revisa Medicina Interna y seis diagramas de flujo basados en el lineamiento del IMSS para cirugía electiva no cardiaca (agosto 2026): quién necesita VPO (ASA × riesgo del procedimiento, fragilidad y síndromes geriátricos), riesgo cardiovascular escalonado y cuándo referir a Cardiología o a Urgencias, cuándo pedir ECG y qué hallazgos lo requieren, estudios que no se piden de rutina, marcapasos y DAI, y segunda valoración y sesión colegiada. Al tocar una respuesta se resalta el camino; los nodos enlazan a los instrumentos.
+- Nuevo instrumento: **riesgo del procedimiento quirúrgico** (ESC 2022, cuadro 2 del lineamiento). STOP-Bang y el riesgo del procedimiento se agregan a las complementarias de la valoración prequirúrgica. Total: 110 instrumentos.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.
