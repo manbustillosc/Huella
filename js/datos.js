@@ -4,7 +4,7 @@ import { DOMINIOS } from './dominios.js';
 import { RUTAS, pasosDe } from './rutas.js';
 import { normalizarEscala } from './motor.js';
 
-export const VERSION = '2.10.0';
+export const VERSION = '2.10.1';
 export const escalas = ESCALAS.map(normalizarEscala);
 export const porId = Object.fromEntries(escalas.map((e) => [e.id, e]));
 export const escalasDe = (dominioId) => escalas.filter((e) => e.dominio === dominioId);
