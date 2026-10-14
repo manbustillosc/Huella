@@ -85,7 +85,7 @@ test('BIS en rutas y en la revisión de medicamentos', () => {
 test('HbA1c → glucosa promedio (ADAG): coincide con la tabla publicada de 5 a 12 %', () => {
   const publicada = { 5: 97, 6: 126, 7: 154, 8: 183, 9: 212, 10: 240, 11: 269, 12: 298 };
   for (const [a1c, mgdl] of Object.entries(publicada)) assert.equal(Math.round(eagDeA1c(Number(a1c))), mgdl, `${a1c} %`);
-  assert.equal(mgdlAMmol(eagDeA1c(7)).toFixed(1), '8.6');
+  for (const [a1c, mmol] of [[5, '5.4'], [6, '7.0'], [7, '8.6'], [8, '10.2'], [9, '11.8'], [10, '13.4'], [11, '14.9'], [12, '16.5']]) assert.equal(mgdlAMmol(eagDeA1c(a1c)).toFixed(1), mmol, `${a1c} % en mmol/L`);
   cerca(a1cDeEag(eagDeA1c(7.3)), 7.3, 1e-9);
   cerca(mmolAMgdl(mgdlAMmol(154)), 154, 1e-9);
   assert.deepEqual(TABLA_EAG.map((x) => x.a1c), [5, 6, 7, 8, 9, 10, 11, 12]);

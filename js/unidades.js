@@ -195,12 +195,12 @@ export const ureaABun = (urea) => urea / 2.1428;
 
 /* ---------- HbA1c y glucosa promedio ---------- */
 // ADAG (Nathan, Diabetes Care 2008; 507 personas, R² 0.84): glucosa promedio estimada (eAG) = 28.7 × A1C − 46.7 mg/dL.
-// En mmol/L se usa el mismo factor que la glucosa del laboratorio (÷ 18.016), equivalente a 1.59 × A1C − 2.59.
+// En mmol/L se divide entre 18, como la tabla de glucosa promedio estimada de la ADA (p. ej., 9 % = 11.8 y 10 % = 13.4).
 export const EAG = { pendiente: 28.7, intercepto: -46.7 };
 // Se calcula en décimas (287 × A1C − 467) / 10 para que, p. ej., 6 % dé 125.5 exacto y redondee a 126 como la tabla.
 export const eagDeA1c = (a1c) => (Number.isFinite(a1c) ? (287 * a1c - 467) / 10 : null);
 export const a1cDeEag = (mgdl) => (Number.isFinite(mgdl) ? (mgdl - EAG.intercepto) / EAG.pendiente : null);
-export const GLUCOSA_MMOL = 18.016;
+export const GLUCOSA_MMOL = 18;
 export const mgdlAMmol = (mgdl) => (Number.isFinite(mgdl) ? mgdl / GLUCOSA_MMOL : null);
 export const mmolAMgdl = (mmol) => (Number.isFinite(mmol) ? mmol * GLUCOSA_MMOL : null);
 // HbA1c en % (NGSP/DCCT) ↔ mmol/mol (IFCC), con la ecuación maestra: IFCC = (NGSP − 2.15) × 10.929.
