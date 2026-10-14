@@ -234,7 +234,7 @@ function renderNavegacion(r) {
     : `<a class="btn-icono" href="${atras}" aria-label="Regresar">${icono('atras')}</a>
        <span class="barra-titulo">${esc(tituloBarra)}</span>
        ${almacen.estadoGuardado().estado === 'guardado' ? '' : senalGuardado('barra')}
-       ${esEscala ? botonEstrella(r.id) : ['medicacion', 'infusiones', 'unidades', 'vpo'].includes(r.vista) ? botonEstrella(r.vista) : ''}`;
+       ${esEscala ? botonEstrella(r.id) : ['medicacion', 'infusiones', 'unidades', 'vpo'].includes(r.vista) ? botonEstrella(r.vista === 'unidades' && r.pestana === 'glucemia' ? 'glucemia' : r.vista) : ''}`;
 
   const tab = (href, ico, texto, activo, extra = '') =>
     `<a href="${href}"${activo ? ' class="activo" aria-current="page"' : ''}>${icono(ico)}<span>${texto}</span>${extra}</a>`;

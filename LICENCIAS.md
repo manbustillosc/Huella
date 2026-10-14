@@ -90,7 +90,8 @@ Estados:
 | PPS | Registro del nivel | Victoria Hospice; la integración en software requiere permiso | Cumple, confirmar |
 | Zarit | Registro | Mapi Research Trust | Cumple |
 | Gijón | Reactivos, adaptación mexicana del INGER | INGER | Ver versión del INGER |
-| CKD-EPI 2021, Cockcroft-Gault | Fórmulas | Referencias citadas | Cumple |
+| CKD-EPI 2021, BIS1 y BIS2 (BIS), Cockcroft-Gault | Fórmulas publicadas | Referencias citadas | Cumple |
+| HbA1c y glucosa promedio (ADAG, GMI) | Ecuaciones publicadas | Nathan et al., 2008; Bergenstal et al., 2018 | Cumple |
 | FAQ de Pfeffer | Actividades del cuestionario con redacción en español propia | Pfeffer et al., 1982; sin titular de licencias identificado | Cumple |
 | GDS de Reisberg | Registro del estadio con descripciones breves propias | © B. Reisberg | Cumple (solo registro) |
 | Fluencia semántica | Consigna e interpretación del INGER (menos de −1 DE por edad y escolaridad); medias, DE y percentiles de Chávez-Oliveros (2015) citados como datos | Prueba de dominio público | Cumple |

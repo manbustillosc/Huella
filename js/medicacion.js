@@ -62,7 +62,7 @@ export function lineaMedicamento(m) {
 }
 
 // Función renal usada en la revisión: { tfg: { valor, fecha, fuente }, depuracion: { valor, fecha, fuente } }.
-const FUENTES_RENAL = { ckdepi: 'CKD-EPI 2021', cockcroft: 'Cockcroft-Gault', manual: 'registrada manualmente' };
+const FUENTES_RENAL = { ckdepi: 'CKD-EPI 2021', bis: 'BIS', cockcroft: 'Cockcroft-Gault', manual: 'registrada manualmente' };
 const fechaDMA = (f) => (f ? f.split('-').reverse().join('/') : '');
 export function textoRenal(r) {
   if (!r) return '';

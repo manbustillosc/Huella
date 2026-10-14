@@ -2,6 +2,7 @@
 import {
   GRUPOS_LINEALES, convertirLineal, cAF, fAC, proporcionAMgMl, mgMlAProporcion, FACTORES_GOTEO, mlhAGotas, gotasAMlh,
   UNIDADES_VELOCIDAD, convertirVelocidad, IONES, SALES, contenidoSal, convertirIon, ANALITOS, bunAUrea, ureaABun, fmtConv,
+  eagDeA1c, a1cDeEag, mgdlAMmol, mmolAMgdl, ngspAIfcc, ifccANgsp, gmiDeGlucosaMedia, RANGO_TABLA_ADAG, TABLA_EAG, LIMITES_GLUCEMIA,
 } from '../unidades.js';
 
 const fmtNum = fmtConv;
@@ -21,6 +22,7 @@ const SECCIONES = [
   ['dosis', 'Dosis y goteo'],
   ['electrolitos', 'Electrolitos'],
   ['laboratorio', 'Laboratorio'],
+  ['glucemia', 'HbA1c y glucosa promedio'],
 ];
 
 function tarjetaLineal(g) {
@@ -125,17 +127,61 @@ function panelLaboratorio() {
     </section>`;
 }
 
+function panelGlucemia() {
+  return `
+    <section class="tarjeta conv" aria-labelledby="t-a1c">
+      <h2 class="titulo-tarjeta" id="t-a1c">HbA1c ↔ glucosa promedio estimada</h2>
+      <p class="discreto">Escribe cualquiera de los cuatro valores; los demás se calculan. Relación del estudio ADAG: glucosa promedio = 28.7 × HbA1c − 46.7 mg/dL.</p>
+      <div class="campos campos-conv campos-a1c">
+        ${entrada('v-a1c', 'HbA1c (%)', '7')}
+        ${entrada('v-ifcc', 'HbA1c (mmol/mol)', '')}
+        ${entrada('v-eag', 'Glucosa promedio (mg/dL)', '')}
+        ${entrada('v-eag-mmol', 'Glucosa promedio (mmol/L)', '')}
+      </div>
+      <p class="aviso-inline" id="e-a1c" role="status" hidden></p>
+      <p class="resultado-a1c" id="s-a1c" aria-live="polite"></p>
+    </section>
+    <section class="tarjeta conv" aria-labelledby="t-gmi">
+      <h2 class="titulo-tarjeta" id="t-gmi">GMI desde el monitor continuo</h2>
+      <p class="discreto">El indicador de manejo de la glucosa (GMI) estima la HbA1c a partir de la glucosa media de un monitor continuo: GMI (%) = 3.31 + 0.02392 × glucosa media (mg/dL).</p>
+      <div class="campos campos-conv">${entrada('v-gmi-mgdl', 'Glucosa media del monitor (mg/dL)', '')}${entrada('v-gmi-mmol', 'Glucosa media del monitor (mmol/L)', '')}</div>
+      <p class="aviso-inline" id="e-gmi" role="status" hidden></p>
+      <p class="resultado-a1c" id="s-gmi" aria-live="polite"></p>
+    </section>
+    <section class="tarjeta" aria-labelledby="t-tabla-a1c">
+      <h2 class="titulo-tarjeta" id="t-tabla-a1c">Tabla de equivalencias</h2>
+      <div class="tabla-envoltura"><table class="tabla">
+        <thead>
+          <tr><th scope="colgroup" colspan="2">HbA1c</th><th scope="colgroup" colspan="2" class="num-col">Glucosa promedio</th></tr>
+          <tr><th scope="col">%</th><th scope="col" class="num-col">mmol/mol</th><th scope="col" class="num-col">mg/dL</th><th scope="col" class="num-col">mmol/L</th></tr>
+        </thead>
+        <tbody>${TABLA_EAG.map((x) => `<tr><th scope="row">${x.a1c}</th><td class="num-col">${Math.round(x.ifcc)}</td><td class="num-col">${Math.round(x.mgdl)}</td><td class="num-col">${x.mmol.toFixed(1)}</td></tr>`).join('')}</tbody>
+      </table></div>
+      <p class="discreto">Calculada con la ecuación de ADAG y la ecuación maestra IFCC–NGSP.</p>
+    </section>
+    <section class="tarjeta" aria-labelledby="t-a1c-notas">
+      <h2 class="titulo-tarjeta" id="t-a1c-notas">Al interpretar</h2>
+      <ul class="lista-notas">
+        <li>La glucosa promedio estimada es un promedio poblacional: la de cada persona puede ser mayor o menor con la misma HbA1c (en ADAG, R² 0.84).</li>
+        <li>La HbA1c puede no reflejar la glucemia con anemia o hemorragia reciente, transfusión, hemólisis, hemoglobinopatías, enfermedad renal crónica avanzada o diálisis, eritropoyetina o tratamiento de la anemia ferropénica.</li>
+        <li>El GMI y la HbA1c del laboratorio pueden diferir en la misma persona; la diferencia no indica un error de ninguno de los dos.</li>
+        <li>La conversión entre % y mmol/mol solo cambia la unidad; no cambia el resultado.</li>
+      </ul>
+      <p class="nota-seguridad">${icono('libro')} <span>Nathan DM et al. Translating the A1C assay into estimated average glucose values. Diabetes Care. 2008;31(8):1473-8 (doi 10.2337/dc08-0545). Bergenstal RM et al. Glucose Management Indicator (GMI). Diabetes Care. 2018;41(11):2275-80 (doi 10.2337/dc18-1581).</span></p>
+    </section>`;
+}
+
 export const PESTANAS_UNIDADES = SECCIONES.map(([id]) => id);
 
 export function renderUnidades({ pestana }) {
-  const panel = { lineales: panelLineales, dosis: panelDosis, electrolitos: panelElectrolitos, laboratorio: panelLaboratorio }[pestana]();
+  const panel = { lineales: panelLineales, dosis: panelDosis, electrolitos: panelElectrolitos, laboratorio: panelLaboratorio, glucemia: panelGlucemia }[pestana]();
   return `
     <section class="vista unidades">
       <a class="migas" href="#/d/calculadoras">${icono('atras')} Calculadoras</a>
       <header class="cabecera">
         <p class="ceja">Calculadoras · Calculadora clínica</p>
         <h1>Conversión de unidades</h1>
-        <p class="entradilla">Escribe un valor y elige su unidad: Huella lo convierte a las demás. Referencia rápida para masa, volumen, concentración, dosis, goteo, electrolitos y laboratorio.</p>
+        <p class="entradilla">Escribe un valor y elige su unidad: Huella lo convierte a las demás. Referencia rápida para masa, volumen, concentración, dosis, goteo, electrolitos, laboratorio y HbA1c.</p>
       </header>
       <nav class="pestanas-med" aria-label="Secciones de conversión">
         ${SECCIONES.map(([id, nombre]) => `<a href="#/unidades/${id}"${id === pestana ? ' aria-current="page" class="activo"' : ''}>${esc(nombre)}</a>`).join('')}
@@ -225,5 +271,54 @@ export function montarUnidades({ pestana }) {
       else escribir('v-bun', v('v-urea') == null ? null : ureaABun(v('v-urea')));
     });
     escribir('v-urea', bunAUrea(20));
+  }
+
+  if (pestana === 'glucemia') {
+    // Lee un campo con sus límites: número válido, o null con el mensaje de error.
+    const leer = (id, lim, nombre) => {
+      const t = String($(`#${id}`)?.value ?? '').trim();
+      if (t === '') return { valor: null };
+      const n = numero(t);
+      if (n == null || /^-/.test(t)) return { valor: null, error: `${nombre}: escribe solo un número positivo.` };
+      if (n < lim.min || n > lim.max) return { valor: null, error: `${nombre}: fuera del rango posible (${lim.min} a ${lim.max}).` };
+      return { valor: n };
+    };
+    const mostrarError = (id, msg) => { const e = $(`#${id}`); e.hidden = !msg; e.textContent = msg || ''; };
+    const glucemia = (origen) => {
+      const L = LIMITES_GLUCEMIA;
+      const campos = { 'v-a1c': ['a1c', 'HbA1c (%)'], 'v-ifcc': ['ifcc', 'HbA1c (mmol/mol)'], 'v-eag': ['mgdl', 'Glucosa promedio (mg/dL)'], 'v-eag-mmol': ['mmol', 'Glucosa promedio (mmol/L)'] };
+      const [clave, nombre] = campos[origen];
+      const r = leer(origen, L[clave], nombre);
+      mostrarError('e-a1c', r.error);
+      let a1c = null;
+      if (r.valor != null) a1c = clave === 'a1c' ? r.valor : clave === 'ifcc' ? ifccANgsp(r.valor) : clave === 'mgdl' ? a1cDeEag(r.valor) : a1cDeEag(mmolAMgdl(r.valor));
+      const eag = a1c == null ? null : eagDeA1c(a1c);
+      const valores = { 'v-a1c': a1c, 'v-ifcc': a1c == null ? null : ngspAIfcc(a1c), 'v-eag': eag, 'v-eag-mmol': eag == null ? null : mgdlAMmol(eag) };
+      for (const [id, x] of Object.entries(valores)) {
+        if (id === origen) continue;
+        const el = $(`#${id}`);
+        el.value = x == null ? '' : id === 'v-a1c' ? x.toFixed(1) : id === 'v-eag-mmol' ? x.toFixed(1) : String(Math.round(x));
+      }
+      const s = $('#s-a1c');
+      if (a1c == null || eag == null || eag <= 0) { s.innerHTML = ''; if (a1c != null && eag <= 0) mostrarError('e-a1c', 'Con ese valor la ecuación da una glucosa promedio de cero o negativa: está fuera de lo que describe.'); return; }
+      const fuera = a1c < RANGO_TABLA_ADAG.min || a1c > RANGO_TABLA_ADAG.max;
+      const desde = clave === 'a1c' || clave === 'ifcc';
+      s.innerHTML = `<strong>HbA1c ${esc(a1c.toFixed(1))} % (${esc(String(Math.round(ngspAIfcc(a1c))))} mmol/mol) ≈ glucosa promedio de ${esc(String(Math.round(eag)))} mg/dL (${esc(mgdlAMmol(eag).toFixed(1))} mmol/L).</strong>${desde ? '' : ' <span class="discreto">HbA1c equivalente según ADAG; si la glucosa media viene de un monitor continuo, usa el GMI.</span>'}${fuera ? ` <span class="aviso-a1c">${icono('alerta')} Fuera del intervalo de la tabla de ADAG (${RANGO_TABLA_ADAG.min} a ${RANGO_TABLA_ADAG.max} %): es una extrapolación.</span>` : ''}`;
+    };
+    const ids = ['v-a1c', 'v-ifcc', 'v-eag', 'v-eag-mmol'];
+    ids.forEach((id) => $(`#${id}`).addEventListener('input', () => glucemia(id)));
+    glucemia('v-a1c');
+    const gmi = (origen) => {
+      const L = LIMITES_GLUCEMIA;
+      const esMg = origen === 'v-gmi-mgdl';
+      const r = leer(origen, esMg ? L.mgdl : L.mmol, esMg ? 'Glucosa media (mg/dL)' : 'Glucosa media (mmol/L)');
+      mostrarError('e-gmi', r.error);
+      const mgdl = r.valor == null ? null : esMg ? r.valor : mmolAMgdl(r.valor);
+      const otro = $(esMg ? '#v-gmi-mmol' : '#v-gmi-mgdl');
+      otro.value = mgdl == null ? '' : esMg ? mgdlAMmol(mgdl).toFixed(1) : String(Math.round(mgdl));
+      const g = gmiDeGlucosaMedia(mgdl);
+      $('#s-gmi').innerHTML = g == null ? '' : `<strong>GMI ${esc(g.toFixed(1))} % (${esc(String(Math.round(ngspAIfcc(g))))} mmol/mol)</strong> con una glucosa media de ${esc(String(Math.round(mgdl)))} mg/dL.`;
+    };
+    ['v-gmi-mgdl', 'v-gmi-mmol'].forEach((id) => $(`#${id}`).addEventListener('input', () => gmi(id)));
   }
 }

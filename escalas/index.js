@@ -45,6 +45,7 @@ import rcri from './rcri.js';
 import zarit from './zarit.js';
 import ckdepi from './ckdepi.js';
 import cockcroft from './cockcroft.js';
+import bis from './bis.js';
 import rudas from './rudas.js';
 import cdr from './cdr.js';
 import fast from './fast.js';
@@ -97,5 +98,5 @@ export const ESCALAS = [
   rcri, ariscat, dasi, asa, riesgoqx, caprini,
   pps, karnofsky, ppi, esasr, spict, necpal,
   icopeFactores, zarit, gijon, lsns6, soledad3, mos, oars, diazveiga, barreras, maltrato,
-  ckdepi, cockcroft, mme,
+  ckdepi, cockcroft, bis, mme,
 ];

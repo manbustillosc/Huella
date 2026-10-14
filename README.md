@@ -183,6 +183,11 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **Robustez**: la copia solo anuncia éxito si se confirmó (si no, abre un cuadro con el texto seleccionado); las confirmaciones de dos toques restauran su etiqueta y muestran el error si la acción falla. «Episodios archivados» muestra el estado de cada episodio (cerrado o abierto, p. ej., importado sin cerrar) sin inventar fechas.
 - **Ruta hospitalaria**: el dolor es una elección explícita entre la escala numérica/EVA (si la persona puede comunicarlo) y PAINAD (si no puede); el grupo cuenta como un solo paso.
 
+## TFG con BIS y HbA1c a glucosa promedio (versión 2.10)
+
+- **BIS1 y BIS2** (Berlin Initiative Study; Schaeffner, 2012): TFG estimada derivada en personas de 70 años o más. BIS1 usa creatinina; si se agrega cistatina C se calcula BIS2, que define la categoría KDIGO. Avisa si la persona tiene menos de 70 años, reutiliza la creatinina de un CKD-EPI o Cockcroft-Gault guardado y puede usarse como TFG en la revisión de medicamentos. Está en Calculadoras (función renal) y en las complementarias de la valoración hospitalaria. Total: 111 instrumentos.
+- **HbA1c y glucosa promedio** (`#/unidades/glucemia`): HbA1c en % o mmol/mol ↔ glucosa promedio estimada en mg/dL o mmol/L (ADAG: 28.7 × HbA1c − 46.7), GMI a partir de la glucosa media de un monitor continuo, tabla de equivalencias de 5 a 12 % y situaciones en que la HbA1c no refleja la glucemia.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

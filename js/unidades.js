@@ -192,3 +192,24 @@ export const ANALITOS = [
 // Urea ↔ BUN (mg/dL): urea = BUN × 2.14.
 export const bunAUrea = (bun) => bun * 2.1428;
 export const ureaABun = (urea) => urea / 2.1428;
+
+/* ---------- HbA1c y glucosa promedio ---------- */
+// ADAG (Nathan, Diabetes Care 2008; 507 personas, R² 0.84): glucosa promedio estimada (eAG) = 28.7 × A1C − 46.7 mg/dL.
+// En mmol/L se usa el mismo factor que la glucosa del laboratorio (÷ 18.016), equivalente a 1.59 × A1C − 2.59.
+export const EAG = { pendiente: 28.7, intercepto: -46.7 };
+// Se calcula en décimas (287 × A1C − 467) / 10 para que, p. ej., 6 % dé 125.5 exacto y redondee a 126 como la tabla.
+export const eagDeA1c = (a1c) => (Number.isFinite(a1c) ? (287 * a1c - 467) / 10 : null);
+export const a1cDeEag = (mgdl) => (Number.isFinite(mgdl) ? (mgdl - EAG.intercepto) / EAG.pendiente : null);
+export const GLUCOSA_MMOL = 18.016;
+export const mgdlAMmol = (mgdl) => (Number.isFinite(mgdl) ? mgdl / GLUCOSA_MMOL : null);
+export const mmolAMgdl = (mmol) => (Number.isFinite(mmol) ? mmol * GLUCOSA_MMOL : null);
+// HbA1c en % (NGSP/DCCT) ↔ mmol/mol (IFCC), con la ecuación maestra: IFCC = (NGSP − 2.15) × 10.929.
+export const ngspAIfcc = (pct) => (Number.isFinite(pct) ? (pct - 2.15) * 10.929 : null);
+export const ifccANgsp = (mmolmol) => (Number.isFinite(mmolmol) ? mmolmol / 10.929 + 2.15 : null);
+// GMI (Bergenstal, Diabetes Care 2018): HbA1c estimada a partir de la glucosa media del monitor continuo.
+export const gmiDeGlucosaMedia = (mgdl) => (Number.isFinite(mgdl) ? 3.31 + 0.02392 * mgdl : null);
+// Intervalo de la tabla publicada de ADAG; fuera de él la relación es una extrapolación.
+export const RANGO_TABLA_ADAG = { min: 5, max: 12 };
+export const TABLA_EAG = [5, 6, 7, 8, 9, 10, 11, 12].map((a1c) => ({ a1c, ifcc: ngspAIfcc(a1c), mgdl: eagDeA1c(a1c), mmol: mgdlAMmol(eagDeA1c(a1c)) }));
+// Límites de captura (valores fuera de ellos son errores de captura, no resultados posibles).
+export const LIMITES_GLUCEMIA = { a1c: { min: 3, max: 20 }, ifcc: { min: 9, max: 195 }, mgdl: { min: 20, max: 1000 }, mmol: { min: 1.1, max: 55.5 } };

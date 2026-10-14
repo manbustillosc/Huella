@@ -47,6 +47,7 @@ const G = [
     ? `TFG estimada en categoría KDIGO ${b.id} (${b.rango} mL/min/1.73 m²). No indica enfermedad renal crónica sin marcadores de daño renal.`
     : `TFG estimada en categoría KDIGO ${b.id} (${b.rango} mL/min/1.73 m²). ${ERC}`,
 }));
+export const BANDAS_TFG = G;
 const porG = Object.fromEntries(G.map((b) => [b.id, b]));
 const gDeEtiqueta = (etiqueta) => String(etiqueta || '').split(' ')[0];
 

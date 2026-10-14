@@ -106,6 +106,7 @@ export const RUTAS = [
       { id: 'rankin', momento: 'basal', nota: 'Discapacidad previa (Rankin premórbido), sobre todo en EVC.' },
       { id: 'rankin', nota: 'Discapacidad global en el momento elegido, para compararla con la previa.' },
       { id: 'ckdepi', nota: 'Función renal: categoría KDIGO de la TFG estimada.' },
+      { id: 'bis', nota: 'TFG estimada derivada en personas de 70 años o más; BIS2 si hay cistatina C.' },
       { id: 'cockcroft', nota: 'Depuración de creatinina para dosificar fármacos.' },
       { id: 'rass', nota: 'Nivel de agitación o sedación; en UCI es el paso previo del CAM-ICU.' },
       { id: 'camicu', nota: 'Solo en UCI o con ventilación mecánica; no es intercambiable con el CAM.' },
@@ -243,15 +244,17 @@ export const RUTAS = [
   },
   {
     id: 'calculadoras', nombre: 'Calculadoras clínicas', icono: 'calculadoras',
-    descripcion: 'Función renal (la TFG estimada clasifica la enfermedad renal; la depuración de creatinina se usa para dosificar) y carga de opioides en equivalentes de morfina.',
+    descripcion: 'Función renal (la TFG estimada clasifica la enfermedad renal: CKD-EPI 2021 o BIS en 70 años o más; la depuración de creatinina se usa para dosificar) y carga de opioides en equivalentes de morfina.',
     pasos: [
       { id: 'ckdepi', grupo: 'Función renal', nota: 'TFG estimada indexada (mL/min/1.73 m²): categoría KDIGO; no confirma enfermedad renal crónica por sí sola.' },
+      { id: 'bis', grupo: 'Función renal', nota: 'TFG estimada para personas de 70 años o más: BIS1 con creatinina; BIS2 con creatinina y cistatina C.' },
       { id: 'cockcroft', grupo: 'Función renal', nota: 'Depuración de creatinina (mL/min): la estimación que piden muchas fichas técnicas para dosificar.' },
       { id: 'mme', grupo: 'Opioides', nota: 'Carga total de opioides en MME/día (CDC 2022); no calcula dosis para cambiar de opioide.' },
     ],
     herramientas: [
       { id: 'infusiones', nota: 'Velocidad de la bomba para la dosis que quieres, dosis de una velocidad, ajuste, titulación y bolos.' },
       { id: 'unidades', nota: 'Conversión de masa, volumen, concentración, dosis, goteo, electrolitos y laboratorio.' },
+      { id: 'glucemia', nota: 'HbA1c a glucosa promedio estimada (ADAG), HbA1c en % y mmol/mol, y GMI del monitor continuo.' },
     ],
   },
 ];

@@ -73,7 +73,7 @@ test('evaluación cognitiva: primero delirium, luego tamizaje y evaluación, con
 test('calculadoras: función renal agrupada', () => {
   const calc2 = RUTAS.find((r) => r.id === 'calculadoras');
   const renal = pasosDe(calc2).filter((p) => p.grupo === 'Función renal').map((p) => p.id);
-  assert.deepEqual(renal, ['ckdepi', 'cockcroft']);
+  assert.deepEqual(renal, ['ckdepi', 'bis', 'cockcroft']);
 });
 
 test('progreso: omitir, retomar y continuar desde donde quedó', () => {

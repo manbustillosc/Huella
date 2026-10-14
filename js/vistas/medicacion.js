@@ -38,7 +38,7 @@ function candidatoRenal(id) {
 }
 
 function bloqueRenal(m) {
-  const filas = [['ckdepi', 'tfg', 'TFGe (CKD-EPI 2021)'], ['cockcroft', 'depuracion', 'Depuración de creatinina (Cockcroft-Gault)']].map(([id, campo, nombre]) => {
+  const filas = [['ckdepi', 'tfg', 'TFGe (CKD-EPI 2021)'], ['bis', 'tfg', 'TFGe (BIS, 70 años o más)'], ['cockcroft', 'depuracion', 'Depuración de creatinina (Cockcroft-Gault)']].map(([id, campo, nombre]) => {
     const r = candidatoRenal(id);
     if (!r) return `<li class="vinculo sin-dato">${icono('pendiente')}<div><strong>${esc(nombre)}</strong><span>Sin registro de ${esc(porId[id].corto)} en esta valoración.</span></div></li>`;
     const dias = r.fecha ? diasEntre(r.fecha, hoyISO()) : 0;
@@ -276,7 +276,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       const res = candidatoRenal(id);
       if (!res) return;
       const m = leer();
-      m.renal = { ...(m.renal || {}), [id === 'ckdepi' ? 'tfg' : 'depuracion']: { valor: Math.round(res.valor), fecha: res.fecha || null, fuente: id } };
+      m.renal = { ...(m.renal || {}), [id === 'cockcroft' ? 'depuracion' : 'tfg']: { valor: Math.round(res.valor), fecha: res.fecha || null, fuente: id } };
       guardar(m);
       rerender();
       aviso('Función renal tomada de esta valoración');
