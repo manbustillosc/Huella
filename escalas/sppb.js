@@ -42,7 +42,7 @@ export default {
   id: 'sppb',
   nombre: 'Batería Corta de Desempeño Físico (SPPB)',
   corto: 'SPPB',
-  dominio: 'fragilidad',
+  dominio: 'desempeno',
   tipo: 'desempeno',
   aliases: ['Guralnik', 'short physical performance battery', 'equilibrio', 'marcha', 'levantarse de la silla'],
   problemas: ['fragilidad', 'sarcopenia', 'caídas', 'movilidad', 'ejercicio', 'Vivifrail'],

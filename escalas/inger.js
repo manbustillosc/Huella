@@ -548,3 +548,252 @@ export const barreras = {
   licencia: { texto: 'Formato del anexo 35 de la guía de instrumentos del INGER (2022); barreras resumidas con redacción propia.', enlace: GUIA },
   referencias: [refInger(35, 'Evaluación de las barreras del entorno físico y movilidad')],
 };
+
+/* ---------- SpRMBPC: lista revisada de problemas de memoria y comportamiento ---------- */
+// Anexo 42 de la guía del INGER (2022). 24 situaciones: cuántas veces ocurrieron en la última semana y cuánto afectaron
+// a quien cuida. Interpretación cualitativa (sin puntos de corte). Subescalas del original (Teri, 1992), que en el orden
+// del formato del INGER quedan juntas: memoria 1–7, conducta disruptiva 8–15 y depresión 16–24 (incluye ansiedad).
+
+export const SUBESCALAS_RMBPC = [
+  { id: 'memoria', nombre: 'Memoria', desde: 1, hasta: 7 },
+  { id: 'disruptiva', nombre: 'Conducta disruptiva', desde: 8, hasta: 15 },
+  { id: 'depresion', nombre: 'Depresión', desde: 16, hasta: 24 },
+];
+
+// [texto del formato del INGER (mayúsculas y erratas corregidas), texto corto para el resultado]
+export const SITUACIONES_RMBPC = [
+  ['Que el/la paciente pregunte muchas veces lo mismo', 'pregunta muchas veces lo mismo'],
+  ['Que tenga problemas para acordarse cosas recientes (por ejemplo, noticias del diario o de la televisión)', 'olvida cosas recientes'],
+  ['Que tenga problemas para acordarse cosas relevantes del pasado', 'olvida cosas relevantes del pasado'],
+  ['Que pierda cosas o no sepa dónde las pone', 'pierde cosas o no sabe dónde las pone'],
+  ['Que se olvide qué día es', 'olvida qué día es'],
+  ['Que empiece algo y no lo termine', 'empieza cosas y no las termina'],
+  ['Que haya tenido dificultad para concentrarse en una tarea', 'dificultad para concentrarse en una tarea'],
+  ['Que destruya cosas', 'destruye cosas'],
+  ['Que haya hecho cosas que a usted lo/a incomodaron o avergonzaron', 'hace cosas que incomodan o avergüenzan a quien cuida'],
+  ['Que lo/a despierte a usted o a otros miembros de la familia durante la noche', 'despierta a la familia durante la noche'],
+  ['Que hable en voz alta y aceleradamente', 'habla en voz alta y aceleradamente'],
+  ['Que haya tenido comportamientos que potencialmente pueden ser peligrosos para él/ella o para otras personas', 'comportamientos potencialmente peligrosos'],
+  ['Que haya amenazado con lastimar a otras personas', 'amenaza con lastimar a otras personas'],
+  ['Que haya estado agresivo/a verbalmente con otras personas', 'agresividad verbal'],
+  ['Que discuta, esté irritable o quejoso/a', 'discute, está irritable o se queja'],
+  ['Que parezca ansioso/a o preocupado/a', 'ansiedad o preocupación'],
+  ['Que haya amenazado con lastimarse', 'amenaza con lastimarse'],
+  ['Que parezca estar triste o deprimido/a', 'tristeza o ánimo deprimido'],
+  ['Que haya manifestado sentimientos de desesperanza o tristeza sobre el futuro (por ejemplo, «Nada vale la pena» o «Nunca hago nada bien»)', 'desesperanza sobre el futuro'],
+  ['Que llore o lloriquee', 'llanto'],
+  ['Que hable de su propia muerte o la de otras personas (por ejemplo, «No vale la pena vivir la vida» o «Sería mejor estar muerto/a»)', 'habla de su propia muerte o la de otras personas'],
+  ['Que comente que se siente solo/a', 'dice sentirse solo/a'],
+  ['Que comente que se siente inútil o una carga para los otros', 'dice sentirse inútil o una carga'],
+  ['Que comente que se siente un fracaso o que no ha tenido ningún logro en su vida', 'dice sentirse un fracaso'],
+].map(([texto, corto], i) => ({ n: i + 1, texto, corto, subescala: SUBESCALAS_RMBPC.find((s) => i + 1 >= s.desde && i + 1 <= s.hasta).id }));
+
+export const FRECUENCIA_RMBPC = ['Nunca', 'Ocurrió, pero no en la última semana', '1 o 2 veces en la última semana', '3 a 6 veces en la última semana', 'Todos los días'];
+export const REACCION_RMBPC = ['Nada', 'Un poco', 'Moderadamente', 'Mucho', 'Muchísimo'];
+const NO_SE = { texto: 'No sé', valor: 9, especial: true };
+// Situaciones que obligan a valorar la seguridad aunque hayan ocurrido antes de la última semana.
+const RMBPC_AUTOLESION = [17, 21];
+const RMBPC_PELIGRO = [12, 13];
+
+// La reacción se pregunta solo si la situación ocurrió (en la última semana o antes).
+const ocurrio = (r, n) => {
+  const i = r[`f${n}`];
+  return i != null && i !== '' && Number(i) >= 1 && Number(i) <= 4;
+};
+
+const RMBPC_SIN = {
+  id: 'sin', rango: 'Ninguna en la última semana', etiqueta: 'Sin problemas de memoria o comportamiento en la última semana', nivel: 'bien',
+  texto: 'Quien cuida no refiere ninguna de las 24 situaciones en la última semana.', sugerencias: [],
+};
+const RMBPC_CON = {
+  id: 'con', rango: 'Una o más en la última semana', etiqueta: 'Problemas de memoria o comportamiento en la última semana', nivel: 'moderado', hallazgo: true,
+  texto: 'Quien cuida refiere situaciones de memoria, conducta o ánimo en la última semana. La interpretación es cualitativa: qué situaciones ocurren, con qué frecuencia y cuánto le afectan; no hay punto de corte.',
+  sugerencias: [
+    'Buscar desencadenantes tratables de los cambios de conducta o de ánimo: dolor, delirium, infección, estreñimiento, fármacos, déficit sensorial y cambios en el entorno o la rutina.',
+    'Empezar por las situaciones que más afectan a quien cuida: explicar su relación con la enfermedad y acordar estrategias no farmacológicas concretas para cada una.',
+    'Valorar la sobrecarga de quien cuida (Zarit) y los apoyos disponibles: respiro, grupos de apoyo y Trabajo Social.',
+  ],
+};
+const RMBPC_NS = {
+  id: 'ns', rango: 'Todas «No sé»', etiqueta: 'Sin información suficiente de quien cuida', nivel: 'neutro',
+  texto: 'Quien cuida no supo responder ninguna situación; no se interpreta. Busca a otra persona que conviva con el paciente.', sugerencias: [],
+};
+
+export const sprmbpc = {
+  id: 'sprmbpc',
+  nombre: 'Lista en español revisada de verificación de problemas de memoria y comportamiento (SpRMBPC)',
+  corto: 'SpRMBPC',
+  dominio: 'social',
+  tipo: 'evaluacion',
+  aliases: ['RMBPC', 'Revised Memory and Behavior Problems Checklist', 'Memory and Behavior Problems Checklist', 'problemas de memoria y comportamiento', 'problemas de conducta', 'cuidador', 'Teri', 'síntomas conductuales', 'SCPD'],
+  problemas: ['demencia', 'cuidador', 'conducta', 'agitación', 'depresión', 'sobrecarga del cuidador'],
+  descripcion: '24 situaciones de memoria, conducta y ánimo: cuántas veces ocurrieron en la última semana y cuánto afectaron a quien cuida. Interpretación cualitativa.',
+  objetivo: 'Verificar con qué frecuencia ocurren algunas conductas en una persona mayor con problemas de memoria y cuánto afectan a la persona que la cuida.',
+  poblacion: 'Cuidadores de personas con deterioro cognitivo o demencia. Versión en español validada en 92 díadas paciente-cuidador en Buenos Aires (Salvia et al., 2011); incluida en la guía de instrumentos del INGER (2022).',
+  aplicacion: [
+    'Aplícala a la persona que cuida y convive con el paciente, en un espacio privado. Consigna del INGER: «Voy a leer una serie de situaciones de las cuales le voy a pedir que me señale cómo siente que le afecta y qué tan frecuente ocurre esta situación».',
+    'Para cada situación, pregunta cuántas veces ocurrió en la última semana; si ocurrió (en la última semana o antes), pregunta cuánto le afectó a la persona que cuida.',
+    '«No sé» se registra como tal y no entra en las sumas.',
+    'Son datos de quien cuida: no anotes su nombre.',
+  ],
+  tiempo: '20 min',
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'menor frecuencia de los problemas referidos',
+  textoEmpeoramiento: 'mayor frecuencia de los problemas referidos',
+  barra: false,
+  min: 0,
+  max: 96,
+  rotuloCifra: 'frecuencia',
+  siguientes: [
+    { id: 'zarit', si: (res) => !res.noEvaluable && res.extras?.reaccion > 0, motivo: 'Quien cuida refiere que estas situaciones le afectan: valora su sobrecarga.' },
+    { id: 'npiq', si: (res) => !res.noEvaluable && res.extras?.semana?.disruptiva > 0, motivo: 'Conductas disruptivas: caracteriza los síntomas neuropsiquiátricos y su gravedad.' },
+    { id: 'cornell', si: (res) => !res.noEvaluable && res.extras?.semana?.depresion > 0, motivo: 'Síntomas afectivos referidos: valora depresión con informante.' },
+  ],
+  campos: SITUACIONES_RMBPC.flatMap((s) => {
+    const sub = SUBESCALAS_RMBPC.find((x) => x.desde === s.n);
+    return [
+      {
+        id: `f${s.n}`, texto: s.texto, textoCorto: s.corto, puntua: false,
+        ...(sub ? { grupo: `${sub.nombre} (situaciones ${sub.desde} a ${sub.hasta})` } : {}),
+        ...(sub ? { ayuda: '¿Cuántas veces ocurrió en la última semana?' } : {}),
+        opciones: [...FRECUENCIA_RMBPC.map((t, i) => ({ texto: t, valor: i })), { ...NO_SE }],
+      },
+      {
+        id: `a${s.n}`, texto: '¿Cuánto le afectó a usted?', textoDesglose: 'Cuánto le afectó a quien cuida', textoAccesible: `(situación ${s.n})`,
+        anidado: true, puntua: false, visibleSi: (r) => ocurrio(r, s.n),
+        opciones: [...REACCION_RMBPC.map((t, i) => ({ texto: t, valor: i })), { ...NO_SE }],
+      },
+    ];
+  }),
+  bandas: [RMBPC_SIN, RMBPC_CON, RMBPC_NS],
+  calcular({ v }) {
+    const items = SITUACIONES_RMBPC.map((s) => {
+      const f = v[`f${s.n}`];
+      const a = v[`a${s.n}`];
+      const fNoSe = Boolean(f?.especial);
+      const ocurre = !fNoSe && f.valor >= 1;
+      return { ...s, f: fNoSe ? null : f.valor, fTexto: f.texto, fNoSe, a: ocurre && !a?.especial ? a.valor : null, aTexto: ocurre ? a.texto : null, aNoSe: ocurre && Boolean(a?.especial) };
+    });
+    const semana = Object.fromEntries(SUBESCALAS_RMBPC.map((x) => [x.id, 0]));
+    const frecuencia = Object.fromEntries(SUBESCALAS_RMBPC.map((x) => [x.id, 0]));
+    const reaccionSub = Object.fromEntries(SUBESCALAS_RMBPC.map((x) => [x.id, 0]));
+    for (const it of items) {
+      if (it.f != null) frecuencia[it.subescala] += it.f;
+      if (it.f != null && it.f >= 2) semana[it.subescala] += 1;
+      if (it.a != null) reaccionSub[it.subescala] += it.a;
+    }
+    const enSemana = items.filter((x) => x.f != null && x.f >= 2);
+    const antes = items.filter((x) => x.f === 1);
+    const diarias = items.filter((x) => x.f === 4);
+    const afectan = items.filter((x) => x.a != null && x.a >= 3).sort((x, y) => y.a - x.a || x.n - y.n);
+    const noSeF = items.filter((x) => x.fNoSe);
+    const noSeA = items.filter((x) => x.aNoSe);
+    const totalF = Object.values(frecuencia).reduce((s, x) => s + x, 0);
+    const totalR = Object.values(reaccionSub).reduce((s, x) => s + x, 0);
+    const lista = (xs) => xs.map((x) => `${x.corto} (${x.n})`).join(', ');
+    const nSub = (id) => SUBESCALAS_RMBPC.find((x) => x.id === id);
+    const tam = (id) => nSub(id).hasta - nSub(id).desde + 1;
+
+    const lineas = [];
+    const alertas = [];
+    const autolesion = items.filter((x) => RMBPC_AUTOLESION.includes(x.n) && x.f != null && x.f >= 1);
+    if (autolesion.length) {
+      alertas.push(`Quien cuida refiere ${lista(autolesion)}: pregunta directamente a la persona por ideas de muerte o de suicidio y valora el riesgo hoy.`);
+    }
+    const peligro = items.filter((x) => RMBPC_PELIGRO.includes(x.n) && x.f != null && x.f >= 1);
+    if (peligro.length) {
+      alertas.push(`Quien cuida refiere ${lista(peligro)}: revisa la seguridad de la persona y de quienes conviven con ella (acceso a armas, medicamentos, cocina y vehículo) y descarta delirium, dolor u otra causa aguda.`);
+    }
+    lineas.push(`En la última semana: ${enSemana.length} de 24 situaciones (memoria ${semana.memoria}/7, conducta disruptiva ${semana.disruptiva}/8, depresión ${semana.depresion}/9).`);
+    if (diarias.length) lineas.push(`Todos los días: ${lista(diarias)}.`);
+    if (afectan.length) lineas.push(`Afectan mucho o muchísimo a quien cuida: ${afectan.map((x) => `${x.corto} (${x.n}, ${REACCION_RMBPC[x.a].toLowerCase()})`).join(', ')}.`);
+    if (antes.length) lineas.push(`Ocurrieron, pero no en la última semana: ${lista(antes)}.`);
+    lineas.push(`Sumas descriptivas, sin punto de corte: frecuencia ${totalF}/96 (memoria ${frecuencia.memoria}/28, conducta disruptiva ${frecuencia.disruptiva}/32, depresión ${frecuencia.depresion}/36); reacción de quien cuida ${totalR}/96 (memoria ${reaccionSub.memoria}/28, conducta disruptiva ${reaccionSub.disruptiva}/32, depresión ${reaccionSub.depresion}/36).`);
+    if (noSeF.length) lineas.push(`No supo la frecuencia de ${noSeF.length === 1 ? '1 situación' : `${noSeF.length} situaciones`}: ${lista(noSeF)}; no entran en las sumas.`);
+    if (noSeA.length) lineas.push(`No supo cuánto le afectó en ${noSeA.length === 1 ? '1 situación' : `${noSeA.length} situaciones`}: ${lista(noSeA)}.`);
+    // En pantalla, las alertas van en su recuadro; en el texto para el expediente, al principio.
+    const lineasNota = [...alertas, ...lineas];
+
+    const conocidas = items.length - noSeF.length;
+    let banda = enSemana.length ? RMBPC_CON : RMBPC_SIN;
+    if (!conocidas) banda = RMBPC_NS;
+
+    const filaItem = (x) => [`${x.n}. ${x.corto.charAt(0).toUpperCase()}${x.corto.slice(1)}`, x.fNoSe ? 'No sé' : x.fTexto, x.aTexto ?? '—'];
+    const detalles = [{
+      titulo: 'Por subescala',
+      encabezados: ['Subescala', 'En la última semana', 'Frecuencia', 'Reacción'],
+      filas: SUBESCALAS_RMBPC.map((x) => [x.nombre, `${semana[x.id]} de ${tam(x.id)}`, `${frecuencia[x.id]}/${tam(x.id) * 4}`, `${reaccionSub[x.id]}/${tam(x.id) * 4}`]),
+    }];
+    for (const sub of SUBESCALAS_RMBPC) {
+      const filas = items.filter((x) => x.subescala === sub.id && (x.fNoSe || x.f >= 1)).map(filaItem);
+      if (filas.length) detalles.push({ titulo: `${sub.nombre}: situaciones referidas`, encabezados: ['Situación', 'Frecuencia', 'Le afectó'], filas });
+    }
+
+    return {
+      banda,
+      puntaje: totalF,
+      max: 96,
+      sufijo: '/ 96 de frecuencia',
+      lineas,
+      lineasNota,
+      alertas,
+      detalles,
+      extras: {
+        enSemana: enSemana.map((x) => x.n),
+        antes: antes.map((x) => x.n),
+        semana,
+        frecuencia,
+        reaccionSub,
+        reaccion: totalR,
+        afectan: afectan.map((x) => x.n),
+        noSe: noSeF.map((x) => x.n),
+        seguridad: [...autolesion, ...peligro].map((x) => x.n),
+      },
+    };
+  },
+  resumen(res) {
+    const e = res.extras;
+    if (res.banda.id === 'ns') return 'SpRMBPC: quien cuida no supo responder ninguna situación; no se interpreta.';
+    const ns = e.noSe.length ? `; ${e.noSe.length} sin respuesta («No sé»)` : '';
+    if (!e.enSemana.length) return `SpRMBPC: ninguna situación de memoria o comportamiento en la última semana (frecuencia ${res.puntaje}/96; reacción de quien cuida ${e.reaccion}/96${ns}).`;
+    return `SpRMBPC: ${e.enSemana.length} de 24 situaciones en la última semana (memoria ${e.semana.memoria}, conducta disruptiva ${e.semana.disruptiva}, depresión ${e.semana.depresion}); frecuencia ${res.puntaje}/96; reacción de quien cuida ${e.reaccion}/96${ns}.`;
+  },
+  resumenBreve(res) {
+    const e = res.extras;
+    if (res.banda.id === 'ns') return 'SpRMBPC sin información';
+    return `SpRMBPC ${e.enSemana.length}/24 en la última semana, frecuencia ${res.puntaje}/96, reacción ${e.reaccion}/96`;
+  },
+  detalleEnResumen: true,
+  cambioExtra(antes, despues) {
+    const a = antes.extras;
+    const d = despues.extras;
+    if (!a?.enSemana || !d?.enSemana) return [];
+    const corto = (n) => `${SITUACIONES_RMBPC[n - 1].corto} (${n})`;
+    const nuevas = d.enSemana.filter((n) => !a.enSemana.includes(n));
+    const resueltas = a.enSemana.filter((n) => !d.enSemana.includes(n));
+    const out = [];
+    if (a.reaccion !== d.reaccion) out.push(`Reacción de quien cuida de ${a.reaccion} a ${d.reaccion} de 96.`);
+    if (nuevas.length) out.push(`Situaciones nuevas en la última semana: ${nuevas.map(corto).join(', ')}.`);
+    if (resueltas.length) out.push(`Situaciones que ya no ocurrieron en la última semana: ${resueltas.map(corto).join(', ')}.`);
+    if (a.noSe.length !== d.noSe.length) out.push(`Respuestas «No sé»: ${a.noSe.length} antes y ${d.noSe.length} ahora; las sumas no son del todo comparables.`);
+    return out;
+  },
+  notas: [
+    'Interpretación cualitativa (guía del INGER, 2022): identifica qué situaciones ocurren, con qué frecuencia y cuánto afectan a la persona que cuida. No hay puntos de corte.',
+    'Subescalas del instrumento original (Teri et al., 1992), que en el orden del formato del INGER quedan juntas: memoria (situaciones 1 a 7), conducta disruptiva (8 a 15) y depresión (16 a 24; incluye ansiedad). Las sumas de frecuencia (0 a 4 por situación) y de reacción (0 a 4) son descriptivas y sirven para comparar con la misma persona que cuida.',
+    'Huella pregunta cuánto le afectó solo en las situaciones que ocurrieron, en la última semana o antes; las que nunca ocurrieron cuentan 0 en la reacción. «No sé» no entra en las sumas.',
+    'Una afectación alta de quien cuida orienta a intervenir con él o ella aunque la frecuencia sea baja.',
+    'Las amenazas de lastimarse, los comentarios sobre la muerte, las conductas peligrosas y las amenazas a otras personas se señalan aunque hayan ocurrido antes de la última semana.',
+    'Para la gravedad de los síntomas neuropsiquiátricos usa el NPI-Q; para la sobrecarga, la escala de Zarit.',
+    'Texto del anexo 42 del INGER con mayúsculas y erratas corregidas («incomodaron», «esté», «lloriquee»).',
+  ],
+  licencia: {
+    texto: 'Formato del anexo 42 de la guía de instrumentos del INGER (2022), que permite reproducirlo completo con fines educativos o asistenciales sin ánimo de lucro citando al INGER. Instrumento original: RMBPC (Teri et al., 1992); versión en español: Salvia et al. (2011).',
+    enlace: GUIA,
+  },
+  referencias: [
+    { texto: 'Teri L, Truax P, Logsdon R, Uomoto J, Zarit S, Vitaliano PP. Assessment of behavioral problems in dementia: the Revised Memory and Behavior Problems Checklist. Psychol Aging. 1992;7(4):622-31.', doi: '10.1037/0882-7974.7.4.622' },
+    { texto: 'Salvia MG, Dawidowski A, Schapira M, et al. Spanish Revised Memory and Behavior Problems Checklist Scale (SpRMBPC): trans-cultural adaptation and validation of the RMBPC questionnaire. Int Psychogeriatr. 2011;23(7):1160-6.', doi: '10.1017/S1041610210002073' },
+    refInger(42, 'Lista en español revisada de verificación de problemas de memoria y comportamiento (SpRMBPC)'),
+  ],
+};

@@ -41,7 +41,7 @@ test('nota completa: cinco secciones en orden, separadas y sin conclusiones de m
   const objetivos = t.slice(i('1. RESULTADOS'), i('2. INTERPRETACIÓN'));
   assert.match(objetivos, /- Barthel basal \(estado al 26\/09\/2026; fuente: cuidador\): 95\/100\./);
   assert.ok(!/dependencia/.test(objetivos), 'los resultados objetivos no llevan interpretación');
-  assert.match(objetivos, /sin instrumentos aplicados: fragilidad y sarcopenia, nutrición/);
+  assert.match(objetivos, /sin instrumentos aplicados: fragilidad y sarcopenia, desempeño físico, nutrición/);
   const interp = t.slice(i('2. INTERPRETACIÓN'), i('3. CAMBIOS'));
   assert.match(interp, /- Barthel: basal \(estado al 26\/09\/2026\), dependencia escasa; al ingreso, dependencia grave\./);
   const cambios = t.slice(i('3. CAMBIOS'), i('4. HALLAZGOS'));
@@ -83,7 +83,7 @@ test('sin hallazgos: la conclusión se limita a los instrumentos aplicados', () 
   const t = notaValoracion({ resultados: [b] }, porId, DOMINIOS, fecha, 'completa');
   assert.ok(!/Sin hallazgos anormales/.test(t));
   assert.match(t, /Sin hallazgos que requieran atención en los instrumentos aplicados \(Barthel\); la conclusión se limita a ellos\./);
-  assert.match(t, /sin instrumentos aplicados: cognitivo, afectivo, fragilidad y sarcopenia, nutrición/);
+  assert.match(t, /sin instrumentos aplicados: cognitivo, afectivo, fragilidad y sarcopenia, desempeño físico, nutrición/);
   // Si todo lo aplicado fue no evaluable, no se concluye nada.
   const solo = notaValoracion({ resultados: [moca] }, porId, DOMINIOS, fecha, 'completa');
   assert.match(solo, /No hay instrumentos interpretables en esta valoración/);

@@ -29,7 +29,7 @@ export const silla30 = {
   id: 'silla30',
   nombre: 'Levantarse de la silla en 30 segundos',
   corto: 'Silla 30 s',
-  dominio: 'caidas',
+  dominio: 'desempeno',
   tipo: 'desempeno',
   aliases: ['30-Second Chair Stand', 'chair stand', 'sentarse y levantarse', 'fuerza de piernas', 'STEADI'],
   problemas: ['caídas', 'debilidad', 'fuerza de las piernas'],
@@ -103,7 +103,7 @@ export const equilibrio4 = {
   id: 'equilibrio4',
   nombre: 'Prueba de equilibrio en 4 etapas (CDC STEADI)',
   corto: 'Equilibrio 4 etapas',
-  dominio: 'caidas',
+  dominio: 'desempeno',
   tipo: 'desempeno',
   aliases: ['4-Stage Balance Test', 'tandem', 'equilibrio estatico', 'STEADI', 'apoyo monopodal'],
   problemas: ['caídas', 'inestabilidad', 'equilibrio'],
@@ -174,7 +174,7 @@ export const dinamometria = {
   id: 'dinamometria',
   nombre: 'Fuerza de prensión (dinamometría)',
   corto: 'Dinamometría',
-  dominio: 'fragilidad',
+  dominio: 'desempeno',
   tipo: 'desempeno',
   aliases: ['fuerza de prension', 'handgrip', 'dinamometro', 'Jamar', 'grip', 'sarcopenia', 'debilidad'],
   problemas: ['sarcopenia', 'debilidad', 'fragilidad', 'desnutrición'],
@@ -271,13 +271,13 @@ export const ewgsop2 = {
   tipo: 'diagnostico',
   aliases: ['sarcopenia', 'masa muscular', 'ASM', 'bioimpedancia', 'DXA', 'fuerza muscular', 'desempeno fisico'],
   problemas: ['sarcopenia', 'debilidad', 'caídas', 'desnutrición'],
-  descripcion: 'Combina fuerza, masa muscular y desempeño con los puntos de corte del EWGSOP2; reutiliza la dinamometría, el SPPB, la marcha y el TUG.',
+  descripcion: 'Combina fuerza, masa muscular y desempeño con los puntos de corte del EWGSOP2; reutiliza la dinamometría, las cinco levantadas, el SPPB, la marcha, el TUG y la caminata de 400 m.',
   objetivo: 'Aplicar el algoritmo del EWGSOP2: sarcopenia probable (fuerza baja), confirmada (más masa baja) y grave (más desempeño bajo).',
   poblacion: 'Personas mayores con sospecha de sarcopenia (p. ej., SARC-F positivo, caídas, debilidad o pérdida de peso).',
   aplicacion: [
     'Fuerza: prensión (kg) o tiempo de 5 levantadas de la silla (s).',
     'Masa muscular: masa muscular esquelética apendicular (ASM) en kg o ajustada por talla (kg/m²), medida con DXA o bioimpedancia; si no se midió, marca «No medida».',
-    'Desempeño (opcional): velocidad de marcha, SPPB o TUG.',
+    'Desempeño (opcional): velocidad de marcha, SPPB, TUG o caminata de 400 m.',
   ],
   tiempo: '2 min (con datos ya medidos)',
   direccionClinica: 'sin_direccion',
@@ -296,6 +296,13 @@ export const ewgsop2 = {
       disponible: (res) => (Number.isFinite(res.extras?.tiempoSilla) ? true : 'El SPPB guardado no tiene el tiempo de 5 levantadas.'),
       describir: (res) => `Cinco levantadas en ${res.extras.tiempoSilla} s`,
       aplicar: (res) => ({ fuerza_tipo: 1, silla5: String(res.extras.tiempoSilla) }),
+      campos: ['fuerza_tipo', 'silla5'],
+    },
+    {
+      id: 'silla5', escala: 'silla5', titulo: 'Cinco levantadas de la silla',
+      disponible: (res) => (Number.isFinite(res.valor) ? true : 'La prueba guardada no tiene un tiempo (no completó las 5 levantadas).'),
+      describir: (res) => `Cinco levantadas en ${res.valor} s`,
+      aplicar: (res) => ({ fuerza_tipo: 1, silla5: String(res.valor) }),
       campos: ['fuerza_tipo', 'silla5'],
     },
     {
@@ -319,6 +326,13 @@ export const ewgsop2 = {
       aplicar: (res) => ({ desempeno_tipo: 2, tug: String(res.valor) }),
       campos: ['desempeno_tipo', 'tug'],
     },
+    {
+      id: 'caminata400', escala: 'caminata400', titulo: 'Caminata de 400 m',
+      disponible: (res) => (typeof res.extras?.bajo === 'boolean' ? true : 'La caminata guardada no tiene resultado.'),
+      describir: (res) => (res.extras.completa ? `400 m en ${res.mostrar} min` : 'No completó los 400 m'),
+      aplicar: (res) => ({ desempeno_tipo: 4, c400: res.extras.bajo ? 1 : 0 }),
+      campos: ['desempeno_tipo', 'c400'],
+    },
   ],
   campos: [
     SEXO,
@@ -340,11 +354,16 @@ export const ewgsop2 = {
     },
     {
       id: 'desempeno_tipo', texto: 'Desempeño físico', textoCorto: 'desempeño', puntua: false, grupo: 'Desempeño físico',
-      opciones: [{ texto: 'Velocidad de marcha (m/s)', valor: 0 }, { texto: 'SPPB (puntos)', valor: 1 }, { texto: 'TUG (s)', valor: 2 }, { texto: 'No medido', valor: -1, especial: true }],
+      // La caminata de 400 m va al final para no cambiar el índice de las opciones de resultados ya guardados.
+      opciones: [{ texto: 'Velocidad de marcha (m/s)', valor: 0 }, { texto: 'SPPB (puntos)', valor: 1 }, { texto: 'TUG (s)', valor: 2 }, { texto: 'No medido', valor: -1, especial: true }, { texto: 'Caminata de 400 m', valor: 3 }],
     },
     { id: 'marcha', tipo: 'numero', texto: 'Velocidad de marcha', unidad: 'm/s', min: 0.05, max: 3, decimales: 2, visibleSi: (r) => r.desempeno_tipo === 0 },
     { id: 'sppb', tipo: 'numero', texto: 'Puntaje SPPB', unidad: 'puntos', min: 0, max: 12, entero: true, visibleSi: (r) => r.desempeno_tipo === 1 },
     { id: 'tug', tipo: 'numero', texto: 'Tiempo del TUG', unidad: 's', min: 2, max: 300, decimales: 1, visibleSi: (r) => r.desempeno_tipo === 2 },
+    {
+      id: 'c400', texto: 'Caminata de 400 m', textoCorto: 'caminata de 400 m', puntua: false, visibleSi: (r) => r.desempeno_tipo === 4,
+      opciones: [{ texto: 'La completó en menos de 6 minutos', valor: 0 }, { texto: 'No la completó o tardó 6 minutos o más', valor: 1 }],
+    },
   ],
   bandas: [B_EW.sin, B_EW.probable, B_EW.noconfirmada, B_EW.confirmada, B_EW.grave],
   calcular({ v }) {
@@ -373,6 +392,7 @@ export const ewgsop2 = {
     if (v.desempeno_tipo.valor === 0) { desBajo = v.marcha <= 0.8; lineas.push(`Desempeño: marcha ${v.marcha} m/s (bajo si ≤0.8): ${desBajo ? 'bajo' : 'no bajo'}.`); }
     if (v.desempeno_tipo.valor === 1) { desBajo = v.sppb <= 8; lineas.push(`Desempeño: SPPB ${v.sppb} (bajo si ≤8): ${desBajo ? 'bajo' : 'no bajo'}.`); }
     if (v.desempeno_tipo.valor === 2) { desBajo = v.tug >= 20; lineas.push(`Desempeño: TUG ${v.tug} s (bajo si ≥20): ${desBajo ? 'bajo' : 'no bajo'}.`); }
+    if (v.desempeno_tipo.valor === 3) { desBajo = v.c400.valor === 1; lineas.push(`Desempeño: caminata de 400 m ${desBajo ? 'no completada o en 6 min o más' : 'en menos de 6 min'} (bajo si no la completa o tarda 6 min o más): ${desBajo ? 'bajo' : 'no bajo'}.`); }
     if (v.desempeno_tipo.valor === -1) lineas.push('Desempeño: no medido.');
     let banda;
     if (!fuerzaBaja) banda = B_EW.sin;
@@ -388,7 +408,7 @@ export const ewgsop2 = {
   resumen: (res) => `EWGSOP2: ${minus(res.banda.etiqueta)}.`,
   resumenBreve: (res) => `EWGSOP2: ${minus(res.banda.etiqueta)}`,
   notas: [
-    'Puntos de corte del EWGSOP2: prensión <27 kg (hombres) y <16 kg (mujeres); 5 levantadas >15 s; ASM <20 kg y <15 kg; ASM/talla² <7.0 y <5.5 kg/m²; marcha ≤0.8 m/s; SPPB ≤8; TUG ≥20 s.',
+    'Puntos de corte del EWGSOP2: prensión <27 kg (hombres) y <16 kg (mujeres); 5 levantadas >15 s; ASM <20 kg y <15 kg; ASM/talla² <7.0 y <5.5 kg/m²; marcha ≤0.8 m/s; SPPB ≤8; TUG ≥20 s; caminata de 400 m no completada o en 6 min o más.',
     'Los puntos de corte de masa muscular se derivaron sobre todo en población europea y dependen del método (DXA o BIA) y del equipo.',
     'La categoría resulta del algoritmo; el diagnóstico de sarcopenia lo integra el médico con la clínica.',
   ],

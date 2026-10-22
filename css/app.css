@@ -1120,6 +1120,12 @@ body[data-vista="escala"] .aviso { bottom: calc(96px + env(safe-area-inset-botto
 .reactivo-titulo.sub span { font-weight: 400; }
 .reactivo.secundario .opciones { margin-top: var(--space-2); }
 .reactivo.secundario .opcion { min-height: 40px; padding: var(--space-2) var(--space-3); font-size: 14px; }
+/* Pregunta obligatoria que depende del reactivo de arriba (p. ej., cuánto afecta al cuidador): sangrada, sin número. */
+.reactivo.anidado { margin-top: calc(-1 * var(--space-2)); margin-left: var(--space-6); padding: var(--space-3) var(--space-4); background: var(--surface-200); }
+.reactivo.anidado .reactivo-titulo.sub { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 22px; font-weight: 600; color: var(--ink); }
+.reactivo.anidado .opciones { margin-top: var(--space-2); }
+.reactivo.anidado .opcion { min-height: 44px; padding: var(--space-2) var(--space-3); font-size: 15px; }
+@media (max-width: 400px) { .reactivo.anidado { margin-left: var(--space-3); } }
 .opcion.especial { border-style: dashed; }
 .opcion.especial .op-titulo { color: var(--ink-muted); }
 .reactivo.numerico .opciones { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1695,6 +1701,14 @@ dialog.copia-manual .acciones { margin-top: var(--space-3); }
 
 /* Catálogo */
 .catalogo-tabla th span { display: block; font-weight: 400; }
+/* En pantallas angostas, cada herramienta futura es un bloque (sin desplazamiento horizontal). */
+@media (max-width: 480px) {
+  .catalogo-tabla thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .catalogo-tabla, .catalogo-tabla tbody, .catalogo-tabla tr, .catalogo-tabla th, .catalogo-tabla td { display: block; width: auto; }
+  .catalogo-tabla tr { padding: var(--space-3) 0; border-bottom: 1px solid var(--line); }
+  .catalogo-tabla th, .catalogo-tabla td { border-bottom: 0; padding: var(--space-1) 0; }
+  .catalogo-tabla td::before { content: attr(data-etiqueta); display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; color: var(--ink-muted); }
+}
 
 @media print {
   body[data-vista="informe"] .vista > :not(.informe-doc) { display: none !important; }

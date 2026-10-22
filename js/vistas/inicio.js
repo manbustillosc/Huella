@@ -197,6 +197,8 @@ export function renderDominio({ id }) {
   const usados = lista.length > 3 ? masUsadosDe(id) : [];
   const clases = [...new Set([...hs, ...lista].map(claseDe))];
   const aplicados = lista.filter((e) => almacen.resultadosDe(e.id).length).length;
+  // Instrumentos de otra sección que también sirven aquí (p. ej., el TUG en Caídas): se enlazan sin duplicarlos.
+  const relacionadas = (d.relacionadas || []).map((x) => porId[x]).filter((e) => e && e.dominio !== id);
   return `
     <section class="vista dominio">
       <a class="migas" href="#/">${icono('atras')} Inicio</a>
@@ -217,6 +219,9 @@ export function renderDominio({ id }) {
           <h2 class="seccion">Todos</h2>` : ''}
         <div class="lista-escalas">${hs.map((h) => filaHerramienta(h)).join('')}${lista.map((e) => filaEscala(e, { detalle: true })).join('')}</div>`
         : '<p class="vacio-texto">Aún no hay instrumentos en este dominio.</p>'}
+      ${relacionadas.length ? `
+        <h2 class="seccion">Relacionadas en otras secciones</h2>
+        <div class="lista-escalas relacionadas">${relacionadas.map((e) => filaEscala(e, { conDominio: true })).join('')}</div>` : ''}
       ${d.planeadas.length ? `
         <h2 class="seccion">Próximamente</h2>
         <ul class="chips">${d.planeadas.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}

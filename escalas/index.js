@@ -77,15 +77,17 @@ import { gad7, cesd7, soledad3 } from './afectivas-extra.js';
 import { downton, shortFesi } from './caidas-extra.js';
 import { must, norton, dolorIntensidad, karnofsky, ppi, asa, lsns6, maltrato, ves13 } from './dominios-extra.js';
 import { isaacs, gpcog, gohai, mos, caprini, lace, g8, esasr, spict, necpal, mme } from './fase5.js';
-import { atenas, isarhp, harp, sppicees, susurro, lsa, oars, diazveiga, barreras } from './inger.js';
+import { atenas, isarhp, harp, sppicees, susurro, lsa, oars, diazveiga, barreras, sprmbpc } from './inger.js';
+import { silla5, caminata6, caminata400, monopodal, alcance } from './desempeno.js';
 
 export const ESCALAS = [
   barthel, katz, lawton, pfeffer, rankin,
   icopeCognicion, minicog, moca, mmse, reloj, gpcog, fluencia, isaacs, rudas, cdr, gdsReisberg, fast,
   icopePsicologica, gds15, phq9, cesd7, gad7, cornell,
   cuatroAt, cam, rass, camicu, npiq,
-  frail, cfs, fried, sarcf, dinamometria, ewgsop2, sppb, vivifrail, ves13, g8,
-  icopeLocomotora, tug, velocidad, tinetti, silla30, equilibrio4, downton, shortFesi, lsa,
+  frail, cfs, fried, sarcf, ewgsop2, vivifrail, ves13, g8,
+  sppb, velocidad, tug, silla5, silla30, equilibrio4, monopodal, alcance, tinetti, dinamometria, caminata6, caminata400,
+  icopeLocomotora, downton, shortFesi, lsa,
   dxa, frax,
   icopeVitalidad, mnasf, must,
   icopeVision, agudezaVisual, icopeAudicion, audiometria, susurro, hhies, ohat, saludBucal, gohai,
@@ -97,6 +99,6 @@ export const ESCALAS = [
   charlson, cirsg, news2, lace, isarhp, harp, sppicees,
   rcri, ariscat, dasi, asa, riesgoqx, caprini,
   pps, karnofsky, ppi, esasr, spict, necpal,
-  icopeFactores, zarit, gijon, lsns6, soledad3, mos, oars, diazveiga, barreras, maltrato,
+  icopeFactores, zarit, sprmbpc, gijon, lsns6, soledad3, mos, oars, diazveiga, barreras, maltrato,
   ckdepi, cockcroft, bis, mme,
 ];

@@ -131,6 +131,12 @@ Estados:
 | Recursos sociales OARS | Registro de la categoría; no reproduce las 13 preguntas | Duke University; formato del INGER (anexo 37) | Cumple (solo registro) |
 | Díaz-Veiga | Preguntas resumidas con redacción propia | Díaz-Veiga; formato del INGER (anexo 38) | Cumple |
 | Barreras del entorno | Barreras resumidas con redacción propia | Formato del INGER (anexo 35) | Cumple |
+| Silla 5 veces | Procedimiento con redacción propia; cortes del EWGSOP2, ICOPE y AWGS; promedios de Bohannon (2006) | Prueba clínica sin titular | Cumple |
+| Caminata 6 min | Procedimiento con redacción propia según la ATS (2002); ecuaciones de Enright y Sherrill (1998) | Prueba clínica sin titular; las ecuaciones son datos publicados | Cumple |
+| Caminata 400 m | Procedimiento con redacción propia; corte del EWGSOP2 | Prueba clínica sin titular | Cumple |
+| Apoyo en un pie | Procedimiento con redacción propia; corte de Vellas (1997) y promedios de Springer (2007) | Prueba clínica sin titular | Cumple |
+| Alcance funcional | Procedimiento con redacción propia; cortes de Duncan (1992) y promedios de Duncan (1990) | Prueba clínica sin titular | Cumple |
+| SpRMBPC | Formato del anexo 42 del INGER (24 situaciones, frecuencia y reacción de quien cuida), con mayúsculas y erratas corregidas | Original: RMBPC, Teri et al., 1992 (University of Washington), sin condiciones de uso publicadas; versión en español: Salvia et al., 2011; formato reproducible del INGER con fines asistenciales sin ánimo de lucro | Cumple, confirmar |
 | Beers 2023 | No se reproducen las tablas | American Geriatrics Society | Cumple |
 
 ## Versiones en español del INGER (licencia comprobada el 12/10/2026)
@@ -153,6 +159,7 @@ Huella usa la *Guía de instrumentos de evaluación de la capacidad funcional* (
 | ASA | La ASA es titular de la clasificación; Huella la resume con redacción propia | American Society of Anesthesiologists |
 | Lubben LSNS-6 | Traducción propia; sin condiciones publicadas | J. Lubben (Boston College) |
 | Soledad 3 reactivos | Traducción propia de una escala derivada de UCLA | Autores de la escala (Hughes et al.) |
+| SpRMBPC | El formato del INGER permite reproducirla, pero no hay condiciones publicadas del instrumento original (RMBPC) | Dra. Linda Teri, University of Washington (autora del original y coautora de la versión en español) |
 
 ## Hojas oficiales del médico (solo en su dispositivo)
 
@@ -182,7 +189,6 @@ Hoy esos instrumentos son solo de registro. Mostrar sus reactivos requeriría:
 | Rotación de opioides | Las tablas varían entre guías; el error es grave | No se integrará; Huella calcula la carga en MME/día (CDC 2022) |
 | WHODAS 2.0 | © OMS; incluido en la guía del INGER; su uso digital requiere permiso de la OMS | Permiso de la OMS (gratuito para uso no comercial) |
 | Inventario de ansiedad de Beck | © Pearson; de pago | No se integrará (alternativa gratuita: GAD-7) |
-| SpRMBPC | Lista cualitativa de problemas de memoria y conducta para cuidadores (guía del INGER) | Pendiente; mientras tanto, NPI-Q y Zarit |
 
 Versiones completas (hoy solo registro): GPCOG (UNSW), G8 (autores y Nestlé), SPICT (equipo SPICT) y NECPAL (ICO) requieren permiso para mostrar sus reactivos o criterios dentro de Huella. MUST: BAPEN cobra licencia por calcularlo en apps fuera del Reino Unido; no se solicitará.
 

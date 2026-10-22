@@ -318,7 +318,9 @@ export function resumenBreveDe(escala, res) {
 function filaDesglose(d) {
   const pts = d.valor != null ? ` (${d.valor})` : '';
   const nota = d.anotacion ? `; ${minusculaInicial(d.anotacion)}` : '';
-  return { pregunta: d.campo.texto.endsWith('?'), texto: d.campo.texto, respuesta: d.respuesta, pts, nota };
+  // «textoDesglose»: rótulo para el resultado y el expediente cuando el del formulario solo se entiende junto a otro reactivo.
+  const texto = d.campo.textoDesglose || d.campo.texto;
+  return { pregunta: texto.endsWith('?'), texto, respuesta: d.respuesta, pts, nota };
 }
 
 /* ---------- Orden por logro ---------- */

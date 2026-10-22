@@ -32,7 +32,7 @@ export default {
   id: 'velocidad',
   nombre: 'Velocidad de la marcha',
   corto: 'Velocidad de marcha',
-  dominio: 'caidas',
+  dominio: 'desempeno',
   tipo: 'desempeno',
   aliases: ['gait speed', 'marcha 4 metros', 'marcha 6 metros', 'm/s'],
   problemas: ['fragilidad', 'sarcopenia', 'caídas', 'movilidad'],

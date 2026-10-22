@@ -8,11 +8,15 @@ import {
 } from './comparacion.js';
 import { partesNota } from './medicacion.js';
 import { planDe, planConContenido, lineasPlan, nombreAmbito, ambitosConContenido, PRIORIDADES, nombreDe } from './plan.js';
+import { ESCALAS } from '../escalas/index.js';
+
+// Rótulo que acompaña la cifra cuando «12/96» no se entiende solo (p. ej., «frecuencia 12/96» en la SpRMBPC).
+const ROTULO_CIFRA = Object.fromEntries(ESCALAS.filter((e) => e.rotuloCifra).map((e) => [e.id, e.rotuloCifra]));
 
 export { fechaCorta };
 export const FORMATOS_NOTA = ['parrafo', 'lista', 'completa'];
 // Dominios que una valoración geriátrica integral suele cubrir; la nota completa avisa si faltan.
-export const DOMINIOS_NUCLEO = ['funcional', 'cognitivo', 'afectivo', 'fragilidad', 'nutricion'];
+export const DOMINIOS_NUCLEO = ['funcional', 'cognitivo', 'afectivo', 'fragilidad', 'desempeno', 'nutricion'];
 export const DIAS_EPISODIO = 90;
 const SEXO = { mujer: 'mujer', hombre: 'hombre' };
 
@@ -21,7 +25,7 @@ const fuenteTexto = (id) => FUENTES.find((f) => f.id === id)?.nombre.toLowerCase
 // Cifra del resultado sin interpretación: «45/100», «0.75 m/s», «52 mL/min/1.73 m²». Null si no es numérico.
 export function cifraGuardada(r) {
   if (r.noEvaluable) return null;
-  if (Number.isFinite(r.puntaje) && r.max != null) return `${r.puntaje}/${r.max}`;
+  if (Number.isFinite(r.puntaje) && r.max != null) return `${ROTULO_CIFRA[r.escalaId] ? `${ROTULO_CIFRA[r.escalaId]} ` : ''}${r.puntaje}/${r.max}`;
   if (Number.isFinite(r.puntaje)) return String(r.puntaje);
   if (Number.isFinite(r.valor)) return `${r.mostrar ?? r.valor} ${r.unidad || ''}`.trim();
   return null;

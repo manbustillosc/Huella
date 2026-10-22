@@ -26,25 +26,25 @@ const tug = (t, fecha) => guardado('tug', resp('tug', { estado: 'Sí', tiempo: t
 test('lista de problemas: hallazgos de tamizaje derivados, estado y prioridad solo del médico', () => {
   const v = valoracion([tug(16, '2026-10-01'), guardado('barthel', EJEMPLOS.barthel(), { fecha: HOY })]);
   let probs = problemasPlan(v, porId, HOY);
-  const caidas = probs.find((p) => p.ambito === 'dom:caidas');
-  assert.ok(caidas, 'el TUG positivo crea el problema del dominio');
-  assert.equal(caidas.derivado, 'tamizaje');
-  assert.equal(caidas.estado, 'tamizaje');
-  assert.equal(caidas.asignado, null);
-  assert.equal(caidas.prioridad, null, 'nunca se asigna prioridad automáticamente');
+  const desempeno = probs.find((p) => p.ambito === 'dom:desempeno');
+  assert.ok(desempeno, 'el TUG positivo crea el problema del dominio');
+  assert.equal(desempeno.derivado, 'tamizaje');
+  assert.equal(desempeno.estado, 'tamizaje');
+  assert.equal(desempeno.asignado, null);
+  assert.equal(desempeno.prioridad, null, 'nunca se asigna prioridad automáticamente');
   assert.ok(!probs.some((p) => p.ambito === 'dom:funcional'), 'un resultado sin hallazgo no crea problema');
-  assert.equal(caidas.nombre, 'Caídas y movilidad');
+  assert.equal(desempeno.nombre, 'Desempeño físico');
   // El médico asigna estado y prioridad
   const plan = planDe(v);
-  fijarProblema(plan, 'dom:caidas', { estado: 'confirmado', nota: '' }, HOY, 'Caídas');
-  fijarPrioridad(plan, 'dom:caidas', 'alta', HOY, 'Caídas');
+  fijarProblema(plan, 'dom:desempeno', { estado: 'confirmado', nota: '' }, HOY, 'Desempeño físico');
+  fijarPrioridad(plan, 'dom:desempeno', 'alta', HOY, 'Desempeño físico');
   v.plan = plan;
   probs = problemasPlan(v, porId, HOY);
-  assert.equal(probs[0].ambito, 'dom:caidas', 'la prioridad alta va primero');
+  assert.equal(probs[0].ambito, 'dom:desempeno', 'la prioridad alta va primero');
   assert.equal(probs[0].estado, 'confirmado');
   // Las intervenciones sugeridas no se agregan solas
   assert.equal(probs[0].intervenciones.length, 0);
-  assert.ok(sugerenciasDe('dom:caidas').length >= 3);
+  assert.ok(sugerenciasDe('dom:desempeno').length >= 3);
   for (const d of DOMINIOS) assert.ok(Array.isArray(SUGERENCIAS_DOMINIO[d.id]), `sugerencias definidas para ${d.id}`);
   // Los estados disponibles son los del documento
   assert.ok(sugerenciasDe('icope:locomotora').length, 'ICOPE reutiliza las intervenciones del manual');

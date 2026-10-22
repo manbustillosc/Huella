@@ -40,6 +40,12 @@ export const SUGERENCIAS_DOMINIO = {
     { categoria: 'nutricion', texto: 'Valoración nutricional y aporte de proteínas.' },
     { categoria: 'farmacologica', texto: 'Revisión de la medicación.' },
   ],
+  desempeno: [
+    { categoria: 'ejercicio', texto: 'Ejercicio multicomponente de fuerza, equilibrio y marcha adaptado a los resultados (p. ej., Vivifrail).' },
+    { categoria: 'caidas', texto: 'Evaluación multifactorial del riesgo de caídas si la marcha o el equilibrio están alterados.' },
+    { categoria: 'referencia', texto: 'Rehabilitación o fisioterapia si la limitación interfiere con sus actividades.' },
+    { categoria: 'nutricion', texto: 'Si la fuerza está baja, completar la valoración de sarcopenia y del estado nutricional.' },
+  ],
   caidas: [
     { categoria: 'caidas', texto: 'Evaluación multifactorial del riesgo de caídas.' },
     { categoria: 'ejercicio', texto: 'Ejercicio de equilibrio y fuerza.' },

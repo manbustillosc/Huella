@@ -6,7 +6,7 @@ export default {
   id: 'tinetti',
   nombre: 'Escala de Tinetti de equilibrio y marcha (POMA-28)',
   corto: 'Tinetti',
-  dominio: 'caidas',
+  dominio: 'desempeno',
   tipo: 'desempeno',
   registro: true,
   aliases: ['POMA', 'Performance Oriented Mobility Assessment', 'equilibrio y marcha', 'Tinetti'],

@@ -148,7 +148,7 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 ## Instrumentos de la guía del INGER que faltaban (versión 2.5)
 
 - Escala Atenas de insomnio, ISAR-HP, HARP (registra el total del mini examen abreviado), SPPICEES, prueba del susurro, espacio de vida (LSA), recursos sociales OARS (registro de la categoría), inventario de Díaz-Veiga y barreras del entorno físico y la movilidad. Total: 108 instrumentos.
-- Quedan fuera WHODAS 2.0 y WHOQOL-OLD (permiso de la OMS), el inventario de ansiedad de Beck (de pago; se usa el GAD-7) y la SpRMBPC (cualitativa, pendiente).
+- Quedan fuera WHODAS 2.0 y WHOQOL-OLD (permiso de la OMS), el inventario de ansiedad de Beck (de pago; se usa el GAD-7) y la SpRMBPC (cualitativa; se agregó en la versión 2.11).
 
 ## Orden de los resultados (versión 2.6)
 
@@ -187,6 +187,24 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 
 - **BIS1 y BIS2** (Berlin Initiative Study; Schaeffner, 2012): TFG estimada derivada en personas de 70 años o más. BIS1 usa creatinina; si se agrega cistatina C se calcula BIS2, que define la categoría KDIGO. Avisa si la persona tiene menos de 70 años, reutiliza la creatinina de un CKD-EPI o Cockcroft-Gault guardado y puede usarse como TFG en la revisión de medicamentos. Está en Calculadoras (función renal) y en las complementarias de la valoración hospitalaria. Total: 111 instrumentos.
 - **HbA1c y glucosa promedio** (`#/unidades/glucemia`): HbA1c en % o mmol/mol ↔ glucosa promedio estimada en mg/dL o mmol/L (ADAG: 28.7 × HbA1c − 46.7), GMI a partir de la glucosa media de un monitor continuo, tabla de equivalencias de 5 a 12 % y situaciones en que la HbA1c no refleja la glucemia.
+
+## Problemas de memoria y comportamiento: SpRMBPC (versión 2.11)
+
+- **Lista en español revisada de verificación de problemas de memoria y comportamiento** (SpRMBPC; anexo 42 de la guía del INGER, 2022; Teri, 1992; Salvia, 2011): 24 situaciones de memoria, conducta disruptiva y ánimo. Para cada una se registra cuántas veces ocurrió en la última semana y, si ocurrió, cuánto le afectó a quien cuida (la pregunta aparece debajo de la situación, sin número propio). «No sé» no entra en las sumas.
+- Interpretación cualitativa, como indica el INGER: situaciones de la última semana por subescala, las diarias, las que más afectan a quien cuida y las que ocurrieron antes; las sumas de frecuencia y de reacción (0 a 96) son descriptivas y sin punto de corte, y sirven para comparar con la misma persona que cuida.
+- Señala las amenazas de lastimarse, los comentarios sobre la muerte, las conductas peligrosas y las amenazas a otras personas aunque hayan ocurrido antes de la última semana. Sugiere Zarit, NPI-Q o Cornell según lo referido.
+- Dominio Social y cuidador y complementarios de la valoración cognitiva.
+
+## Desempeño físico (versión 2.11)
+
+- **Sección propia «Desempeño físico»**: SPPB, velocidad de marcha, TUG, Tinetti, levantarse de la silla en 30 s, equilibrio en 4 etapas y dinamometría pasan a esta sección (también en la nota y en el plan de atención). Fragilidad y Caídas las siguen mostrando en «Relacionadas en otras secciones».
+- **Pararse y sentarse 5 veces de la silla**: tiempo de 5 levantadas sin brazos; más de 15 s es fuerza baja (EWGSOP2). Muestra también el corte de ICOPE (más de 14 s), el de AWGS 2019 (12 s o más), los puntos equivalentes del SPPB y el promedio por edad (Bohannon, 2006). Reutiliza el tiempo de la silla del SPPB. No hay una versión validada que cuente repeticiones en 15 segundos: 15 s es el corte del tiempo de 5 levantadas.
+- **Caminata de 6 minutos**: distancia, porcentaje del valor esperado y límite inferior (Enright y Sherrill, 1998); cambio con significado clínico de 20 y 50 m (Perera, 2006); avisa cuando la edad está fuera de 40 a 80 años o cambian el oxígeno o el auxiliar.
+- **Caminata de 400 m**: no completarla o tardar 6 minutos o más es desempeño bajo (EWGSOP2); datos pronósticos de Health ABC y definición de discapacidad mayor de la movilidad del estudio LIFE.
+- **Apoyo en un pie**: menos de 5 s predice caídas con lesión (Vellas, 1997); promedio por edad (Springer, 2007).
+- **Alcance funcional**: en cm o pulgadas; 15 cm o menos, riesgo alto de caídas recurrentes, y de más de 15 a menos de 25 cm, riesgo moderado (Duncan, 1992); promedios por edad y sexo (Duncan, 1990).
+- El algoritmo EWGSOP2 reutiliza las cinco levantadas (fuerza) y la caminata de 400 m (desempeño). Las pruebas nuevas están en los complementarios de la valoración de fragilidad y movilidad.
+- La nota completa avisa si la valoración integral no tiene ninguna prueba de desempeño físico. En pantallas angostas, «Futuras herramientas» se muestra en bloques. Total: 117 instrumentos.
 
 ## Pruebas y publicación
 

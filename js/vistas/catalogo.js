@@ -10,7 +10,6 @@ export const CATALOGO_FUTURO = [
   { nombre: 'Carga anticolinérgica (ACB)', dominio: 'Polifarmacia', uso: 'Suma del efecto anticolinérgico de la medicación.', estado: 'La escala ACB (actualización 2012) es © Regenstrief Institute y solo puede usarse según sus términos: falta su permiso (acb@agingbraincare.org). Mientras tanto, la revisión de medicamentos incluye la tabla 7 de Beers 2023.' },
   { nombre: 'WHODAS 2.0', dominio: 'Funcional', uso: 'Discapacidad en 6 dominios según la CIF (OMS).', estado: 'Incluido en la guía del INGER, pero su uso en formato digital requiere permiso de la OMS (gratuito para uso no comercial).' },
   { nombre: 'Inventario de ansiedad de Beck', dominio: 'Afectivo', uso: 'Síntomas de ansiedad (21 reactivos).', estado: 'Propiedad de Pearson y de pago: no se integrará. Huella incluye el GAD-7, gratuito.' },
-  { nombre: 'SpRMBPC', dominio: 'Social', uso: 'Lista de problemas de memoria y conducta y reacción del cuidador.', estado: 'Interpretación cualitativa (guía del INGER); pendiente de integrar. Mientras tanto, NPI-Q y Zarit.' },
   { nombre: 'Rotación de opioides', dominio: 'Calculadoras', uso: 'Dosis del nuevo opioide al cambiar de uno a otro.', estado: 'No se integrará: las tablas varían entre guías y el error tiene consecuencias graves. Huella calcula la carga total en MME/día (CDC 2022), que los CDC indican no usar para convertir dosis.' },
 ];
 
@@ -33,7 +32,7 @@ export function renderCatalogo() {
       </header>
       <div class="tabla-envoltura"><table class="tabla catalogo-tabla">
         <thead><tr><th>Instrumento</th><th>Uso</th><th>Estado</th></tr></thead>
-        <tbody>${CATALOGO_FUTURO.map((x) => `<tr><th scope="row">${esc(x.nombre)}<span class="discreto">${esc(x.dominio)}</span></th><td>${esc(x.uso)}</td><td>${esc(x.estado)}</td></tr>`).join('')}</tbody>
+        <tbody>${CATALOGO_FUTURO.map((x) => `<tr><th scope="row">${esc(x.nombre)}<span class="discreto">${esc(x.dominio)}</span></th><td data-etiqueta="Uso">${esc(x.uso)}</td><td data-etiqueta="Estado">${esc(x.estado)}</td></tr>`).join('')}</tbody>
       </table></div>
       <h2 class="seccion">Otros pendientes por dominio o ruta</h2>
       <ul class="chips">${otros.map((x) => `<li>${esc(x.nombre)} <span class="discreto">· ${esc(x.de)}</span></li>`).join('')}</ul>

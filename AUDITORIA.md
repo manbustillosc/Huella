@@ -112,3 +112,24 @@ Revisión de los mL/h impresos contra la dosis y la preparación de la misma tab
 | Instrumento | Revisión |
 |---|---|
 | Rankin modificada | Grados 0 a 5 de van Swieten (1988) y grado 6 (muerte) de los estudios de desenlace; referencias verificadas en PubMed (doi 10.1177/003693305700200504 y 10.1161/01.str.19.5.604). Secuencia de decisión basada en el cuestionario simplificado de Bruno (2010), con redacción propia. 0 a 2 independencia; 3 a 5 dependencia. |
+
+## Versión 2.11: SpRMBPC, 17/10/2026
+
+| Instrumento | Fuente | Revisión |
+|---|---|---|
+| SpRMBPC | Anexo 42 de la guía del INGER (2022); Teri et al., 1992; Salvia et al., 2011 | 24 situaciones en el orden del formato; frecuencia de 0 a 4 y reacción de 0 a 4 con «No sé». Subescalas del original (memoria 7, conducta disruptiva 8, depresión 9), que en el orden del INGER quedan juntas (1–7, 8–15, 16–24). Interpretación cualitativa sin puntos de corte, como indica la guía. Erratas corregidas: «incomodaron», «esté», «lloriquee». |
+
+Pendiente: confirmar con la autora del original (RMBPC) las condiciones de uso digital (ver `LICENCIAS.md`).
+
+## Versión 2.11: desempeño físico, 22/10/2026
+
+| Instrumento | Fuente del punto de corte | Revisión |
+|---|---|---|
+| Pararse y sentarse 5 veces | EWGSOP2 (Cruz-Jentoft, 2019); ICOPE (OPS, 2025); AWGS 2019 (Chen, 2020); Guralnik, 1994; Bohannon, 2006 | Clasifica con >15 s (EWGSOP2); exactamente 15 s no es fuerza baja. Los demás cortes se muestran en una tabla y no cambian la categoría. No existe versión validada de repeticiones en 15 s. |
+| Caminata de 6 minutos | ATS, 2002; Enright y Sherrill, 1998; Perera, 2006 | Ecuaciones por sexo y límite inferior (−153 m hombres, −139 m mujeres). Fuera de 40 a 80 años se advierte la extrapolación. |
+| Caminata de 400 m | EWGSOP2; Newman, 2006; Pahor, 2014 | No completada o ≥6 min = desempeño bajo. |
+| Apoyo en un pie | Vellas, 1997; Springer, 2007 | <5 s = mayor riesgo de caídas con lesión (riesgo relativo 2.13). |
+| Alcance funcional | Duncan, 1990 y 1992 | ≤15.24 cm (6 pulgadas) OR 4.02; >15.24 a <25.4 cm OR 2.00; no puede OR 8.07. Derivado en varones: se advierte en mujeres. |
+
+Cambio de sección: SPPB, velocidad de marcha, TUG, Tinetti, silla 30 s, equilibrio en 4 etapas y dinamometría pasan de Fragilidad o Caídas a Desempeño físico. Los hallazgos de esas pruebas aparecen ahora en el problema «Desempeño físico» del plan; lo que el médico ya había escrito en «Caídas y movilidad» o «Fragilidad y sarcopenia» se conserva.
+

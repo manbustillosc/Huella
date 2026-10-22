@@ -38,7 +38,7 @@ export default {
   id: 'tug',
   nombre: 'Prueba cronometrada Levántate y Anda (Timed Up and Go)',
   corto: 'TUG',
-  dominio: 'caidas',
+  dominio: 'desempeno',
   tipo: 'desempeno',
   aliases: ['timed up and go', 'levantate y anda', 'get up and go', 'marcha', 'STEADI'],
   problemas: ['caídas', 'marcha', 'equilibrio', 'movilidad', 'fragilidad'],

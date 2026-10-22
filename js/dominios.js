@@ -26,15 +26,23 @@ export const DOMINIOS = [
   },
   {
     id: 'fragilidad', nombre: 'Fragilidad y sarcopenia',
-    descripcion: 'Fragilidad, fuerza de prensión, sarcopenia (EWGSOP2), desempeño físico y prescripción de ejercicio.',
+    descripcion: 'Fragilidad, sarcopenia (EWGSOP2) y prescripción de ejercicio; las pruebas de fuerza y desempeño están en Desempeño físico.',
     problemas: ['debilidad', 'pérdida de peso', 'ejercicio'],
+    planeadas: [],
+    relacionadas: ['dinamometria', 'silla5', 'sppb', 'velocidad', 'caminata400'],
+  },
+  {
+    id: 'desempeno', nombre: 'Desempeño físico',
+    descripcion: 'Pruebas de marcha, fuerza, equilibrio y resistencia: SPPB, velocidad de marcha, TUG, levantarse de la silla, equilibrio, alcance funcional, caminatas de 6 minutos y de 400 m y dinamometría.',
+    problemas: ['desempeño físico', 'marcha', 'fuerza', 'equilibrio', 'resistencia', 'movilidad', 'levantarse de la silla'],
     planeadas: [],
   },
   {
     id: 'caidas', nombre: 'Caídas y movilidad',
-    descripcion: 'Marcha, equilibrio y riesgo de caídas.',
+    descripcion: 'Riesgo de caídas, miedo a caer y espacio de vida; las pruebas de marcha y equilibrio están en Desempeño físico.',
     problemas: ['caídas', 'marcha', 'equilibrio'],
     planeadas: [],
+    relacionadas: ['tug', 'velocidad', 'tinetti', 'equilibrio4', 'monopodal', 'alcance', 'silla30'],
   },
   {
     id: 'osea', nombre: 'Salud ósea',
@@ -104,7 +112,7 @@ export const DOMINIOS = [
   },
   {
     id: 'social', nombre: 'Social y cuidador',
-    descripcion: 'Riesgo social, red y recursos de apoyo, barreras del entorno, sobrecarga del cuidador y maltrato.',
+    descripcion: 'Riesgo social, red y recursos de apoyo, barreras del entorno, sobrecarga del cuidador, problemas de memoria y conducta que le afectan, y maltrato.',
     problemas: ['cuidador', 'aislamiento', 'red de apoyo', 'maltrato'],
     planeadas: [],
   },

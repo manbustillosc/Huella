@@ -204,10 +204,14 @@ const notaPrefill = (c) => (c.prefill ? '<p class="ayuda prefill">Se completa co
 
 function campoOpciones(c, n, r) {
   const sel = r[c.id];
-  const clases = ['reactivo', c.compacto && 'compacto', c.compactoNumerico && 'numerico', c.secundario && 'secundario', sel != null && sel !== '' && 'contestado'].filter(Boolean).join(' ');
+  const clases = ['reactivo', c.compacto && 'compacto', c.compactoNumerico && 'numerico', c.secundario && 'secundario', c.anidado && 'anidado', sel != null && sel !== '' && 'contestado'].filter(Boolean).join(' ');
+  // «anidado»: pregunta obligatoria que depende del reactivo anterior; va debajo de él y sin número propio.
+  let titulo = encabezadoCampo(c, n);
+  if (c.secundario) titulo = `<p class="reactivo-titulo sub" id="t-${c.id}">${esc(c.texto)} <span>(opcional)</span></p>`;
+  else if (c.anidado) titulo = `<p class="reactivo-titulo sub" id="t-${c.id}">${esc(c.texto)}${c.textoAccesible ? `<span class="sr"> ${esc(c.textoAccesible)}</span>` : ''}</p>`;
   return `
     <div class="${clases}" id="r-${c.id}" data-campo="${c.id}" role="radiogroup" aria-labelledby="t-${c.id}">
-      ${c.secundario ? `<p class="reactivo-titulo sub" id="t-${c.id}">${esc(c.texto)} <span>(opcional)</span></p>` : encabezadoCampo(c, n)}
+      ${titulo}
       ${c.ayuda ? `<p class="ayuda">${esc(c.ayuda)}</p>` : ''}
       ${notaPrefill(c)}
       <div class="opciones">
@@ -358,7 +362,7 @@ export function renderEscala(params) {
   let n = 0;
   const campos = e.campos.map((c) => {
     const visible = campoVisible(c, r);
-    if (visible && !c.secundario) n += 1;
+    if (visible && !c.secundario && !c.anidado) n += 1;
     const html = htmlCampo(c, n, r);
     const grupo = c.grupo ? `<h2 class="grupo-campos">${esc(c.grupo)}</h2>` : '';
     return grupo + (visible ? html : html.replace(/^(\s*<(div|fieldset))/, '$1 hidden'));
@@ -488,7 +492,7 @@ export function montarEscala(params, rerender) {
       if (!tarjeta) continue;
       const visible = campoVisible(c, r);
       tarjeta.hidden = !visible;
-      if (visible && !c.secundario) {
+      if (visible && !c.secundario && !c.anidado) {
         n += 1;
         const num = tarjeta.querySelector('.num');
         if (num) num.textContent = n;
@@ -645,7 +649,7 @@ function avanzar() {
 // Respuestas del resultado. En las escalas cognitivas y funcionales se agrupan: primero lo que logra por completo,
 // luego lo parcial y al final lo que no logra.
 const filaRespuesta = (d) => `
-  <div><dt>${esc(d.campo.texto)}</dt><dd><span>${esc(d.respuesta)}${d.anotacion ? ` · ${esc(minusculaInicial(d.anotacion))}` : ''}</span>${d.valor != null ? `<strong>${d.valor}</strong>` : ''}</dd></div>`;
+  <div><dt>${esc(d.campo.textoDesglose || d.campo.texto)}</dt><dd><span>${esc(d.respuesta)}${d.anotacion ? ` · ${esc(minusculaInicial(d.anotacion))}` : ''}</span>${d.valor != null ? `<strong>${d.valor}</strong>` : ''}</dd></div>`;
 const listaRespuestas = (ds) => (ds.length ? `<dl class="desglose">${ds.map(filaRespuesta).join('')}</dl>` : '');
 function bloqueRespuestas(e, desglose) {
   const orden = ordenarPorCapacidad(e, desglose);
