@@ -206,6 +206,11 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - El algoritmo EWGSOP2 reutiliza las cinco levantadas (fuerza) y la caminata de 400 m (desempeño). Las pruebas nuevas están en los complementarios de la valoración de fragilidad y movilidad.
 - La nota completa avisa si la valoración integral no tiene ninguna prueba de desempeño físico. En pantallas angostas, «Futuras herramientas» se muestra en bloques. Total: 117 instrumentos.
 
+## PHQ-2/9 y núcleo de la valoración rápida (versión 2.11.1)
+
+- **PHQ-2/9**: el PHQ-9 empieza con sus 2 primeras preguntas (PHQ-2). Si suman 2 o más, aparecen las 7 restantes y el resultado es el PHQ-9 de 0 a 27; si suman 0 o 1, termina con «PHQ-2 negativo», salvo que el médico decida aplicar las 9 (por ejemplo, para seguir un tratamiento). Corte del paso a PHQ-9 según Levis (2020); el reactivo 9 sigue generando su alerta. Los resultados guardados antes, con las 9 respuestas, siguen calculando igual. Un PHQ-2 y un PHQ-9 solo se comparan por categoría.
+- **Valoración geriátrica rápida**: núcleo de Barthel, Lawton-Brody, Mini-Cog, PHQ-2/9, MNA-SF, FRAIL y SARC-F; complementarias: GDS-15 (alternativa al PHQ-2/9) y TUG.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

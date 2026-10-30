@@ -140,7 +140,7 @@ test('PHQ-9: el reactivo 9 positivo genera una alerta destacada, con cualquier t
   assert.equal(hallazgos.length, 0);
   const nota = notaValoracion({ resultados: [g] }, porId, DOMINIOS, fecha, 'completa');
   const s4 = nota.slice(nota.indexOf('4. HALLAZGOS'));
-  assert.match(s4, /- ALERTA: PHQ-9: Reactivo 9 positivo/);
+  assert.match(s4, /- ALERTA: PHQ-2\/9: Reactivo 9 positivo/);
   assert.ok(!/Sin hallazgos que requieran atención/.test(s4), 'con alerta no se afirma que no haya hallazgos');
 });
 
@@ -268,8 +268,8 @@ test('rutas y dominios: el módulo A sustituye los planes y no quedan planes de 
   const comp = (id) => pasosDe(ruta(id)).filter((p) => p.complementario).map((p) => p.id);
   assert.ok(comp('hospital').includes('rass') && comp('hospital').includes('camicu'));
   for (const id of ['rudas', 'cdr', 'fast', 'npiq', 'cornell']) assert.ok(comp('cognitiva').includes(id), `cognitiva: ${id}`);
-  assert.ok(comp('rapida').includes('phq9'));
-  assert.ok(!pasosDe(ruta('rapida')).some((p) => !p.complementario && !p.plan && p.id === 'phq9'), 'PHQ-9 no duplica a la GDS-15 en el núcleo');
+  assert.ok(comp('rapida').includes('gds15'));
+  assert.ok(!pasosDe(ruta('rapida')).some((p) => !p.complementario && !p.plan && p.id === 'gds15'), 'la GDS-15 no duplica al PHQ-2/9 en el núcleo');
   const cortos = new Set(escalas.map((e) => e.corto.toLowerCase()));
   const planes = [...RUTAS.flatMap((r) => r.planes || []), ...DOMINIOS.flatMap((d) => d.planeadas)];
   for (const p of planes) assert.ok(!cortos.has(p.replace(/ \(registro\)$/, '').toLowerCase()), `plan ya disponible: ${p}`);

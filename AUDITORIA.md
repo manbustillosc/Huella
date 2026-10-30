@@ -133,3 +133,10 @@ Pendiente: confirmar con la autora del original (RMBPC) las condiciones de uso d
 
 Cambio de sección: SPPB, velocidad de marcha, TUG, Tinetti, silla 30 s, equilibrio en 4 etapas y dinamometría pasan de Fragilidad o Caídas a Desempeño físico. Los hallazgos de esas pruebas aparecen ahora en el problema «Desempeño físico» del plan; lo que el médico ya había escrito en «Caídas y movilidad» o «Fragilidad y sarcopenia» se conserva.
 
+## Versión 2.11.1: PHQ-2/9 y valoración rápida, 30/10/2026
+
+| Cambio | Fuente | Revisión |
+|---|---|---|
+| PHQ-2 como primer paso del PHQ-9 | Kroenke, 2003; Levis, 2020 | PHQ-2 = reactivos 1 y 2 (0 a 6). Con ≥2 se completa el PHQ-9: en Levis (2020), PHQ-2 ≥2 seguido de PHQ-9 ≥10 tuvo sensibilidad de 0.82 (PHQ-9 solo: 0.86) y especificidad de 0.87 (0.85), y evitó el PHQ-9 completo al 57 %. El corte de 3 o más es el del PHQ-2 usado solo (Kroenke, 2003). |
+| Núcleo de la valoración rápida | Decisión del médico (30/10/2026) | Barthel, Lawton-Brody, Mini-Cog, PHQ-2/9, MNA-SF, FRAIL y SARC-F; GDS-15 y TUG complementarias. |
+

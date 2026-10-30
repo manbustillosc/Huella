@@ -54,7 +54,7 @@ Estados:
 | FAST | Estadio con palabras clave | © B. Reisberg | Cumple |
 | ICOPE, 7 instrumentos | Adaptación | OPS, CC BY-NC-SA 3.0 IGO | Cumple |
 | GDS-15 | Reactivos | Dominio público (apoyo federal de EE. UU.) | Cumple |
-| PHQ-9 | Reactivos | Pfizer: no requiere permiso para reproducir, traducir ni distribuir | Cumple |
+| PHQ-2/9 | Reactivos (el PHQ-2 son los 2 primeros del PHQ-9) | Pfizer: no requiere permiso para reproducir, traducir ni distribuir | Cumple |
 | Cornell | Registro de subtotales | © G. S. Alexopoulos | Cumple |
 | 4AT | Reactivos en redacción propia | CC BY 4.0 | Cumple (atribución corregida el 11/10/2026) |
 | CAM | Algoritmo en redacción propia | CC BY-NC-SA 4.0 | Cumple (atribución corregida el 11/10/2026) |

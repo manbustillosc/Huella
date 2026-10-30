@@ -22,13 +22,13 @@ test('las nueve rutas apuntan a instrumentos existentes con momentos válidos', 
   }
 });
 
-test('la ruta rápida es breve y conserva el acceso a complementarias', () => {
+test('la ruta rápida tiene el núcleo elegido por el médico y conserva el acceso a complementarias', () => {
   const rapida = RUTAS.find((r) => r.id === 'rapida');
   const nucleo = pasosDe(rapida).filter((p) => !p.plan && !p.complementario);
-  assert.ok(nucleo.length <= 4, 'núcleo de 4 instrumentos o menos');
-  assert.ok(pasosDe(rapida).some((p) => p.complementario));
+  assert.deepEqual(nucleo.map((p) => p.id), ['barthel', 'lawton', 'minicog', 'phq9', 'mnasf', 'frail', 'sarcf']);
+  assert.deepEqual(pasosDe(rapida).filter((p) => p.complementario).map((p) => p.id), ['gds15', 'tug']);
   const t = tiempoRuta(rapida);
-  assert.ok(t.max <= 25, `tiempo estimado ${t.texto}`);
+  assert.ok(t.max <= 45, `tiempo estimado ${t.texto}`);
   assert.match(t.texto, /min/);
   for (const r of RUTAS) assert.ok(tiempoRuta(r).max > 0, `${r.id}: sin tiempo estimado`);
 });
@@ -83,16 +83,16 @@ test('progreso: omitir, retomar y continuar desde donde quedó', () => {
   assert.equal(p.completos, 0);
   assert.equal(siguientePendiente(rapida).id, 'barthel');
   almacen.guardarResultado(guardado('barthel', todos('barthel', () => 0), { momento: 'actual', fecha: '2026-10-10' }));
-  assert.equal(siguientePendiente(rapida).id, 'minicog');
-  almacen.alternarOmitida('rapida', 'minicog', true);
+  assert.equal(siguientePendiente(rapida).id, 'lawton');
+  almacen.alternarOmitida('rapida', 'lawton', true);
   p = progresoRuta(rapida);
   assert.equal(p.completos, 1);
   assert.equal(p.omitidos, 1);
-  assert.equal(siguientePendiente(rapida).id, 'gds15', 'continúa con el siguiente pendiente');
-  almacen.alternarOmitida('rapida', 'minicog', false);
-  assert.equal(siguientePendiente(rapida).id, 'minicog', 'retomado');
+  assert.equal(siguientePendiente(rapida).id, 'minicog', 'continúa con el siguiente pendiente');
+  almacen.alternarOmitida('rapida', 'lawton', false);
+  assert.equal(siguientePendiente(rapida).id, 'lawton', 'retomado');
   // Una complementaria hecha no cuenta para el progreso del núcleo.
-  almacen.guardarResultado(guardado('sarcf', todos('sarcf', () => 0), { fecha: '2026-10-10' }));
+  almacen.guardarResultado(guardado('tug', resp('tug', { estado: 'Sí', tiempo: 9 }), { momento: 'actual', fecha: '2026-10-10' }));
   p = progresoRuta(rapida);
   assert.equal(p.completos, 1);
   assert.equal(p.complementariosHechos, 1);

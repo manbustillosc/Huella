@@ -23,19 +23,19 @@ export const RUTAS = [
   },
   {
     id: 'rapida', nombre: 'Valoración geriátrica rápida', icono: 'rapida',
-    descripcion: 'Núcleo breve para consulta: funcionalidad básica, cognición, ánimo y fragilidad. Las complementarias se agregan según los hallazgos.',
+    descripcion: 'Núcleo breve para consulta: funcionalidad básica e instrumental, cognición, ánimo, nutrición, fragilidad y sarcopenia. Las complementarias se agregan según los hallazgos.',
     pasos: [
       { id: 'barthel', nota: 'Funcionalidad en actividades básicas de la vida diaria.' },
+      { id: 'lawton', nota: 'Actividades instrumentales: detectan el deterioro funcional temprano y ayudan a interpretar la cognición.' },
       { id: 'minicog', nota: 'Tamizaje cognitivo breve.' },
-      { id: 'gds15', nota: 'Tamizaje de síntomas depresivos.' },
+      { id: 'phq9', nota: 'Ánimo: empieza con las 2 preguntas del PHQ-2; si suman 2 o más, completa el PHQ-9.' },
+      { id: 'mnasf', nota: 'Tamizaje nutricional.' },
       { id: 'frail', nota: 'Tamizaje de fragilidad.' },
+      { id: 'sarcf', nota: 'Tamizaje de sarcopenia.' },
     ],
     complementarios: [
-      { id: 'lawton', nota: 'Si se sospecha deterioro funcional temprano o cognitivo (actividades instrumentales).' },
-      { id: 'sarcf', nota: 'Si FRAIL es positivo, o hay debilidad o caídas.' },
-      { id: 'mnasf', nota: 'Si hay pérdida de peso o disminución del apetito.' },
+      { id: 'gds15', nota: 'Alternativa al PHQ-2/9 para síntomas depresivos en personas mayores; no apliques ambas.' },
       { id: 'tug', nota: 'Si hay caídas o alteración de la marcha.' },
-      { id: 'phq9', nota: 'Alternativa a la GDS-15 si necesitas graduar la intensidad o seguir el tratamiento; no apliques ambas.' },
     ],
   },
   {
