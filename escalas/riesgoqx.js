@@ -37,12 +37,13 @@ export default {
     },
   ],
   bandas: [
-    { min: 1, max: 1, etiqueta: 'Cirugía de riesgo bajo', nivel: 'bien', texto: 'Riesgo estimado <1 % a 30 días. En personas asintomáticas no se piden ECG, radiografía de tórax, ecocardiograma ni laboratorio de rutina.', sugerencias: [] },
-    { min: 2, max: 2, etiqueta: 'Cirugía de riesgo intermedio', nivel: 'moderado', hallazgo: true, texto: 'Riesgo estimado de 1 a 5 % a 30 días. Indica ECG de 12 derivaciones y, con ASA III, solicitar VPO.', sugerencias: ['ECG de 12 derivaciones.', 'Con ASA III: solicitar VPO a Medicina Interna.'] },
-    { min: 3, max: 3, etiqueta: 'Cirugía de riesgo alto', nivel: 'grave', hallazgo: true, texto: 'Riesgo estimado >5 % a 30 días. Indica ECG de 12 derivaciones y solicitar VPO desde ASA I; valorar sesión colegiada en casos complejos.', sugerencias: ['ECG de 12 derivaciones.', 'Solicitar VPO a Medicina Interna (desde ASA I).', 'Casos complejos: sesión colegiada interdisciplinaria.'] },
+    { min: 1, max: 1, riesgo: 'menos de 1 %', etiqueta: 'Cirugía de riesgo bajo', nivel: 'bien', texto: 'Riesgo estimado <1 % a 30 días. En personas asintomáticas no se piden ECG, radiografía de tórax, ecocardiograma ni laboratorio de rutina.', sugerencias: [] },
+    { min: 2, max: 2, riesgo: '1 a 5 %', etiqueta: 'Cirugía de riesgo intermedio', nivel: 'moderado', hallazgo: true, texto: 'Riesgo estimado de 1 a 5 % a 30 días. Indica ECG de 12 derivaciones y, con ASA III, solicitar VPO.', sugerencias: ['ECG de 12 derivaciones.', 'Con ASA III: solicitar VPO a Medicina Interna.'] },
+    { min: 3, max: 3, riesgo: 'más de 5 %', etiqueta: 'Cirugía de riesgo alto', nivel: 'grave', hallazgo: true, texto: 'Riesgo estimado >5 % a 30 días. Indica ECG de 12 derivaciones y solicitar VPO desde ASA I; valorar sesión colegiada en casos complejos.', sugerencias: ['ECG de 12 derivaciones.', 'Solicitar VPO a Medicina Interna (desde ASA I).', 'Casos complejos: sesión colegiada interdisciplinaria.'] },
   ],
   calcular: ({ v }) => ({ valor: v.categoria.valor, mostrar: ['', 'Bajo', 'Intermedio', 'Alto'][v.categoria.valor], sufijo: 'riesgo del procedimiento', unidad: '' }),
-  resumen: (res) => `Riesgo del procedimiento (ESC 2022): ${res.banda.etiqueta.replace('Cirugía de riesgo ', '')}.`,
+  frase: (res) => `${res.banda.etiqueta} (ESC 2022): ${res.banda.riesgo} de riesgo de muerte cardiovascular, infarto o EVC a 30 días.`,
+  resumen: (res) => `${res.banda.etiqueta} (ESC 2022): ${res.banda.riesgo} de riesgo de muerte cardiovascular, infarto o EVC a 30 días.`,
   resumenBreve: (res) => `Procedimiento de riesgo ${res.banda.etiqueta.replace('Cirugía de riesgo ', '')}`,
   detalleEnResumen: true,
   notas: [

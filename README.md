@@ -211,6 +211,14 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **PHQ-2/9**: el PHQ-9 empieza con sus 2 primeras preguntas (PHQ-2). Si suman 2 o más, aparecen las 7 restantes y el resultado es el PHQ-9 de 0 a 27; si suman 0 o 1, termina con «PHQ-2 negativo», salvo que el médico decida aplicar las 9 (por ejemplo, para seguir un tratamiento). Corte del paso a PHQ-9 según Levis (2020); el reactivo 9 sigue generando su alerta. Los resultados guardados antes, con las 9 respuestas, siguen calculando igual. Un PHQ-2 y un PHQ-9 solo se comparan por categoría.
 - **Valoración geriátrica rápida**: núcleo de Barthel, Lawton-Brody, Mini-Cog, PHQ-2/9, MNA-SF, FRAIL y SARC-F; complementarias: GDS-15 (alternativa al PHQ-2/9) y TUG.
 
+## Riesgo prequirúrgico en una frase (versión 2.12)
+
+- **En pocas palabras**: ASA, RCRI, Gupta (MICA), ARISCAT, Caprini, riesgo del procedimiento (ESC 2022), DASI y ACS NSQIP muestran, debajo de la categoría, una frase con el porcentaje de riesgo y su fuente, con botón para copiarla. Es también el texto de la nota y de la interpretación en la nota completa.
+- **ASA**: mortalidad perioperatoria publicada por clase: I 0 a 0.3 %, II 0.3 a 1.4 %, III 1.8 a 5.4 %, IV 7.8 a 25.9 %, V 9.4 a 57.8 % (rangos reunidos por Wolters, 1996), con una tabla de todas las clases; ASA VI no tiene riesgo aplicable.
+- **Gupta (MICA)**: nuevo. Porcentaje de riesgo de infarto o paro cardiaco hasta 30 días según la edad, la ASA, el estado funcional, la creatinina y 21 tipos de cirugía (ecuación de Gupta, 2011, con datos ACS NSQIP); menos de 1 % es riesgo bajo (ACC/AHA). Reutiliza la ASA y la creatinina guardadas.
+- **ACS NSQIP**: nuevo registro de los porcentajes de la calculadora oficial (muerte, complicación grave, cualquier complicación, neumonía, complicación cardiaca, TEV y otros). Huella no reproduce ni aproxima ese modelo.
+- **Ruta prequirúrgica**: «Resultados en pocas palabras» reúne las frases de los instrumentos aplicados, en el orden de la ruta, con «Copiar los resultados». El núcleo pasa a ser ASA, RCRI, Gupta, DASI, ARISCAT, Caprini, CFS, Mini-Cog, Barthel, MNA-SF y CKD-EPI; ACS NSQIP queda entre las complementarias. Total: 119 instrumentos.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

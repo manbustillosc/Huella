@@ -65,6 +65,8 @@ export const EJEMPLOS = {
   caminata400: () => resp('caminata400', { completa: 'Sí', minutos: 6, segundos: 25, auxiliar: 'Ninguno' }),
   monopodal: () => resp('monopodal', { edad: 81, tiempo: 3.5, pierna: 'Derecha' }),
   alcance: () => resp('alcance', { sexo: 'Hombre', edad: 79, puede: 'Sí', alcance: 22 }),
+  gupta: () => resp('gupta', { edad: 78, asa: 'ASA III', funcional: 'Independiente', creatinina: 'No', cirugia: 'Ortopédica y de extremidades (no vascular)' }),
+  nsqip: () => resp('nsqip', { muerte: 1.2, grave: 8.5, cualquiera: 11.3, neumonia: 1.4, cardiaca: 0.9, tev: 1.1, estancia: 4.5 }),
   sprmbpc: () => resp('sprmbpc', {
     ...Object.fromEntries(Array.from({ length: 24 }, (_, i) => [`f${i + 1}`, 'Nunca'])),
     f1: '3 a 6 veces en la última semana', a1: 'Un poco',

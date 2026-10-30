@@ -131,6 +131,8 @@ Estados:
 | Recursos sociales OARS | Registro de la categoría; no reproduce las 13 preguntas | Duke University; formato del INGER (anexo 37) | Cumple (solo registro) |
 | Díaz-Veiga | Preguntas resumidas con redacción propia | Díaz-Veiga; formato del INGER (anexo 38) | Cumple |
 | Barreras del entorno | Barreras resumidas con redacción propia | Formato del INGER (anexo 35) | Cumple |
+| Gupta (MICA) | Ecuación logística publicada (coeficientes de Gupta, 2011) | Modelo publicado; sin titular de la ecuación | Cumple |
+| ACS NSQIP | Registro de los porcentajes de la calculadora oficial; no reproduce ni aproxima el modelo | © American College of Surgeons (riskcalculator.facs.org) | Cumple (solo registro) |
 | Silla 5 veces | Procedimiento con redacción propia; cortes del EWGSOP2, ICOPE y AWGS; promedios de Bohannon (2006) | Prueba clínica sin titular | Cumple |
 | Caminata 6 min | Procedimiento con redacción propia según la ATS (2002); ecuaciones de Enright y Sherrill (1998) | Prueba clínica sin titular; las ecuaciones son datos publicados | Cumple |
 | Caminata 400 m | Procedimiento con redacción propia; corte del EWGSOP2 | Prueba clínica sin titular | Cumple |

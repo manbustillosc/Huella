@@ -140,3 +140,12 @@ Cambio de sección: SPPB, velocidad de marcha, TUG, Tinetti, silla 30 s, equilib
 | PHQ-2 como primer paso del PHQ-9 | Kroenke, 2003; Levis, 2020 | PHQ-2 = reactivos 1 y 2 (0 a 6). Con ≥2 se completa el PHQ-9: en Levis (2020), PHQ-2 ≥2 seguido de PHQ-9 ≥10 tuvo sensibilidad de 0.82 (PHQ-9 solo: 0.86) y especificidad de 0.87 (0.85), y evitó el PHQ-9 completo al 57 %. El corte de 3 o más es el del PHQ-2 usado solo (Kroenke, 2003). |
 | Núcleo de la valoración rápida | Decisión del médico (30/10/2026) | Barthel, Lawton-Brody, Mini-Cog, PHQ-2/9, MNA-SF, FRAIL y SARC-F; GDS-15 y TUG complementarias. |
 
+## Versión 2.12: riesgo prequirúrgico en una frase, 30/10/2026
+
+| Instrumento | Fuente | Revisión |
+|---|---|---|
+| ASA | Wolters, 1996; Daabiss, 2011 | Mortalidad absoluta publicada por clase: I 0–0.3 %, II 0.3–1.4 %, III 1.8–5.4 %, IV 7.8–25.9 %, V 9.4–57.8 %. Daabiss cita 1.8–4.5 % para la clase III; se usa 1.8–5.4 %, la cifra de la tabla más difundida y la del médico. Rangos de estudios con distinto seguimiento: no son un riesgo individual. |
+| Gupta (MICA) | Gupta, 2011 (Circulation) | x = −5.25 + 0.02 × edad + funcional (0; 0.65; 1.03) + ASA (−5.17; −3.29; −1.92; −0.95; 0) + creatinina >1.5 (0.61) + cirugía (21 grupos; hernia = 0). Coeficientes cotejados en tres calculadoras públicas; ejemplo de 72 años, ASA III, parcialmente dependiente, creatinina >1.5 y cirugía aórtica = 5.37 %. Desenlace: infarto o paro cardiaco a 30 días. Umbral de 1 %: ACC/AHA 2014. |
+| ACS NSQIP | Bilimoria, 2013 | Solo registro de la calculadora oficial; el modelo no es público. |
+| RCRI, ARISCAT, Caprini, ESC 2022, DASI | Fuentes ya revisadas | La frase usa las mismas cifras que las categorías: RCRI (Lee, 1999 y CCS, 2017), ARISCAT (PERISCOPE), Caprini (ACCP 2012, riesgo sin profilaxis), ESC 2022 (muerte cardiovascular, infarto o EVC a 30 días). |
+

@@ -79,6 +79,7 @@ import { must, norton, dolorIntensidad, karnofsky, ppi, asa, lsns6, maltrato, ve
 import { isaacs, gpcog, gohai, mos, caprini, lace, g8, esasr, spict, necpal, mme } from './fase5.js';
 import { atenas, isarhp, harp, sppicees, susurro, lsa, oars, diazveiga, barreras, sprmbpc } from './inger.js';
 import { silla5, caminata6, caminata400, monopodal, alcance } from './desempeno.js';
+import { gupta, nsqip } from './prequirurgicas.js';
 
 export const ESCALAS = [
   barthel, katz, lawton, pfeffer, rankin,
@@ -97,7 +98,7 @@ export const ESCALAS = [
   braden, norton,
   painad, dolorIntensidad,
   charlson, cirsg, news2, lace, isarhp, harp, sppicees,
-  rcri, ariscat, dasi, asa, riesgoqx, caprini,
+  rcri, gupta, nsqip, ariscat, dasi, asa, riesgoqx, caprini,
   pps, karnofsky, ppi, esasr, spict, necpal,
   icopeFactores, zarit, sprmbpc, gijon, lsns6, soledad3, mos, oars, diazveiga, barreras, maltrato,
   ckdepi, cockcroft, bis, mme,

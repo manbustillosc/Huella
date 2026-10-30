@@ -300,6 +300,9 @@ export function calcular(escala, r = {}, ctx = {}) {
 
 const etiquetaMin = (banda) => minusculaInicial(banda.etiqueta);
 
+// Resultado en una frase sencilla, con el porcentaje de riesgo publicado cuando lo hay (instrumentos con «frase»).
+export const fraseDe = (escala, res) => (!res || res.noEvaluable || !res.completo || !escala.frase ? null : escala.frase(res));
+
 export function resumenDe(escala, res) {
   if (res.noEvaluable) return `${escala.corto}: no evaluable (${minusculaInicial(res.noEvaluable)}).`;
   if (escala.resumen) return escala.resumen(res);

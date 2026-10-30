@@ -273,7 +273,10 @@ const ASA = [
   ['V', 'Moribundo', 'No se espera que sobreviva sin la operación.', ['aneurisma abdominal o torácico roto', 'trauma masivo', 'hemorragia intracraneal con efecto de masa', 'isquemia intestinal con cardiopatía significativa o falla de varios órganos'], 'critico'],
   ['VI', 'Muerte encefálica', 'Paciente con muerte encefálica declarada cuyos órganos se procuran para donación.', ['donador de órganos'], 'critico'],
 ];
-const textoAsa = ([, , def, ej]) => `${def} Ejemplos: ${ej.join('; ')}.`;
+// Mortalidad perioperatoria absoluta publicada por clase (rangos reunidos por Wolters, 1996; citados por Daabiss, 2011).
+export const MORTALIDAD_ASA = { I: '0 a 0.3', II: '0.3 a 1.4', III: '1.8 a 5.4', IV: '7.8 a 25.9', V: '9.4 a 57.8' };
+export const fraseMortalidadAsa = (clase) => (MORTALIDAD_ASA[clase] ? `${MORTALIDAD_ASA[clase]} % de riesgo de mortalidad perioperatoria` : null);
+const textoAsa = ([c, , def, ej]) => `${def} Ejemplos: ${ej.join('; ')}.${MORTALIDAD_ASA[c] ? ` Mortalidad perioperatoria publicada para la clase ${c}: ${MORTALIDAD_ASA[c]} %.` : ''}`;
 const detalleAsa = ([, , def, ej]) => `${def}\nEjemplos: ${ej.join(' · ')}.`;
 
 export const asa = {
@@ -301,18 +304,41 @@ export const asa = {
   calcular({ v }) {
     const c = ASA[v.clase.valor - 1][0];
     const e = v.urgencia.valor === 1 ? 'E' : '';
-    return { valor: v.clase.valor, mostrar: `${c}${e}`, sufijo: 'ASA', unidad: '', extras: { clase: c, urgencia: Boolean(e) } };
+    const lineas = [];
+    if (MORTALIDAD_ASA[c]) lineas.push(`ASA ${c}: ${fraseMortalidadAsa(c)} (rangos publicados; varían según la población, la cirugía y el tiempo de seguimiento).`);
+    else lineas.push('ASA VI: paciente con muerte encefálica para donación de órganos; no aplica un riesgo de mortalidad perioperatoria.');
+    if (e) lineas.push('Cirugía de urgencia («E»): el riesgo es mayor que en una cirugía programada de la misma clase.');
+    return {
+      valor: v.clase.valor, mostrar: `${c}${e}`, sufijo: 'ASA', unidad: '', lineas, lineasNota: lineas.slice(1),
+      detalles: [{
+        titulo: 'Mortalidad perioperatoria publicada por clase',
+        encabezados: ['Clase', 'Estado físico', 'Mortalidad'],
+        filas: ASA.slice(0, 5).map(([cl, nombre]) => [`ASA ${cl}${cl === c ? ' (esta persona)' : ''}`, nombre, `${MORTALIDAD_ASA[cl]} %`]),
+      }],
+      extras: { clase: c, urgencia: Boolean(e), mortalidad: MORTALIDAD_ASA[c] || null },
+    };
   },
-  resumen: (res) => `ASA ${res.mostrar} (${res.banda.etiqueta.replace(/^ASA [IV]+: /, '')}).`,
+  frase: (res) => {
+    const c = res.extras.clase;
+    const nombre = res.banda.etiqueta.replace(/^ASA [IV]+: /, '');
+    const urg = res.extras.urgencia ? ' Cirugía de urgencia («E»): el riesgo es mayor.' : '';
+    if (!MORTALIDAD_ASA[c]) return `ASA ${res.mostrar} (${nombre}): no aplica un riesgo de mortalidad perioperatoria.${urg}`;
+    return `ASA ${res.mostrar} (${nombre}): ${fraseMortalidadAsa(c)}.${urg}`;
+  },
+  resumen: (res) => asa.frase(res),
   resumenBreve: (res) => `ASA ${res.mostrar}`,
   notas: [
     'Definiciones y ejemplos en adultos de la ASA (actualización de diciembre de 2020), resumidos con redacción propia; los ejemplos no son una lista completa ni sustituyen el juicio clínico.',
     'La edad por sí sola no cambia la clase. No incluye la fragilidad: complétala con RCRI, ARISCAT y la valoración geriátrica.',
     '«E» se agrega a cualquier clase cuando la cirugía es de urgencia: el retraso aumentaría la amenaza para la vida o para un órgano.',
+    'Mortalidad perioperatoria absoluta publicada por clase: I 0 a 0.3 %; II 0.3 a 1.4 %; III 1.8 a 5.4 %; IV 7.8 a 25.9 %; V 9.4 a 57.8 % (rangos de varios estudios reunidos por Wolters, 1996). Varían según la población, la cirugía y el seguimiento: algunos estudios solo contaron las primeras 48 horas o 7 días. Para la clase III, Daabiss (2011) cita 1.8 a 4.5 %.',
+    'La ASA no considera el tipo de cirugía: para el riesgo del procedimiento usa también RCRI, Gupta (MICA), ARISCAT, Caprini o la calculadora ACS NSQIP.',
   ],
   licencia: { texto: 'ASA Physical Status Classification System © American Society of Anesthesiologists. Huella resume las definiciones con redacción propia.', enlace: 'https://www.asahq.org/standards-and-practice-parameters/statement-on-asa-physical-status-classification-system' },
   referencias: [
     { texto: 'American Society of Anesthesiologists. Statement on ASA Physical Status Classification System. Última modificación: 13 de diciembre de 2020.', enlace: 'https://www.asahq.org/standards-and-practice-parameters/statement-on-asa-physical-status-classification-system' },
+    { texto: 'Wolters U, Wolf T, Stützer H, Schröder T. ASA classification and perioperative variables as predictors of postoperative outcome. Br J Anaesth. 1996;77(2):217-22.', doi: '10.1093/bja/77.2.217' },
+    { texto: 'Daabiss M. American Society of Anaesthesiologists physical status classification. Indian J Anaesth. 2011;55(2):111-5.', doi: '10.4103/0019-5049.79879' },
   ],
 };
 

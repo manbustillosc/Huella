@@ -1,7 +1,7 @@
 // Estado de una ruta guiada a partir de la valoración en curso.
 import { almacen } from '../almacen.js';
 import { porId, pasosDe, momentoPorDefecto } from '../datos.js';
-import { minutosDe } from '../motor.js';
+import { minutosDe, calcular, fraseDe } from '../motor.js';
 
 export const momentoDeRuta = (ruta) => (ruta.momentos ? almacen.momentoRuta(ruta.id) || ruta.momento : ruta.momento || null);
 
@@ -96,3 +96,19 @@ export function siguientePendiente(ruta, desde = -1) {
 
 export const urlPaso = (ruta, paso, resultado = false) =>
   `#/r/${ruta.id}/${paso.id}${paso.momento ? `@${paso.momento}` : ''}${resultado ? '/resultado' : ''}`;
+
+// Frases sencillas de los instrumentos aplicados en la ruta (los que tienen «frase», como los riesgos prequirúrgicos),
+// en el orden de la ruta. Se recalculan desde las respuestas guardadas para usar siempre el texto vigente.
+export function frasesRuta(ruta) {
+  const vistos = new Set();
+  const out = [];
+  for (const p of pasosConEstado(ruta)) {
+    if (!p.resultado || p.resultado.noEvaluable || !p.escala?.frase || vistos.has(p.id)) continue;
+    vistos.add(p.id);
+    const res = calcular(p.escala, p.resultado.respuestas || {});
+    const f = fraseDe(p.escala, res) || p.resultado.resumen;
+    if (f) out.push({ id: p.id, texto: f });
+  }
+  return out;
+}
+

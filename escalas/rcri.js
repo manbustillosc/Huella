@@ -10,6 +10,15 @@ const SUG_BASE = [
   'Completar la valoración preoperatoria geriátrica: cognición (Mini-Cog), riesgo de delirium, fragilidad (CFS o FRAIL), funcionalidad y nutrición.',
 ];
 
+// Resultado en una frase: clase, riesgo y fuente de cada cifra.
+function fraseRcri({ puntaje, banda, presentes }) {
+  const clase = inicialMinuscula(banda.etiqueta.replace(' · ', ', '));
+  const factores = presentes.length
+    ? ` ${presentes.length === 1 ? 'Factor' : 'Factores'}: ${presentes.map(inicialMinuscula).join('; ')}.`
+    : ' Sin factores de riesgo.';
+  return `RCRI ${puntaje} ${puntaje === 1 ? 'punto' : 'puntos'}, ${clase}: ${banda.original} % de complicaciones cardiacas mayores (infarto, edema pulmonar, fibrilación ventricular o paro cardiaco, o bloqueo AV completo; Lee, 1999) y ${banda.recalibrado} % de muerte, infarto o paro cardiaco a 30 días (recalibración canadiense, 2017).${factores}`;
+}
+
 export default {
   id: 'rcri',
   nombre: 'Índice de Riesgo Cardiaco Revisado (RCRI)',
@@ -66,13 +75,8 @@ export default {
       }],
     };
   },
-  resumen({ puntaje, max, banda, presentes }) {
-    const clase = inicialMinuscula(banda.etiqueta.replace(' · ', ', '));
-    const factores = presentes.length
-      ? ` ${presentes.length === 1 ? 'Factor' : 'Factores'}: ${presentes.map(inicialMinuscula).join('; ')}.`
-      : ' Sin factores de riesgo.';
-    return `RCRI (Lee): ${puntaje}/${max}, ${clase}. Muerte, infarto o paro cardiaco a 30 días: ${banda.recalibrado} % (recalibración CCS 2017).${factores}`;
-  },
+  frase: fraseRcri,
+  resumen: fraseRcri,
   resumenBreve({ puntaje, max, banda, presentes }) {
     const clase = inicialMinuscula(banda.etiqueta.replace(' · ', ', '));
     const factores = presentes.length

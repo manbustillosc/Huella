@@ -346,10 +346,10 @@ export const caprini = {
     { id: 'f5', tipo: 'checklist', texto: 'Factores de 5 puntos', textoCorto: 'factores de 5 puntos', opciones: lista(F5) },
   ],
   bandas: [
-    { min: 0, max: 0, etiqueta: 'Riesgo muy bajo de tromboembolia venosa', nivel: 'bien', texto: '0 puntos (riesgo estimado menor de 0.5 % en la guía del ACCP).', sugerencias: ['Deambulación temprana.'] },
-    { min: 1, max: 2, etiqueta: 'Riesgo bajo de tromboembolia venosa', nivel: 'leve', texto: '1 a 2 puntos (alrededor de 1.5 %).', sugerencias: ['Profilaxis mecánica, de preferencia compresión neumática intermitente, además de la deambulación temprana.'] },
-    { min: 3, max: 4, etiqueta: 'Riesgo moderado de tromboembolia venosa', nivel: 'moderado', hallazgo: true, texto: '3 a 4 puntos (alrededor de 3 %).', sugerencias: ['Profilaxis farmacológica si el riesgo de sangrado no es alto; si lo es, profilaxis mecánica.', NOTA_SANGRADO] },
-    { min: 5, max: 99, etiqueta: 'Riesgo alto de tromboembolia venosa', nivel: 'grave', hallazgo: true, texto: '5 puntos o más (alrededor de 6 %).', sugerencias: ['Profilaxis farmacológica más mecánica si el riesgo de sangrado lo permite; considerar profilaxis extendida (4 semanas) tras cirugía abdominal o pélvica por cáncer.', NOTA_SANGRADO] },
+    { min: 0, max: 0, riesgo: 'menos de 0.5 %', etiqueta: 'Riesgo muy bajo de tromboembolia venosa', nivel: 'bien', texto: '0 puntos (riesgo estimado menor de 0.5 % en la guía del ACCP).', sugerencias: ['Deambulación temprana.'] },
+    { min: 1, max: 2, riesgo: 'alrededor de 1.5 %', etiqueta: 'Riesgo bajo de tromboembolia venosa', nivel: 'leve', texto: '1 a 2 puntos (alrededor de 1.5 %).', sugerencias: ['Profilaxis mecánica, de preferencia compresión neumática intermitente, además de la deambulación temprana.'] },
+    { min: 3, max: 4, riesgo: 'alrededor de 3 %', etiqueta: 'Riesgo moderado de tromboembolia venosa', nivel: 'moderado', hallazgo: true, texto: '3 a 4 puntos (alrededor de 3 %).', sugerencias: ['Profilaxis farmacológica si el riesgo de sangrado no es alto; si lo es, profilaxis mecánica.', NOTA_SANGRADO] },
+    { min: 5, max: 99, riesgo: 'alrededor de 6 %', etiqueta: 'Riesgo alto de tromboembolia venosa', nivel: 'grave', hallazgo: true, texto: '5 puntos o más (alrededor de 6 %).', sugerencias: ['Profilaxis farmacológica más mecánica si el riesgo de sangrado lo permite; considerar profilaxis extendida (4 semanas) tras cirugía abdominal o pélvica por cáncer.', NOTA_SANGRADO] },
   ],
   calcular({ v }) {
     const edad = puntosEdadCaprini(v.edad);
@@ -362,9 +362,11 @@ export const caprini = {
     const lineas = [`Edad ${v.edad} años (${edad}).`, marcados.length ? `Factores: ${marcados.join('; ')}.` : 'Sin otros factores.'];
     return { puntaje, lineas, lineasNota: lineas, extras: { edad, factores: marcados.length } };
   },
+  frase: (res) => `Caprini ${res.puntaje} ${res.puntaje === 1 ? 'punto' : 'puntos'}: ${res.banda.etiqueta.toLowerCase()} (${res.banda.riesgo} sin profilaxis, según la guía del ACCP 2012).`,
+  resumen: (res) => `Caprini ${res.puntaje} ${res.puntaje === 1 ? 'punto' : 'puntos'}: ${res.banda.etiqueta.toLowerCase()} (${res.banda.riesgo} sin profilaxis, según la guía del ACCP 2012).`,
   notas: [
     'Puntos y factores según la versión de 2005 publicada en la guía de la AHRQ (apéndice B.10). Existen otras versiones con puntajes distintos; no se mezclan.',
-    'Categorías y profilaxis sugerida: guía del ACCP para cirugía general y abdominopélvica no ortopédica (Gould, 2012). En cirugía ortopédica mayor la profilaxis se decide por el tipo de cirugía.',
+    'Categorías, riesgo estimado sin profilaxis y profilaxis sugerida: guía del ACCP para cirugía general y abdominopélvica no ortopédica (Gould, 2012). En cirugía ortopédica mayor la profilaxis se decide por el tipo de cirugía.',
     NOTA_SANGRADO,
   ],
   licencia: { texto: 'Modelo publicado por Caprini (2005) y difundido por la AHRQ (apéndice B.10 de su guía de prevención de tromboembolia venosa). Redacción propia.', enlace: 'https://www.ahrq.gov/es/patient-safety/settings/hospital/vtguide/appb2.html' },

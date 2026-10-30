@@ -40,7 +40,7 @@ test('ARISCAT: clases <26, 26–44 y ≥45 con desenlace y población explícito
   assert.equal(ar({ edad: 60, anemia: 'Sí', incision: 'Intratorácica', urgencia: 'Sí' }).banda.etiqueta, 'Riesgo alto');
   assert.match(ar({}).banda.texto, /PERISCOPE/);
   assert.ok(porId.ariscat.notas.some((n) => /Desenlace/.test(n) && /hospitalización/.test(n)));
-  assert.match(resumenDe(porId.ariscat, ar({ urgencia: 'Sí' })), /ARISCAT: 8 puntos \(riesgo bajo de complicaciones pulmonares posoperatorias\)/);
+  assert.equal(resumenDe(porId.ariscat, ar({ urgencia: 'Sí' })), 'ARISCAT 8 puntos: riesgo bajo de complicaciones pulmonares intrahospitalarias (3.4 % en la validación europea PERISCOPE).');
 });
 
 /* ---------- DASI ---------- */
@@ -97,7 +97,7 @@ test('PPS: niveles de 10 % a 100 %, seguimiento longitudinal y sin esperanza de 
 test('ruta prequirúrgica: agrupa RCRI, DASI, ARISCAT, CFS, cognición, función, nutrición y riñón sin combinarlos', () => {
   const r = RUTAS.find((x) => x.id === 'preqx');
   const nucleo = pasosDe(r).filter((p) => !p.plan && !p.complementario);
-  assert.deepEqual(nucleo.map((p) => p.id), ['rcri', 'dasi', 'ariscat', 'cfs', 'minicog', 'barthel', 'mnasf', 'ckdepi']);
+  assert.deepEqual(nucleo.map((p) => p.id), ['asa', 'rcri', 'gupta', 'dasi', 'ariscat', 'caprini', 'cfs', 'minicog', 'barthel', 'mnasf', 'ckdepi']);
   assert.ok(nucleo.every((p) => p.grupo), 'cada paso tiene su grupo');
   assert.match(r.descripcion, /no se combinan en un riesgo único/);
   const planes = [...RUTAS.flatMap((x) => x.planes || []), ...DOMINIOS.flatMap((d) => d.planeadas)].join(' | ');

@@ -13,12 +13,12 @@ export function puntosSpO2(spo2) {
 
 const BANDAS = [
   {
-    id: 'bajo', min: 0, max: 25, rango: 'Menos de 26', etiqueta: 'Riesgo bajo', nivel: 'bien',
+    id: 'bajo', periscope: '3.4', min: 0, max: 25, rango: 'Menos de 26', etiqueta: 'Riesgo bajo', nivel: 'bien',
     texto: 'Riesgo bajo de complicaciones pulmonares posoperatorias. En la validación europea PERISCOPE se observaron en 3.4 % durante la hospitalización.',
     sugerencias: [],
   },
   {
-    id: 'intermedio', min: 26, max: 44, rango: '26 a 44', etiqueta: 'Riesgo intermedio', nivel: 'moderado', hallazgo: true,
+    id: 'intermedio', periscope: '13.0', min: 26, max: 44, rango: '26 a 44', etiqueta: 'Riesgo intermedio', nivel: 'moderado', hallazgo: true,
     texto: 'Riesgo intermedio de complicaciones pulmonares posoperatorias. En la validación europea PERISCOPE se observaron en 13.0 % durante la hospitalización.',
     sugerencias: [
       'Optimizar factores modificables antes de la cirugía (infección respiratoria reciente, anemia, enfermedad pulmonar descompensada) cuando la urgencia lo permita.',
@@ -26,7 +26,7 @@ const BANDAS = [
     ],
   },
   {
-    id: 'alto', min: 45, max: 123, rango: '45 o más', etiqueta: 'Riesgo alto', nivel: 'grave', hallazgo: true,
+    id: 'alto', periscope: '38.0', min: 45, max: 123, rango: '45 o más', etiqueta: 'Riesgo alto', nivel: 'grave', hallazgo: true,
     texto: 'Riesgo alto de complicaciones pulmonares posoperatorias. En la validación europea PERISCOPE se observaron en 38.0 % durante la hospitalización.',
     sugerencias: [
       'Optimizar factores modificables y discutir con el equipo quirúrgico y de anestesia la técnica, la duración prevista y la vigilancia posoperatoria.',
@@ -98,7 +98,8 @@ export default {
     const lineas = [conPuntos.length ? `Puntos: ${conPuntos.join('; ')}.` : 'Ninguna variable suma puntos.'];
     return { puntaje, lineas, lineasNota: lineas, extras: Object.fromEntries(partes.map((x) => [x[0], x[2]])) };
   },
-  resumen: (res) => `ARISCAT: ${res.puntaje} puntos (${res.banda.etiqueta.toLowerCase()} de complicaciones pulmonares posoperatorias).`,
+  frase: (res) => `ARISCAT ${res.puntaje} ${res.puntaje === 1 ? 'punto' : 'puntos'}: ${res.banda.etiqueta.toLowerCase()} de complicaciones pulmonares intrahospitalarias (${res.banda.periscope} % en la validación europea PERISCOPE).`,
+  resumen: (res) => `ARISCAT ${res.puntaje} ${res.puntaje === 1 ? 'punto' : 'puntos'}: ${res.banda.etiqueta.toLowerCase()} de complicaciones pulmonares intrahospitalarias (${res.banda.periscope} % en la validación europea PERISCOPE).`,
   resumenBreve: (res) => `ARISCAT ${res.puntaje} (${res.banda.etiqueta.toLowerCase()} pulmonar)`,
   detalleEnResumen: true,
   notas: [

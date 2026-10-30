@@ -105,6 +105,9 @@ export default {
     };
   },
   resumen: (res) => `DASI: ${res.mostrar}/${MAX_DASI} (${res.banda.id === 'bajo' ? 'capacidad funcional baja, ≤34' : 'mayor de 34'}); ${fmt(res.extras.met)} MET estimados.`,
+  frase: (res) => (res.banda.id === 'bajo'
+    ? `DASI ${res.mostrar} (${fmt(res.extras.met)} MET estimados): capacidad funcional baja (34 o menos), asociada con más muerte o infarto a 30 días tras cirugía no cardiaca (estudio METS).`
+    : `DASI ${res.mostrar} (${fmt(res.extras.met)} MET estimados): capacidad funcional por encima del umbral de riesgo de la guía AHA/ACC 2024 (más de 34).`),
   resumenBreve: (res) => `DASI ${res.mostrar} (${res.banda.id === 'bajo' ? '≤34' : '>34'}; ${fmt(res.extras.met)} MET estimados)`,
   detalleEnResumen: true,
   notas: [

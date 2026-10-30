@@ -4,9 +4,9 @@ import { rutaDe } from '../datos.js';
 import { momentoDe } from '../motor.js';
 import { valorGuardado } from '../nota.js';
 import { etiquetaAplicacion } from '../comparacion.js';
-import { $$, esc, icono, plural, aviso, estadoHerramienta } from '../ui.js';
+import { $, $$, esc, icono, plural, aviso, estadoHerramienta, copiar } from '../ui.js';
 import { herramientaDe } from '../herramientas.js';
-import { progresoRuta, siguientePendiente, urlPaso, tiempoRuta, momentoDeRuta } from './rutas-estado.js';
+import { progresoRuta, siguientePendiente, urlPaso, tiempoRuta, momentoDeRuta, frasesRuta } from './rutas-estado.js';
 
 const ESTADOS = {
   completo: ['completo', 'Completo'],
@@ -88,6 +88,7 @@ export function renderRuta({ id }) {
   const nucleo = p.pasos.filter((x) => x.estado !== 'plan' && !x.complementario);
   const planes = p.pasos.filter((x) => x.estado === 'plan');
   const terminado = !sig;
+  const frases = frasesRuta(ruta);
   return `
     <section class="vista ruta">
       <a class="migas" href="#/">${icono('atras')} Inicio</a>
@@ -119,6 +120,12 @@ export function renderRuta({ id }) {
           <span><strong>${esc(ruta.destacada.texto)}</strong><span>${esc(ruta.destacada.nota)}</span></span>
           ${icono('adelante', 'chev')}
         </a>` : ''}
+      ${frases.length ? `
+        <section class="frases-ruta" aria-labelledby="t-frases">
+          <h2 class="sub" id="t-frases">Resultados en pocas palabras</h2>
+          <ul>${frases.map((f) => `<li>${esc(f.texto)}</li>`).join('')}</ul>
+          <button class="btn btn-chico" type="button" id="copiar-frases">${icono('copiar')} Copiar los resultados</button>
+        </section>` : ''}
       <h2 class="seccion">Núcleo</h2>
       <ol class="pasos">${listaPasos(ruta, nucleo)}</ol>
       ${p.complementarios.length ? `
@@ -151,6 +158,7 @@ export function renderRuta({ id }) {
 }
 
 export function montarRuta({ id }, rerender) {
+  $('#copiar-frases')?.addEventListener('click', () => copiar(frasesRuta(rutaDe(id)).map((f) => f.texto).join('\n'), 'Resultados copiados'));
   $$('[data-retomar]').forEach((b) => b.addEventListener('click', () => {
     almacen.alternarOmitida(id, b.dataset.retomar, false);
     aviso('Instrumento retomado');

@@ -4,7 +4,7 @@ import { porId, dominioDe, momentoPorDefecto } from '../datos.js';
 import {
   calcular, resumenDe, resumenBreveDe, textoEscala, posicionMarcador, rangoTexto, campoVisible,
   limpiarOcultas, TIPOS, MOMENTOS, momentoDe, FUENTES, MOTIVOS_NO_EVALUABLE, minusculaInicial, NINGUNO, TEXTO_NINGUNO,
-  ordenarPorCapacidad,
+  ordenarPorCapacidad, fraseDe,
 } from '../motor.js';
 import {
   compararResultados, esUnico, etiquetaAplicacion, fechaCorta, textoRespectoA, textoCambio, vigenteDe, diasEntre,
@@ -840,6 +840,7 @@ export function renderResultado(params) {
   const m = e.momentos ? momentoDe(ctx.momento) : null;
   const pa = pasoActual(ctx);
   const botones = botonesGuardado(ctx, plan);
+  const frase = fraseDe(e, res);
 
   return `
     <section class="vista resultado">
@@ -853,6 +854,12 @@ export function renderResultado(params) {
             : res.puntaje == null && res.valor == null && !res.mostrar ? ''
             : `<p class="puntaje"><span class="puntaje-num${String(res.mostrar).length > 4 ? ' largo' : ''}">${esc(res.mostrar)}</span><span class="puntaje-de">${esc(res.sufijo)}</span></p>`}
         <p class="chip nivel-${b.nivel}"><span class="punto" aria-hidden="true"></span>${esc(b.etiqueta)}</p>
+        ${frase ? `
+          <div class="frase-sencilla">
+            <p class="frase-titulo">En pocas palabras</p>
+            <p class="frase-texto" id="frase-resultado">${esc(frase)}</p>
+            <button class="btn btn-chico" type="button" id="copiar-frase">${icono('copiar')} Copiar la frase</button>
+          </div>` : ''}
         ${b.figura && !res.noEvaluable ? `<div class="figura-resultado">${b.figura}</div>` : ''}
         ${res.alertas?.length ? `
           <div class="alerta-seguridad" role="alert">
@@ -990,6 +997,7 @@ export function montarResultado(params, alGuardar) {
     const f = almacen.formatoEscala();
     copiar(textoConContexto(e, res, r, ctx.momento, f, cmpCtx), f === 'parrafo' ? 'Copiado en párrafo' : 'Copiado en lista');
   });
+  $('#copiar-frase')?.addEventListener('click', () => copiar(fraseDe(e, res), 'Frase copiada'));
   $('#nueva')?.addEventListener('click', () => {
     almacen.guardarRespuestas(e.id, ctx.momento, {});
     location.hash = ctx.url;

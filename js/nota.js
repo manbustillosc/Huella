@@ -235,6 +235,11 @@ export function notaValoracion(valoracion, escalasPorId, dominios, fecha = new D
     l.push('', '2. INTERPRETACIÓN DE LOS INSTRUMENTOS');
     for (const { porEscala } of grupos) {
       for (const g of porEscala) {
+        // Instrumentos con frase sencilla (riesgos con porcentaje publicado): la frase guardada es la interpretación.
+        if (g.escala.frase && g.rs.length === 1 && !g.rs[0].noEvaluable && g.rs[0].resumen) {
+          l.push(`- ${g.rs[0].resumen}`);
+          continue;
+        }
         const partes = g.rs.map((r) => {
           const etq = etiquetaAplicacion(r, { omitirFecha: hoy });
           const cat = r.noEvaluable ? 'no evaluable' : minusculaInicial(r.etiqueta || '');
