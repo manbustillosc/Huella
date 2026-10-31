@@ -102,6 +102,15 @@ const T_OP = -2.5;
 const T_NORMAL = -1.0;
 const tSitio = (id, texto) => ({ id, tipo: 'numero', texto, unidad: 'DE', min: -8, max: 6, decimales: 1, opcional: true });
 const SITIOS = [['t_columna', 'columna lumbar (L1–L4)'], ['t_cuello', 'cuello femoral'], ['t_cadera', 'cadera total'], ['t_radio', 'radio 33%']];
+// Indicaciones de la ISCD (posiciones oficiales para adultos, 2019 y 2023) para medir el antebrazo y usar el radio 33%
+// en el diagnóstico. Sin una de ellas, el radio se registra solo como dato adicional.
+export const INDICACIONES_RADIO = [
+  { texto: 'La cadera o la columna no pueden medirse o interpretarse', valor: 'central' },
+  { texto: 'Hiperparatiroidismo', valor: 'hiperparatiroidismo' },
+  { texto: 'Obesidad que supera el límite de peso de la mesa del densitómetro', valor: 'obesidad' },
+  { texto: 'Ninguna: registrar el radio solo como dato adicional', valor: 'ninguna' },
+];
+const escrito = (x) => x != null && String(x).trim() !== '' && Number.isFinite(Number(String(x).trim().replace(',', '.')));
 
 const B_DXA = {
   normal: { id: 'normal', rango: 'T-score ≥ −1.0', etiqueta: 'Densidad mineral ósea normal', nivel: 'bien', texto: 'T-score más bajo de −1.0 o mayor (categorías de la OMS).' },
@@ -123,7 +132,8 @@ export const dxa = {
   objetivo: 'Registrar el resultado de la densitometría y su categoría densitométrica sin confundirla con el diagnóstico clínico de osteoporosis.',
   poblacion: 'T-score: mujeres posmenopáusicas y hombres de 50 años o más. Z-score: mujeres premenopáusicas y hombres menores de 50 años (ISCD).',
   aplicacion: [
-    'Registra los T-scores que informa la densitometría (columna L1–L4, cuello femoral, cadera total y, si se midió, radio 33%). Huella usa el más bajo, como recomienda la ISCD.',
+    'Registra los T-scores que informa la densitometría (columna L1–L4, cuello femoral y cadera total). Huella usa el más bajo de estos sitios, como recomienda la ISCD.',
+    'Si se midió el radio 33%, indica si había una indicación de la ISCD para usarlo en el diagnóstico (cadera o columna no medibles o no interpretables, hiperparatiroidismo u obesidad que supera el límite de la mesa); sin ella, se registra solo como dato adicional.',
     'En mujeres premenopáusicas y hombres menores de 50 años registra el Z-score más bajo.',
     'Anota la fecha del estudio como fecha de aplicación.',
   ],
@@ -146,6 +156,12 @@ export const dxa = {
     tSitio('t_cuello', 'T-score, cuello femoral'),
     tSitio('t_cadera', 'T-score, cadera total'),
     tSitio('t_radio', 'T-score, radio 33%'),
+    {
+      id: 'radio_motivo', texto: 'Indicación de la ISCD para usar el radio 33% en el diagnóstico', textoCorto: 'indicación del radio 33%', puntua: false,
+      visibleSi: (r) => escrito(r.t_radio),
+      ayuda: 'La ISCD mide el antebrazo (radio 33% del no dominante) solo si la cadera o la columna no pueden medirse o interpretarse, en el hiperparatiroidismo o si el peso supera el límite de la mesa. Sin indicación, el radio no entra en la categoría densitométrica.',
+      opciones: INDICACIONES_RADIO,
+    },
     { id: 'z_min', tipo: 'numero', texto: 'Z-score más bajo', unidad: 'DE', min: -8, max: 6, decimales: 1, opcional: true },
     {
       id: 'fractura', texto: 'Fractura por fragilidad de cadera o vertebral (clínica o morfométrica)', textoCorto: 'fractura por fragilidad', puntua: false,
@@ -166,8 +182,12 @@ export const dxa = {
   validar({ v }) {
     const usaT = (v.sexo?.valor === 1 && v.menopausia?.valor === 1) || (v.sexo?.valor === 0 && Number.isFinite(v.edad) && v.edad >= 50);
     const hayT = SITIOS.some(([id]) => Number.isFinite(v[id]));
+    const hayCentral = SITIOS.some(([id]) => id !== 't_radio' && Number.isFinite(v[id]));
     if (v.sexo && Number.isFinite(v.edad) && (v.sexo.valor === 0 || v.menopausia)) {
       if (usaT && !hayT) return { t_columna: 'Registra al menos un T-score.' };
+      if (usaT && !hayCentral && v.radio_motivo?.valor === 'ninguna') {
+        return { radio_motivo: 'Sin T-score de columna ni de cadera, el radio 33% solo clasifica si existe una indicación de la ISCD; elige la que corresponda o registra un sitio central.' };
+      }
       if (!usaT && !Number.isFinite(v.z_min)) return { z_min: 'En esta población se interpreta el Z-score: regístralo.' };
     }
     return null;
@@ -180,14 +200,20 @@ export const dxa = {
     let banda;
     let valor = null;
     let sitiosMin = [];
+    let radio = null;
     if (usaT) {
-      const medidos = SITIOS.filter(([id]) => Number.isFinite(v[id])).map(([id, n]) => ({ n, t: v[id] }));
+      // El radio 33% entra en la categoría solo con una indicación de la ISCD; si no, se muestra como dato adicional.
+      const conRadio = Number.isFinite(v.t_radio);
+      const radioDx = conRadio && Boolean(v.radio_motivo) && v.radio_motivo.valor !== 'ninguna';
+      radio = conRadio ? { t: v.t_radio, diagnostico: radioDx, indicacion: v.radio_motivo?.valor || null } : null;
+      const medidos = SITIOS.filter(([id]) => Number.isFinite(v[id]) && (id !== 't_radio' || radioDx)).map(([id, n]) => ({ n, t: v[id] }));
       const min = Math.min(...medidos.map((x) => x.t));
       valor = min;
       banda = min >= T_NORMAL ? B_DXA.normal : min > T_OP ? B_DXA.baja : B_DXA.osteoporosis;
       sitiosMin = medidos.filter((x) => x.t === min).map((x) => x.n);
-      lineas.push(`T-scores: ${medidos.map((x) => `${x.n} ${x.t}`).join('; ')}. Más bajo: ${min} (${sitiosMin.join(' y ')}).`);
-      if (v.t_radio != null && Number.isFinite(v.t_radio) && medidos.length === 1) lineas.push('Solo se registró el radio 33%: la ISCD lo usa cuando la cadera o la columna no pueden medirse o interpretarse.');
+      lineas.push(`T-scores para la categoría: ${medidos.map((x) => `${x.n} ${x.t}`).join('; ')}. Más bajo: ${min} (${sitiosMin.join(' y ')}).`);
+      if (radioDx) lineas.push(`Radio 33% incluido en la categoría por indicación de la ISCD: ${v.radio_motivo.texto.toLowerCase()}.`);
+      else if (conRadio) lineas.push(`Radio 33%: T-score ${v.t_radio}, registrado como dato adicional; no entra en la categoría densitométrica porque no se documentó una indicación de la ISCD (cadera o columna no medibles o no interpretables, hiperparatiroidismo u obesidad que supera el límite de la mesa).`);
     } else {
       valor = v.z_min;
       banda = v.z_min <= -2.0 ? B_DXA.zbaja : B_DXA.zesperada;
@@ -208,7 +234,7 @@ export const dxa = {
       valor, unidad: usaT ? 'T' : 'Z', mostrar: String(valor), sufijo: usaT ? 'T-score más bajo' : 'Z-score más bajo',
       lineas, lineasNota: lineas,
       extras: {
-        usaT, valor, fractura: v.fractura.valor, sitiosMin,
+        usaT, valor, fractura: v.fractura.valor, sitiosMin, radio,
         dmo: v.dmo_sitio?.valor && Number.isFinite(v.dmo_valor) ? { sitio: v.dmo_sitio.valor, valor: v.dmo_valor, equipo: v.equipo?.valor || 'no_consta', lsc: Number.isFinite(v.lsc) ? v.lsc : null } : null,
       },
     };
@@ -243,7 +269,8 @@ export const dxa = {
   resumen: (res) => `DXA: ${res.banda.etiqueta.toLowerCase()} (${res.extras.usaT ? 'T-score' : 'Z-score'} más bajo ${res.mostrar})${res.extras.fractura === 1 ? '; fractura por fragilidad de cadera o vertebral' : ''}.`,
   resumenBreve: (res) => `DXA: ${res.banda.etiqueta.toLowerCase()} (${res.mostrar})`,
   notas: [
-    'Categorías densitométricas de la OMS con el T-score más bajo de columna lumbar, cuello femoral y cadera total (radio 33% si corresponde): normal ≥ −1.0; baja masa ósea entre −1.0 y −2.5; osteoporosis ≤ −2.5.',
+    'Categorías densitométricas de la OMS con el T-score más bajo de columna lumbar, cuello femoral y cadera total: normal ≥ −1.0; baja masa ósea entre −1.0 y −2.5; osteoporosis ≤ −2.5.',
+    'El radio 33% (antebrazo no dominante) entra en la categoría solo con una indicación de la ISCD: cadera o columna que no pueden medirse o interpretarse, hiperparatiroidismo u obesidad que supera el límite de peso de la mesa. Sin ella, Huella lo muestra como dato adicional y no lo usa para clasificar.',
     'La osteoporosis densitométrica no es lo mismo que la clínica: una fractura por fragilidad de cadera o vertebral establece el diagnóstico clínico aunque el T-score no llegue a −2.5.',
     'En mujeres premenopáusicas y hombres menores de 50 años se interpreta el Z-score (≤ −2.0: por debajo de lo esperado para la edad).',
     'Seguimiento: la ISCD recomienda comparar la DMO en g/cm² del mismo sitio, en el mismo equipo, con el cambio mínimo significativo (LSC) del centro. Huella no califica como mejoría o deterioro las diferencias del T-score ni compara T-score con Z-score.',
@@ -251,6 +278,7 @@ export const dxa = {
   referencias: [
     { texto: 'Kanis JA. Assessment of fracture risk and its application to screening for postmenopausal osteoporosis: synopsis of a WHO report. Osteoporos Int. 1994;4(6):368-81.', doi: '10.1007/BF01622200' },
     { texto: 'Shuhart CR, Yeap SS, Anderson PA, et al. Executive summary of the 2019 ISCD Position Development Conference. J Clin Densitom. 2019;22(4):453-71.', doi: '10.1016/j.jocd.2019.07.001' },
+    { texto: 'International Society for Clinical Densitometry. 2023 ISCD Official Positions: Adult. 2023.', enlace: 'https://iscd.org/wp-content/uploads/2024/03/2023-ISCD-Adult-Positions.pdf' },
   ],
 };
 

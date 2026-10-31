@@ -47,6 +47,21 @@ export function vigenciaResultado(r, aplicaciones, v, hoy) {
   return { estado: 'reciente', texto: `Aplicado el ${fechaCorta(f)}, en este episodio.` };
 }
 
+// Respuestas en edición (solo en esta pestaña) con algún dato capturado que todavía no está en la valoración: las que
+// no se añadieron o las que cambian un resultado abierto para revisarlo. Se usan para avisar antes de cerrar, abrir o
+// borrar una valoración, porque esas operaciones las descartan.
+const sinMarcas = (r) => JSON.stringify(Object.keys(r || {}).filter((k) => !k.startsWith('_')).sort().map((k) => [k, r[k]]));
+export function respuestasSinAnadir(borradores, porId, resultados = []) {
+  return borradores.filter(({ escalaId, r }) => {
+    const e = porId[escalaId];
+    if (!e || !r) return false;
+    const capturado = r._noEvaluable || e.campos.some((c) => !c.prefill && r[c.id] !== undefined && r[c.id] !== null && r[c.id] !== '' && !(Array.isArray(r[c.id]) && !r[c.id].length));
+    if (!capturado) return false;
+    const origen = r._origen ? resultados.find((x) => x.id === r._origen) : null;
+    return !(origen && sinMarcas(origen.respuestas) === sinMarcas(r));
+  });
+}
+
 // Respuestas en edición con al menos un dato capturado por el médico (sin contar los datos precargados) y que aún
 // no permiten calcular el resultado.
 export function instrumentosIncompletos(borradores, porId) {

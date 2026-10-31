@@ -219,6 +219,14 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **ACS NSQIP**: nuevo registro de los porcentajes de la calculadora oficial (muerte, complicación grave, cualquier complicación, neumonía, complicación cardiaca, TEV y otros). Huella no reproduce ni aproxima ese modelo.
 - **Ruta prequirúrgica**: «Resultados en pocas palabras» reúne las frases de los instrumentos aplicados, en el orden de la ruta, con «Copiar los resultados». El núcleo pasa a ser ASA, RCRI, Gupta, DASI, ARISCAT, Caprini, CFS, Mini-Cog, Barthel, MNA-SF y CKD-EPI; ACS NSQIP queda entre las complementarias. Total: 119 instrumentos.
 
+## Correcciones de la auditoría integral (versión 2.13)
+
+- **Ningún episodio con información se pierde.** Cerrar, archivar y exportar usan un solo criterio de contenido: cualquier dato capturado cuenta (datos clínicos, medicamentos, criterios STOPP/START o Beers revisados, función renal, plan y bitácora, ICOPE, momentos de las rutas, etiqueta), no solo los resultados. La copia archivada se compara completa con la original antes de empezar otro episodio; si después no se puede empezar uno nuevo, Huella dice que sí quedó archivado. Al abrir un episodio archivado se comprueba cada escritura y el resultado final; en el peor caso queda un duplicado, nunca una pérdida. Antes de cerrar, abrir o borrar se avisa si hay instrumentos en edición sin añadir.
+- **«Nueva valoración»** explica que borra toda la valoración en curso sin archivarla y recomienda cerrarla en Seguimiento o exportarla antes.
+- **DXA:** el radio 33 % entra en la categoría densitométrica solo con una indicación de la ISCD (cadera o columna no medibles o no interpretables, hiperparatiroidismo u obesidad que supera el límite de la mesa); sin ella se muestra como dato adicional.
+- **Diagramas de la VPO:** se distinguen cirugía electiva, urgente y de emergencia (modificador «E»); ASA V ya no se presenta como «urgencia quirúrgica»; la elevación nueva del ST o los cambios isquémicos con síntomas van a Urgencias; el manejo de marcapasos y DAI se individualiza (sitio respecto al ombligo, dependencia de la estimulación, imán frente a reprogramación y reactivación al terminar); y el ECG preoperatorio muestra qué indica el lineamiento del IMSS y con qué fuerza lo recomienda la guía AHA/ACC 2024. Lo que dice el lineamiento sigue visible y atribuido.
+- **Sin conexión**, solo la navegación recibe `index.html` como respaldo; un archivo JavaScript o CSS recibe su copia guardada o un error 503. Un enlace con codificación inválida abre el inicio en lugar de detener la app.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

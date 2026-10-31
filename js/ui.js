@@ -12,6 +12,17 @@ export { icono };
 export const $ = (sel, raiz = document) => raiz.querySelector(sel);
 export const $$ = (sel, raiz = document) => [...raiz.querySelectorAll(sel)];
 export const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+// Segmentos de la ruta del hash («#/e/barthel/resultado» → ['e', 'barthel', 'resultado']). Un ancla interna
+// («#/icope/detallada#d-vision») no forma parte de la ruta. Devuelve null si un segmento tiene una codificación
+// inválida (p. ej., «%E0%A4%A»), para que el enrutador lleve al inicio en lugar de detenerse con un error.
+export function segmentosHash(hash) {
+  const crudos = String(hash || '').replace(/^#\/?/, '').split('#')[0].split('/');
+  try {
+    return crudos.map(decodeURIComponent);
+  } catch {
+    return null;
+  }
+}
 export const sinAcentos = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 export const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 export const movimientoReducido = () => matchMedia('(prefers-reduced-motion: reduce)').matches;

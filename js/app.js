@@ -2,7 +2,7 @@
 import { almacen, mensajeFallo } from './almacen.js';
 import { VERSION, escalas, porId, DOMINIOS, RUTAS, escalasDe, dominioDe, rutaDe } from './datos.js';
 import { momentoDe, MOMENTOS } from './motor.js';
-import { $, esc, icono, aviso, botonEstrella, nombreCorto, cuentaDominio } from './ui.js';
+import { $, esc, icono, aviso, botonEstrella, nombreCorto, cuentaDominio, segmentosHash } from './ui.js';
 import { renderMedicacion, montarMedicacion } from './vistas/medicacion.js';
 import { renderInfusiones, montarInfusiones, PESTANAS_INFUSION } from './vistas/infusiones.js';
 import { renderUnidades, montarUnidades, PESTANAS_UNIDADES } from './vistas/unidades.js';
@@ -32,8 +32,8 @@ function parsearEscala(segmento) {
 }
 
 function ruta() {
-  // Un ancla interna (#/icope/detallada#d-vision) no forma parte de la ruta.
-  const partes = location.hash.replace(/^#\/?/, '').split('#')[0].split('/').map(decodeURIComponent);
+  const partes = segmentosHash(location.hash);
+  if (!partes) return { vista: 'inicio', enlaceInvalido: true };
   const [a, b, c, d] = partes;
   if ((a === 'r' && b === 'icope' && !c) || a === 'icope') {
     return { vista: 'icope', pestana: a === 'icope' && PESTANAS_ICOPE.some(([id]) => id === b) ? b : 'panel' };
@@ -65,6 +65,11 @@ function ruta() {
 
 function render() {
   const r = ruta();
+  if (r.enlaceInvalido) {
+    // Enlace con codificación inválida: se reemplaza por el inicio (sin agregar otra entrada al historial) y se avisa.
+    history.replaceState(null, '', '#/');
+    aviso('El enlace no es válido; se abrió el inicio');
+  }
   let html;
   if (r.vista === 'resultado') {
     html = renderResultado(r);

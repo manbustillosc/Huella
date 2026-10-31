@@ -10,7 +10,7 @@ import { medicacionDe, resumenMedicacion } from '../medicacion.js';
 import { planDe, planConContenido } from '../plan.js';
 import { estadosIcope, avanceBasica, ESTADOS_ICOPE } from '../icope.js';
 import { episodioDe } from '../episodio.js';
-import { vigenciaResultado, VIGENCIAS, TEXTO_PERIODOS } from '../pendientes.js';
+import { vigenciaResultado, VIGENCIAS, TEXTO_PERIODOS, respuestasSinAnadir } from '../pendientes.js';
 
 export const diasDesde = (ts) => (ts ? Math.max(0, Math.floor((Date.now() - ts) / 86400000)) : 0);
 
@@ -75,8 +75,8 @@ export function renderValoracion() {
         ${lineaGuardado()}
         ${v.creada ? `<p class="inicio-valoracion">${icono('calendario')} Episodio <a href="#/seguimiento">${esc(ep.codigo)}</a> · iniciado el ${esc(fechaCorta(isoDe(new Date(v.creada))))}${dias > 0 ? ` (hace ${plural(dias, 'día', 'días')})` : ' (hoy)'}.</p>` : ''}
       </header>
-      ${ep.estado === 'cerrado' ? `<p class="aviso-episodio">${icono('alerta')} Este episodio está cerrado (${esc(fechaCorta(ep.cerrado))}). Puedes consultarlo y generar informes; para agregar resultados, reábrelo en <a href="#/seguimiento">Seguimiento</a>.</p>` : ''}
-      ${dias > 7 && v.resultados.length && ep.estado !== 'cerrado' ? `<p class="aviso-episodio">${icono('alerta')} Esta valoración tiene más de una semana. Si los nuevos resultados son de otro episodio clínico, cierra este en <a href="#/seguimiento">Seguimiento</a> para archivarlo y empieza otro, sin mezclar resultados.</p>` : ''}
+      ${ep.estado === 'cerrado' ? `<p class="aviso-episodio">${icono('alerta')} <span>Este episodio está cerrado (${esc(fechaCorta(ep.cerrado))}). Puedes consultarlo y generar informes; para agregar resultados, reábrelo en <a href="#/seguimiento">Seguimiento</a>.</span></p>` : ''}
+      ${dias > 7 && v.resultados.length && ep.estado !== 'cerrado' ? `<p class="aviso-episodio">${icono('alerta')} <span>Esta valoración tiene más de una semana. Si los nuevos resultados son de otro episodio clínico, cierra este en <a href="#/seguimiento">Seguimiento</a> para archivarlo y empieza otro, sin mezclar resultados.</span></p>` : ''}
       <div class="tarjeta">
         <p class="titulo-tarjeta">Datos clínicos <span>(opcionales, no identificables)</span></p>
         <div class="campos">
@@ -126,8 +126,9 @@ export function renderValoracion() {
         <pre class="nota" id="nota" data-formato="${formato}">${esc(notaValoracion(v, porId, DOMINIOS, new Date(), formato))}</pre>
         <div class="acciones dos">
           <button class="btn btn-primario" type="button" id="copiar-nota">${icono('copiar')} ${ETIQUETA_COPIAR[formato]}</button>
-          <button class="btn" type="button" id="nueva-val">${icono('borrar')} Nueva valoración</button>
-        </div>` : `
+          <button class="btn" type="button" id="nueva-val" aria-describedby="aviso-nueva-val">${icono('borrar')} Nueva valoración</button>
+        </div>
+        <p class="aviso-episodio" id="aviso-nueva-val">${icono('alerta')} <span>«Nueva valoración» borra de este navegador toda la valoración en curso: resultados, datos clínicos, medicamentos y revisión STOPP/START y Beers, plan de atención e ICOPE. No la archiva. Para conservarla, ciérrala en <a href="#/seguimiento">Seguimiento</a> (queda en episodios archivados) o expórtala antes.</span></p>` : `
         <div class="vacio-estado">
           ${icono('valoracion')}
           <p>Aún no hay resultados</p>
@@ -182,14 +183,15 @@ export function montarValoracion(rerender, alCambiar) {
   });
   const nueva = $('#nueva-val');
   if (nueva) {
+    const n = respuestasSinAnadir(almacen.borradores(), porId, almacen.valoracion().resultados).length;
     confirmarEnDosToques(nueva, {
-      texto: `${icono('alerta')} Toca otra vez para borrar todos los resultados`,
+      texto: `${icono('alerta')} Toca otra vez para borrar toda la valoración en curso${n ? ` y ${plural(n, 'instrumento en edición', 'instrumentos en edición')}` : ''}`,
       accion: () => {
         const r = almacen.nuevaValoracion();
         if (!r.ok) { aviso(mensajeFallo(r.motivo)); return; }
         alCambiar();
         rerender();
-        aviso('Valoración borrada; puedes empezar una nueva');
+        aviso('Valoración en curso borrada; puedes empezar una nueva');
       },
     });
   }

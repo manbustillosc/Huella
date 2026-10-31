@@ -9,6 +9,7 @@ import {
   tieneContenido, ESTADOS_EPISODIO, MAX_ETIQUETA_EPISODIO, MAX_EPISODIOS,
 } from '../episodio.js';
 import { validarImportacion, MAX_BYTES_IMPORTACION } from '../importacion.js';
+import { respuestasSinAnadir } from '../pendientes.js';
 import { textoCambio, textoRespectoA, fechaCorta } from '../comparacion.js';
 import { $, $$, esc, icono, plural, hoyISO, aviso, confirmarEnDosToques } from '../ui.js';
 import { filaObjetivo, filaIntervencion, formularioCambio, conectarPlan, conectarQuitar, avisoDatos } from './plan-ui.js';
@@ -227,11 +228,16 @@ export function montarSeguimiento(rerender, alCambiar) {
     descargar(nombreArchivo(v, hoy), JSON.stringify(exportarEpisodio(v, VERSION), null, 2));
     aviso('Episodio exportado');
   };
+  // Las respuestas en edición que aún no se añadieron se pierden al cerrar o abrir otro episodio: se avisa antes.
+  const descartes = () => {
+    const n = respuestasSinAnadir(almacen.borradores(), porId, almacen.valoracion().resultados).length;
+    return n ? `; ${n === 1 ? 'se descarta' : 'se descartan'} ${plural(n, 'instrumento en edición sin añadir', 'instrumentos en edición sin añadir')}` : '';
+  };
   function conectar() {
     conectarQuitar(panel, { redibujar });
     const cerrar = $('#cerrar-episodio', panel);
     if (cerrar) confirmarEnDosToques(cerrar, {
-      texto: `${icono('alerta')} Toca otra vez para cerrar y archivar el episodio`,
+      texto: `${icono('alerta')} Toca otra vez para cerrar y archivar el episodio${descartes()}`,
       accion: () => {
         // Se archiva una copia cerrada; la valoración en curso solo cambia si el archivo quedó guardado.
         const cerrada = cerrarEpisodio(JSON.parse(JSON.stringify(almacen.valoracion())), hoy);
@@ -239,7 +245,7 @@ export function montarSeguimiento(rerender, alCambiar) {
         if (!r.ok) { avisoFallo(r.motivo); return; }
         alCambiar();
         rerender();
-        aviso('Episodio cerrado y archivado; empieza uno nuevo');
+        aviso(r.archivado ? 'Episodio cerrado y archivado; empieza uno nuevo' : 'El episodio no tenía información; empieza uno nuevo');
       },
     });
     $('#reabrir-episodio', panel)?.addEventListener('click', () => {
@@ -262,11 +268,14 @@ export function montarSeguimiento(rerender, alCambiar) {
       accion: () => { const e = almacen.episodios().find((x) => x.id === b.dataset.exportarEp); if (e) exportar(e); },
     }));
     $$('[data-abrir-ep]', panel).forEach((b) => confirmarEnDosToques(b, {
-      texto: `${icono('alerta')} Confirmar`,
+      texto: `${icono('alerta')} Confirmar${descartes()}`,
       accion: () => {
         const r = almacen.abrirEpisodio(b.dataset.abrirEp);
         if (!r.ok) { avisoFallo(r.motivo); return; }
-        alCambiar(); rerender(); aviso('Episodio abierto');
+        alCambiar(); rerender();
+        aviso(r.duplicado
+          ? 'Episodio abierto. No se pudo quitar su copia de los archivados: bórrala cuando compruebes que todo está bien'
+          : 'Episodio abierto');
       },
     }));
     $$('[data-borrar-ep]', panel).forEach((b) => confirmarEnDosToques(b, {

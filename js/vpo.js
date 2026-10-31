@@ -20,6 +20,15 @@ export const ORIGENES_VPO = {
   propia: 'Adaptación propia de Huella',
 };
 
+// Fuentes complementarias verificables (guías internacionales). Se citan donde Huella matiza o completa el lineamiento.
+export const GUIAS_VPO = {
+  acc2024: 'Thompson A, Fleischmann KE, Smilowitz NR, et al. 2024 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery. Circulation. 2024;150(19):e351-e442. doi:10.1161/CIR.0000000000001285.',
+  acc2014: 'Fleisher LA, Fleischmann KE, Auerbach AD, et al. 2014 ACC/AHA Guideline on Perioperative Cardiovascular Evaluation and Management of Patients Undergoing Noncardiac Surgery. Circulation. 2014;130(24):e278-333. doi:10.1161/CIR.0000000000000106.',
+  asa2020: 'American Society of Anesthesiologists. ASA Physical Status Classification System. Última modificación: 13 de diciembre de 2020.',
+  hrs2011: 'Crossley GH, Poole JE, Rozner MA, et al. The Heart Rhythm Society (HRS)/American Society of Anesthesiologists (ASA) Expert Consensus Statement on the perioperative management of patients with implantable defibrillators, pacemakers and arrhythmia monitors. Heart Rhythm. 2011;8(7):1114-54. doi:10.1016/j.hrthm.2010.12.023.',
+  apsf2024: 'Disque D, Oliver AP, Neelankavil JP. Keeping Pace: 2023 Update on the Perioperative Management of Cardiovascular Implantable Electronic Devices (CIEDs). APSF Newsletter. 2024;39(1).',
+};
+
 const inicio = (texto, extra = {}) => ({ tipo: 'inicio', texto, ...extra });
 const paso = (texto, extra = {}) => ({ tipo: 'paso', texto, ...extra });
 const alerta = (texto, extra = {}) => ({ tipo: 'alerta', texto, ...extra });
@@ -43,9 +52,21 @@ export const DIAGRAMAS = [
       { origen: 'lineamiento', texto: 'Actividades 1 a 7', paginas: '4' },
       { origen: 'lineamiento', texto: 'Algoritmo 1. Valoración preoperatoria', paginas: '8' },
       { origen: 'lineamiento', texto: 'Cuadro 1 (ASA) y cuadro 2 (riesgo del procedimiento)', paginas: '10 y 11' },
+      { origen: 'guia', texto: 'Clasificación del estado físico de la ASA (2020): ASA V y modificador «E» de urgencia' },
+      { origen: 'guia', texto: 'Guía ACC/AHA 2014 de cirugía no cardiaca: definiciones de cirugía de emergencia, urgente, sensible al tiempo y electiva' },
     ],
     nodos: [
       inicio('Persona con indicación de cirugía electiva no cardiaca.'),
+      alerta('Este algoritmo es para cirugía electiva. Si la cirugía es urgente o de emergencia, la clase ASA lleva el modificador «E» y la valoración cambia.', {
+        tono: 'info', escalas: ['asa'],
+        detalle: [
+          'Electiva: se sigue este algoritmo y, si corresponde, la VPO completa.',
+          'Urgente (suele operarse entre 6 y 24 h): valoración perioperatoria breve con Anestesiología y Cirugía para estabilizar y corregir lo posible sin retrasar la cirugía.',
+          'Emergencia (amenaza para la vida o un órgano; suele operarse en menos de 6 h): atención inmediata; ninguna evaluación debe retrasar el procedimiento vital.',
+          'La «E» se agrega a cualquier clase (p. ej., ASA IIIE): la urgencia no es una clase ASA.',
+        ],
+        origen: 'Adaptación propia de Huella: el lineamiento trata solo la cirugía electiva. Definición de la «E»: ASA, 2020; tiempos orientativos: guía ACC/AHA 2014.',
+      }),
       paso('Cirugía hace la evaluación integral.', {
         detalle: [
           'Revisa la nota de referencia y hace o revisa la historia clínica.',
@@ -81,7 +102,15 @@ export const DIAGRAMAS = [
             rama('No', [alerta('Mantener el control por la especialidad; la cirugía electiva espera.')], 'alerta'),
           ]),
         ]),
-        rama('ASA V', [fin('Urgencia quirúrgica: no requiere VPO.')], 'alerta'),
+        rama('ASA V', [
+          alerta('ASA V es una persona moribunda que no se espera que sobreviva sin la operación; no es sinónimo de urgencia. Queda fuera de la ruta de cirugía electiva: estabilización y coordinación perioperatoria inmediata con Anestesiología y Cirugía, sin retrasar un procedimiento vital.', {
+            detalle: [
+              'La urgencia se indica con el modificador «E», que puede acompañar a cualquier clase (p. ej., ASA VE, ASA IIIE).',
+              'La decisión de operar y en qué condiciones es del equipo tratante, con la persona o su representante.',
+            ],
+            origen: 'El algoritmo 1 del lineamiento (p. 8) anota «Urgencia quirúrgica, no requiere VPO». Huella separa la clase ASA de la urgencia según la definición de la ASA (2020).',
+          }),
+        ], 'alerta'),
         rama('ASA VI', [fin('Notificar al coordinador hospitalario de donación de órganos y tejidos.')]),
       ]),
     ],
@@ -154,39 +183,61 @@ export const DIAGRAMAS = [
     fuentes: [
       { origen: 'lineamiento', texto: 'Cuadro 9 (criterios para solicitar ECG) y cuadro 10 (alteraciones que requieren valoración)', paginas: '18' },
       { origen: 'lineamiento', texto: 'Recomendaciones sobre estudios de rutina (rendimiento del ECG)', paginas: '7' },
+      { origen: 'guia', texto: 'Guía AHA/ACC 2024 de cirugía no cardiaca: fuerza de las recomendaciones de ECG preoperatorio' },
     ],
     nodos: [
       decision('¿Síntomas o signos cardiovasculares activos?', [
-        rama('Sí', [fin('Pedir ECG de 12 derivaciones.')]),
+        rama('Sí', [fin('Pedir ECG de 12 derivaciones.', {
+          detalle: ['Si los síntomas sugieren un síndrome coronario agudo o hay inestabilidad hemodinámica, la vía es Urgencias, no la cirugía electiva (diagrama «Riesgo cardiovascular»).'],
+          origen: 'Lineamiento, cuadro 9 (p. 18). Guía AHA/ACC 2024: razonable con síntomas cardiovasculares.',
+        })]),
         rama('No', [
           decision('¿Enfermedad coronaria, arritmia significativa, enfermedad arterial periférica o cerebrovascular, o cardiopatía estructural?', [
-            rama('Sí', [fin('Pedir ECG de 12 derivaciones.')]),
+            rama('Sí', [fin('Pedir ECG de 12 derivaciones.', {
+              origen: 'Lineamiento, cuadro 9 (p. 18). Guía AHA/ACC 2024: razonable con enfermedad cardiovascular conocida antes de cirugía de riesgo elevado; no se pide de rutina antes de cirugía de bajo riesgo en personas asintomáticas.',
+            })]),
             rama('No', [
               decision('¿Cirugía de riesgo intermedio o alto?', [
-                rama('Sí', [fin('Pedir ECG de 12 derivaciones.')]),
-                rama('No', [fin('No pedir ECG de rutina: persona asintomática con cirugía de bajo riesgo.', { tono: 'bien' })], 'bien'),
+                rama('Sí', [fin('El lineamiento indica pedir ECG de 12 derivaciones.', {
+                  detalle: ['Guía AHA/ACC 2024: en personas asintomáticas sin enfermedad cardiovascular conocida, el ECG antes de cirugía de riesgo elevado es opcional; puede considerarse para tener un trazo basal (recomendación débil). No es obligatorio por la guía.'],
+                  origen: 'Lineamiento, cuadro 9 (p. 18), que cita la guía AHA/ACC 2024; la fuerza de la recomendación es de la guía.',
+                })]),
+                rama('No', [fin('No pedir ECG de rutina: persona asintomática con cirugía de bajo riesgo.', { tono: 'bien', origen: 'Lineamiento, cuadro 9 (p. 18), y guía AHA/ACC 2024: no se recomienda de rutina.' })], 'bien'),
               ], { escalas: ['riesgoqx'] }),
             ], 'bien'),
           ]),
         ], 'bien'),
       ], { detalle: ['Dolor torácico, disnea o palpitaciones no diagnosticados, taquicardia, síncope o soplo cardiaco.'] }),
       decision('Si hay ECG, ¿qué muestra?', [
+        rama('Sospecha de síndrome coronario agudo', [
+          alerta('Enviar a Urgencias de inmediato: no esperar una valoración por Cardiología programada.', {
+            detalle: [
+              'Elevación nueva del ST (sugiere lesión miocárdica aguda).',
+              'Depresión significativa del ST o alteraciones nuevas de la onda T con dolor torácico o equivalente anginoso, disnea, síncope o inestabilidad hemodinámica.',
+            ],
+            origen: 'Adaptación propia de Huella: ante sospecha de síndrome coronario agudo la evaluación es inmediata. El cuadro 10 del lineamiento (p. 18) agrupa estos cambios en la valoración por Cardiología.',
+          }),
+        ], 'alerta'),
         rama('Requiere Urgencias', [
           alerta('Enviar a Urgencias.', { detalle: ['Bloqueo AV de segundo grado Mobitz II, de alto grado o completo (tercer grado).', 'Arritmia nueva con inestabilidad hemodinámica, síncope o síntomas cardiovasculares.'] }),
         ], 'alerta'),
         rama('Requiere Cardiología', [
           paso('Valoración por Cardiología antes de la cirugía electiva.', {
             detalle: [
-              'Cambios nuevos sugestivos de isquemia o lesión: elevación del ST, depresión significativa del ST o alteraciones nuevas de la onda T.',
+              'Depresión significativa del ST o alteraciones nuevas de la onda T en una persona sin síntomas y hemodinámicamente estable.',
               'Fibrilación auricular de nueva aparición, con respuesta ventricular rápida o control inadecuado de la frecuencia.',
               'QT o QTc prolongado de forma significativa o nueva, con síncope, arritmia ventricular, antecedentes sugestivos de QT largo o sin causa reversible corregible.',
             ],
+            origen: 'Lineamiento, cuadro 10 (p. 18), sin los cambios que sugieren un síndrome coronario agudo, que Huella envía a Urgencias.',
           }),
         ]),
         rama('Sin esas alteraciones', [fin('Continuar la VPO.', { tono: 'bien' })], 'bien'),
       ]),
     ],
-    notas: ['En personas adultas asintomáticas, cerca del 12 % de los ECG son anormales, pero cambian la conducta en alrededor del 0.6 %.'],
+    notas: [
+      'En personas adultas asintomáticas, cerca del 12 % de los ECG son anormales, pero cambian la conducta en alrededor del 0.6 %.',
+      'Lo que indica el lineamiento del IMSS es obligatorio en su ámbito; la guía AHA/ACC 2024 gradúa la fuerza de cada indicación: razonable con síntomas o enfermedad cardiovascular conocida, opcional en personas asintomáticas sin ella antes de cirugía de riesgo elevado y no recomendado de rutina antes de cirugía de bajo riesgo.',
+    ],
   },
   {
     id: 'estudios',
@@ -217,18 +268,44 @@ export const DIAGRAMAS = [
   {
     id: 'dispositivos',
     nombre: 'Marcapasos y DAI',
-    resumen: 'Cuándo enviar a Cardiología o a la clínica de marcapasos antes de la cirugía.',
-    fuentes: [{ origen: 'lineamiento', texto: 'Cuadro 11. Dispositivos de estimulación cardiaca', paginas: '19' }],
+    resumen: 'Cuándo enviar a Cardiología o a la clínica de marcapasos, cómo se protege cada tipo de dispositivo y qué hacer al terminar.',
+    fuentes: [
+      { origen: 'lineamiento', texto: 'Cuadro 11. Dispositivos de estimulación cardiaca', paginas: '19' },
+      { origen: 'guia', texto: 'Consenso HRS/ASA 2011 sobre el manejo perioperatorio de desfibriladores, marcapasos y monitores de arritmias' },
+      { origen: 'guia', texto: 'Actualización de la APSF sobre dispositivos electrónicos cardiacos implantables (2024)' },
+    ],
     nodos: [
-      paso('Ser portador de marcapasos no contraindica la cirugía: el manejo se individualiza según el dispositivo, la dependencia de la estimulación y el procedimiento.'),
+      paso('Ser portador de marcapasos no contraindica la cirugía: el manejo se individualiza según el dispositivo, la dependencia de la estimulación y el procedimiento.', {
+        detalle: [
+          'Tipo de dispositivo: marcapasos, TRC sin desfibrilador (TRC-P), DAI o DAI con resincronización (DAI-TRC).',
+          'Dependencia de la estimulación: ritmo propio insuficiente o ausente sin el dispositivo; para la litotricia, el lineamiento la define como más de 40 % de estimulación ventricular en la telemetría.',
+          'Procedimiento: tipo de energía (monopolar, bipolar, radiofrecuencia, litotricia) y distancia del campo quirúrgico al generador y los cables.',
+        ],
+        origen: 'Lineamiento, cuadro 11 (p. 19); detalle de la evaluación: consenso HRS/ASA 2011.',
+      }),
       decision('¿Qué dispositivo tiene?', [
         rama('DAI o DAI-TRC', [
-          alerta('El electrocauterio monopolar está contraindicado mientras las terapias del dispositivo estén activas.'),
-          fin('Enviar a Cardiología o a la clínica de marcapasos para suspender temporalmente las terapias y reactivarlas al terminar.'),
+          alerta('Lineamiento: con DAI o DAI-TRC no se usa electrocauterio monopolar mientras las terapias estén activas; enviar a Cardiología o a la clínica de marcapasos para suspenderlas temporalmente y reactivarlas al terminar.', {
+            origen: 'Lineamiento, cuadro 11 (p. 19). Las guías lo individualizan según el sitio de la cirugía, como sigue.',
+          }),
+          decision('¿Electrocauterio monopolar o radiofrecuencia por encima del ombligo?', [
+            rama('Sí', [
+              paso('Suspender las terapias antitaquicardia durante el procedimiento, con reprogramación o con imán según el plan del equipo de dispositivos. Mientras estén suspendidas: monitorización continua y desfibrilador externo listo.'),
+              alerta('Si la persona depende de la estimulación: el imán sobre un DAI suspende las terapias pero no cambia la estimulación a modo asincrónico. Si hace falta modo asincrónico, se programa con el programador.'),
+            ]),
+            rama('No', [
+              paso('Por debajo del ombligo, con electrocauterio bipolar o sin electrocauterio, la interferencia es poco probable y por lo general no hace falta reprogramar: el equipo de dispositivos decide. Tener a la mano imán, programador y desfibrilador externo.'),
+            ], 'bien'),
+          ], { detalle: ['Por ejemplo, cirugía de tórax, abdomen superior, mama, cuello u hombro.'] }),
         ], 'alerta'),
-        rama('Marcapasos', [
+        rama('Marcapasos o TRC-P', [
           decision('¿Electrocauterio monopolar con el sitio quirúrgico a menos de 30 cm del generador?', [
-            rama('Sí', [fin('Enviar a valoración y, si hace falta, reprogramación del dispositivo.')]),
+            rama('Sí', [
+              fin('Enviar a valoración y, si hace falta, reprogramación del dispositivo.'),
+              paso('Si la persona depende de la estimulación, se busca estimulación asincrónica: con reprogramación o, en muchos marcapasos, con un imán. La respuesta al imán depende del modelo y algunos marcapasos sin cables no responden a él.', {
+                origen: 'Consenso HRS/ASA 2011 y actualización de la APSF (2024).',
+              }),
+            ]),
             rama('No', [
               decision('¿Litotricia extracorpórea en una persona dependiente de la estimulación (estimulación ventricular >40 %)?', [
                 rama('Sí', [fin('Valorar y reprogramar el dispositivo.')]),
@@ -239,6 +316,9 @@ export const DIAGRAMAS = [
         ]),
       ]),
       paso('Durante la cirugía: con electrocauterio monopolar, aplicaciones intermitentes con pulsos menores de 5 segundos; con electrocauterio bipolar no se requiere reprogramación.'),
+      fin('Al terminar: si se suspendieron terapias o se reprogramó el dispositivo, reactivar las terapias y restablecer la programación habitual, y comprobar el funcionamiento antes de retirar la monitorización. Con un imán, retirarlo devuelve la programación previa.', {
+        origen: 'Lineamiento, cuadro 11 (reactivación al concluir); comprobación: consenso HRS/ASA 2011 y actualización de la APSF (2024).',
+      }),
     ],
   },
   {

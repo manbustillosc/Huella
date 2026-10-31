@@ -330,7 +330,7 @@ export const asa = {
   notas: [
     'Definiciones y ejemplos en adultos de la ASA (actualización de diciembre de 2020), resumidos con redacción propia; los ejemplos no son una lista completa ni sustituyen el juicio clínico.',
     'La edad por sí sola no cambia la clase. No incluye la fragilidad: complétala con RCRI, ARISCAT y la valoración geriátrica.',
-    '«E» se agrega a cualquier clase cuando la cirugía es de urgencia: el retraso aumentaría la amenaza para la vida o para un órgano.',
+    '«E» se agrega a cualquier clase cuando la cirugía es de urgencia: el retraso aumentaría la amenaza para la vida o para un órgano. ASA V describe el estado físico (persona moribunda), no la urgencia, que se indica con «E» (p. ej., ASA VE).',
     'Mortalidad perioperatoria absoluta publicada por clase: I 0 a 0.3 %; II 0.3 a 1.4 %; III 1.8 a 5.4 %; IV 7.8 a 25.9 %; V 9.4 a 57.8 % (rangos de varios estudios reunidos por Wolters, 1996). Varían según la población, la cirugía y el seguimiento: algunos estudios solo contaron las primeras 48 horas o 7 días. Para la clase III, Daabiss (2011) cita 1.8 a 4.5 %.',
     'La ASA no considera el tipo de cirugía: para el riesgo del procedimiento usa también RCRI, Gupta (MICA), ARISCAT, Caprini o la calculadora ACS NSQIP.',
   ],

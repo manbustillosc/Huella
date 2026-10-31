@@ -58,6 +58,8 @@ export function mensajeFallo(motivo) {
     verificacion: 'No se pudo comprobar que el cambio quedara guardado, así que no se hizo ningún cambio. Exporta el episodio por seguridad.',
     desconocido: 'No se pudo guardar el cambio y no se hizo ningún cambio. Exporta el episodio por seguridad.',
     no_encontrado: 'No se encontró el episodio.',
+    integridad: 'La comprobación final no encontró una de las copias del episodio. Revisa la valoración en curso y los episodios archivados, y exporta lo que necesites por seguridad.',
+    archivado_sin_nueva: 'El episodio quedó archivado y cerrado, pero el navegador no permitió empezar uno nuevo. La valoración anterior sigue en pantalla; libera espacio (exporta y borra episodios archivados que ya no necesites) y vuelve a intentarlo.',
     no_disponible: 'Este navegador no permite guardar datos de forma permanente (p. ej., modo privado): los datos duran solo mientras la pestaña esté abierta. Exporta el episodio antes de cerrarla.',
   }[motivo] || 'No se pudo guardar el cambio.';
 }
@@ -182,38 +184,53 @@ export const almacen = {
     return escribir(local, 'episodios', lista, { respaldar: false });
   },
   // Archiva la valoración en curso (o la versión cerrada que se indique) y solo entonces empieza una nueva.
+  // La copia archivada se compara completa con la original antes de borrar nada; si después no se puede empezar la
+  // valoración nueva, se avisa que el episodio sí quedó archivado.
   archivarYNueva(v = this.valoracion()) {
     if (tieneContenido(v)) {
       const lista = this.episodios().filter((e) => e.id !== v.id);
       if (lista.length >= MAX_EPISODIOS) return { ok: false, motivo: 'limite' };
       const r = this.guardarEpisodios([v, ...lista]);
       if (!r.ok) return r;
-      const guardado = this.episodios();
-      if (!guardado.some((e) => e.id === v.id)) return { ok: false, motivo: 'verificacion' };
+      const copia = this.episodios().find((e) => e.id === v.id);
+      if (!copia || JSON.stringify(copia) !== JSON.stringify(v)) return { ok: false, motivo: 'verificacion' };
+      const n = this.nuevaValoracion();
+      return n.ok ? { ...n, archivado: true } : { ok: false, motivo: 'archivado_sin_nueva', causa: n.motivo };
     }
     return this.nuevaValoracion();
   },
   // Abre un episodio archivado como valoración en curso; la actual pasa al archivo si tiene contenido.
   // Orden sin pérdidas: 1) se copia la actual al archivo (el episodio que se abre sigue ahí), 2) se escribe la valoración,
-  // 3) se quita del archivo el episodio abierto. Si algo falla, nada queda sin copia.
+  // 3) se quita del archivo el episodio abierto. Si algo falla, nada queda sin copia: en el peor caso queda un duplicado.
+  // Entre el paso 1 y el 3 el archivo puede tener un episodio más que el límite; el paso 3 lo devuelve al límite.
   abrirEpisodio(id) {
     const original = this.episodios();
     const e = original.find((x) => x.id === id);
     if (!e) return { ok: false, motivo: 'no_encontrado' };
     const actual = this.valoracion();
-    const conActual = tieneContenido(actual) ? [actual, ...original.filter((x) => x.id !== actual.id)] : original;
-    if (conActual !== original) {
+    // Si la valoración en curso comparte identificador con el episodio que se abre (p. ej., quedó archivada pero no se
+    // pudo empezar otra) y tiene cambios, se archiva con un identificador nuevo para no perder esos cambios.
+    const mismoId = actual.id === id;
+    const archivarActual = tieneContenido(actual) && !(mismoId && JSON.stringify(actual) === JSON.stringify(e));
+    const aArchivar = mismoId ? { ...actual, id: nuevoId() } : actual;
+    const conActual = archivarActual ? [aArchivar, ...original.filter((x) => x.id !== aArchivar.id)] : original;
+    if (archivarActual) {
       const r1 = escribir(local, 'episodios', conActual, { respaldar: false });
       if (!r1.ok) return r1;
     }
     const r2 = escribir(local, 'valoracion', e, { respaldar: false });
     if (!r2.ok) {
-      if (conActual !== original) escribir(local, 'episodios', original, { respaldar: false });
+      // El episodio que se quería abrir sigue archivado y la valoración en curso no cambió; se intenta quitar la copia
+      // de la actual que se agregó en el paso 1 (si no se puede, solo queda duplicada).
+      if (archivarActual) escribir(local, 'episodios', original, { respaldar: false });
       return r2;
     }
-    escribir(local, 'episodios', conActual.filter((x) => x.id !== id), { respaldar: false });
+    const r3 = escribir(local, 'episodios', conActual.filter((x) => x.id !== id), { respaldar: false });
     escribir(sesion, 'respuestas', null);
-    return { ok: true, motivo: null };
+    // Comprobación final de integridad: el episodio quedó en curso y la valoración anterior, en el archivo.
+    if (leer(local, 'valoracion', null)?.id !== id) return { ok: false, motivo: 'integridad' };
+    if (archivarActual && !this.episodios().some((x) => x.id === aArchivar.id)) return { ok: false, motivo: 'integridad' };
+    return { ok: true, motivo: null, duplicado: !r3.ok };
   },
   borrarEpisodio(id) {
     const lista = this.episodios();

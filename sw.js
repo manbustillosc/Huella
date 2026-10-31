@@ -1,6 +1,6 @@
 // Service worker: guarda la app en el dispositivo para que funcione sin conexión.
 // Al cambiar cualquier archivo, sube VERSION para que los celulares descarguen la nueva versión.
-const VERSION = 'huella-2.12.0';
+const VERSION = 'huella-2.13.0';
 
 const ARCHIVOS = [
   './',
@@ -138,10 +138,18 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Sin conexión y sin copia guardada: respuesta explícita de «no disponible» (nunca otra página en su lugar).
+const noDisponible = () => new Response('Recurso no disponible sin conexión.', {
+  status: 503, statusText: 'Sin conexión', headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+});
+
 // Primero la red, revalidando con el servidor (para ver cambios recientes); sin conexión, la copia guardada.
+// Solo una navegación (abrir la app o recargarla) puede recibir index.html como respaldo; un archivo JavaScript, CSS,
+// imagen o fuente recibe su propia copia o un 503, para que el navegador no intente ejecutar HTML como código.
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  const navegacion = request.mode === 'navigate' || request.destination === 'document';
   event.respondWith(
     fetch(request, { cache: 'no-cache' })
       .then((respuesta) => {
@@ -151,6 +159,8 @@ self.addEventListener('fetch', (event) => {
         }
         return respuesta;
       })
-      .catch(() => caches.match(request, { ignoreSearch: true }).then((r) => r || caches.match('./index.html'))),
+      .catch(() => caches.match(request, { ignoreSearch: true })
+        .then((r) => r || (navegacion ? caches.match('./index.html') : null))
+        .then((r) => r || noDisponible())),
   );
 });

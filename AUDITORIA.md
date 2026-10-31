@@ -149,3 +149,25 @@ Cambio de sección: SPPB, velocidad de marcha, TUG, Tinetti, silla 30 s, equilib
 | ACS NSQIP | Bilimoria, 2013 | Solo registro de la calculadora oficial; el modelo no es público. |
 | RCRI, ARISCAT, Caprini, ESC 2022, DASI | Fuentes ya revisadas | La frase usa las mismas cifras que las categorías: RCRI (Lee, 1999 y CCS, 2017), ARISCAT (PERISCOPE), Caprini (ACCP 2012, riesgo sin profilaxis), ESC 2022 (muerte cardiovascular, infarto o EVC a 30 días). |
 
+## Versión 2.13: auditoría integral del 30/10/2026
+
+Hallazgos de la auditoría estática de la versión 2.12.0, reproducidos con pruebas (`tests/fase16-auditoria-integral.test.mjs`) antes de corregirlos.
+
+| Hallazgo | Estado | Corrección y fuente |
+|---|---|---|
+| 01. `tieneContenido()` ignoraba datos clínicos, STOPP/START, Beers, función renal, prioridades, revaloraciones, bitácora, reutilización ICOPE, momentos de rutas y etiqueta | Confirmado y corregido | Criterio general: cuenta cualquier dato capturado salvo identificador, fecha de creación y datos automáticos del episodio. La copia archivada se compara completa antes de empezar otra valoración; nuevo aviso «archivado sin poder empezar otro». |
+| 02. Radio 33 % usado siempre en el T-score más bajo | Confirmado y corregido | Pregunta obligatoria de indicación cuando se registra el radio; solo clasifica con indicación (posiciones oficiales de la ISCD para adultos, 2019 y 2023). |
+| 03. «ASA V: urgencia quirúrgica, no requiere VPO» | Confirmado (transcrito del algoritmo 1 del lineamiento, p. 8) y corregido | ASA V = persona moribunda; la urgencia es el modificador «E» de cualquier clase (ASA, 2020). Nodo nuevo que separa cirugía electiva, urgente y de emergencia (definiciones de la guía ACC/AHA 2014). El texto del lineamiento queda citado como origen. |
+| 04. «Electrocauterio monopolar contraindicado» con DAI, sin matices | Confirmado (cuadro 11 del lineamiento, p. 19) y corregido | Se conserva atribuido al lineamiento y se individualiza: por encima o por debajo del ombligo, dependencia de la estimulación, imán frente a reprogramación (el imán sobre un DAI no da estimulación asincrónica), desfibrilador disponible y reactivación con comprobación (consenso HRS/ASA 2011; APSF 2024). |
+| 05. Elevación del ST dentro de «valoración por Cardiología antes de la cirugía» | Confirmado (cuadro 10 del lineamiento, p. 18) y corregido | Rama nueva «Sospecha de síndrome coronario agudo» → Urgencias de inmediato; Cardiología programada queda para cambios sin síntomas ni inestabilidad. |
+| 06. ECG en asintomáticos con cirugía de riesgo intermedio o alto como indicación universal | Confirmado (cuadro 9 del lineamiento, p. 18) y matizado | Se mantiene la indicación del lineamiento y se muestra la fuerza de la guía AHA/ACC 2024: opcional («puede considerarse») en asintomáticos sin enfermedad cardiovascular conocida. También en el riesgo del procedimiento (ESC 2022). |
+| 07. Exportación deshabilitada en episodios con información | Confirmado y corregido | Mismo criterio que el archivado; prueba de exportación e importación con datos sin resultados. |
+| 08. `index.html` como respaldo de cualquier recurso sin conexión | Confirmado y corregido | Solo para navegaciones; los demás reciben su copia o un 503. |
+| 09. `decodeURIComponent()` sin manejo de excepciones | Confirmado y corregido | `segmentosHash()` devuelve null con una codificación inválida; el enrutador abre el inicio y avisa. |
+| 10. Aviso «borrar todos los resultados» incompleto | Confirmado y corregido | El aviso dice que se borra toda la valoración en curso, sin archivarla, y recomienda cerrarla en Seguimiento o exportarla. |
+| 11. Apertura de episodios archivados sin comprobar todas las escrituras | Riesgo confirmado; no se encontró pérdida | Se comprueba cada escritura y el estado final; si falla quitar la copia archivada se avisa del duplicado; una valoración con el mismo identificador y cambios se archiva aparte; el límite de 30 se respeta al terminar. |
+
+Sección 5 del informe (validación clínica complementaria): en esta versión se contrastaron DXA, ASA, Gupta (ya en la 2.12), CKD-EPI 2021, Cockcroft-Gault y BIS con implementaciones independientes de sus ecuaciones publicadas (prueba de rejilla en `fase16`); los instrumentos revisados en versiones anteriores están en la tabla «Instrumentos revisados manualmente». No se encontró ninguna discrepancia reproducible en ellos.
+
+Pendientes: la revisión individual de los demás instrumentos de los 119 con los 12 puntos de la sección 5, y las pruebas manuales en iPhone con Safari, Android con Chrome y Edge (las automatizadas usan Chromium).
+

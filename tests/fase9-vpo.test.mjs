@@ -29,7 +29,9 @@ test('VPO: el algoritmo general sigue al lineamiento (ASA × riesgo del procedim
   assert.deepEqual(asa.ramas.map((r) => r.etiqueta), ['ASA I o II', 'ASA III', 'ASA IV', 'ASA V', 'ASA VI']);
   assert.match(asa.ramas[0].nodos[0].texto, /riesgo alto/);
   assert.match(asa.ramas[1].nodos[0].texto, /intermedio o alto/);
-  assert.match(asa.ramas[3].nodos[0].texto, /Urgencia quirúrgica: no requiere VPO/);
+  // ASA V: el lineamiento la anota como urgencia quirúrgica; desde la 2.13 Huella separa la clase de la urgencia («E»).
+  assert.match(asa.ramas[3].nodos[0].texto, /moribunda/);
+  assert.match(asa.ramas[3].nodos[0].origen, /Urgencia quirúrgica, no requiere VPO/);
   assert.ok(g.nodos.some((n) => /fragilidad/.test(n.texto) && n.escalas.includes('cfs')), 'fragilidad y síndromes geriátricos piden VPO');
   const ecg = DIAGRAMAS.find((d) => d.id === 'ecg');
   assert.ok(JSON.stringify(ecg).includes('Mobitz II'));

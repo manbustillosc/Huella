@@ -61,9 +61,24 @@ export function fijarEtiquetaEpisodio(v, etiqueta) {
   return v;
 }
 
-export const tieneContenido = (v) => Boolean(v?.resultados?.length || v?.medicacion?.meds?.length
-  || ['problemas', 'objetivos', 'intervenciones', 'libres'].some((k) => v?.plan?.[k]?.length)
-  || Object.keys(v?.plan?.preferencias || {}).length || Object.keys(v?.icope?.detalle || {}).length);
+// ¿Hay algo capturado? Texto no vacío, número, «sí», o una lista u objeto que contenga alguno de ellos.
+export function hayDato(x) {
+  if (x == null || x === false) return false;
+  if (typeof x === 'string') return x.trim() !== '';
+  if (typeof x === 'number') return Number.isFinite(x);
+  if (x === true) return true;
+  if (Array.isArray(x)) return x.some(hayDato);
+  if (typeof x === 'object') return Object.values(x).some(hayDato);
+  return false;
+}
+
+// Lo que Huella crea sola al empezar una valoración (identificador, fecha de creación y datos del episodio) no
+// cuenta como información. Todo lo demás sí: resultados, datos clínicos, medicamentos, criterios STOPP/START o Beers
+// revisados, función renal, plan, ICOPE, momentos y omisiones de las rutas, y cualquier dato que agreguen versiones
+// futuras. Archivar, cerrar y exportar usan este mismo criterio, para que ningún episodio con información se pierda.
+const AUTOMATICOS = new Set(['id', 'creada', 'episodio']);
+export const tieneContenido = (v) => Boolean(v && typeof v === 'object' && (
+  Object.entries(v).some(([k, x]) => !AUTOMATICOS.has(k) && hayDato(x)) || hayDato(episodioDe(v).etiqueta)));
 
 /* ---------- Exportación e importación ---------- */
 
