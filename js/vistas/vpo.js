@@ -1,6 +1,6 @@
 // Pantalla de diagramas de flujo de la valoración preoperatoria (VPO). Las ramas de cada decisión se pueden elegir
 // para resaltar el camino que aplica a la persona.
-import { DIAGRAMAS, LISTA_VPO, DOCUMENTO_VPO, ORIGENES_VPO, FUENTE_LISTA_VPO, diagramaDe } from '../vpo.js';
+import { DIAGRAMAS, LISTA_VPO, DOCUMENTO_VPO, ORIGENES_VPO, FUENTE_LISTA_VPO, GUIAS_VPO, diagramaDe } from '../vpo.js';
 import { porId } from '../datos.js';
 import { herramientaDe } from '../herramientas.js';
 import { $$, esc, icono } from '../ui.js';
@@ -99,6 +99,10 @@ export function renderVpo({ pestana }) {
       <section class="documento-vpo" aria-label="Documento de referencia">
         <p class="nota-seguridad">${icono('libro')} <span><strong>Documento:</strong> ${esc(DOCUMENTO_VPO.cita)} ${esc(DOCUMENTO_VPO.version)} ${esc(DOCUMENTO_VPO.enlace)} Huella digital del archivo: ${esc(DOCUMENTO_VPO.huella)}.</span></p>
         <p class="nota-seguridad">${icono('info')} <span>Las páginas citadas son las impresas en el documento. Los criterios de guías internacionales se marcan aparte; donde difieren del lineamiento, Huella lo indica.</span></p>
+        <details class="referencias">
+          <summary>${icono('libro')} Guías internacionales citadas</summary>
+          <ol>${Object.values(GUIAS_VPO).map((g) => `<li>${esc(g)}</li>`).join('')}</ol>
+        </details>
       </section>
     </section>`;
 }

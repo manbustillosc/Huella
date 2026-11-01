@@ -1,8 +1,8 @@
 // Huella · enrutador, navegación y arranque.
-import { almacen, mensajeFallo } from './almacen.js';
+import { almacen } from './almacen.js';
 import { VERSION, escalas, porId, DOMINIOS, RUTAS, escalasDe, dominioDe, rutaDe } from './datos.js';
 import { momentoDe, MOMENTOS } from './motor.js';
-import { $, esc, icono, aviso, botonEstrella, nombreCorto, cuentaDominio, segmentosHash } from './ui.js';
+import { $, esc, icono, aviso, avisoGuardado, botonEstrella, nombreCorto, cuentaDominio, segmentosHash } from './ui.js';
 import { renderMedicacion, montarMedicacion } from './vistas/medicacion.js';
 import { renderInfusiones, montarInfusiones, PESTANAS_INFUSION } from './vistas/infusiones.js';
 import { renderUnidades, montarUnidades, PESTANAS_UNIDADES } from './vistas/unidades.js';
@@ -254,7 +254,7 @@ function renderNavegacion(r) {
 function senalGuardado(lugar) {
   const est = almacen.estadoGuardado();
   const corto = { guardado: 'Guardado', sesion: 'Solo esta sesión', error: 'No guardado' }[est.estado];
-  const titulo = est.estado === 'guardado' ? est.texto : `${est.texto}. ${mensajeFallo(est.motivo)}`;
+  const titulo = est.estado === 'guardado' ? est.texto : `${est.texto}. ${est.mensaje}`;
   const ico = est.estado === 'guardado' ? 'check' : 'alerta';
   if (lugar === 'barra') return `<a class="senal-guardado est-g-${est.estado}" href="#/seguimiento" title="${esc(titulo)}" aria-label="${esc(titulo)}">${icono(ico)}<span>${corto}</span></a>`;
   return `<p class="senal-guardado est-g-${est.estado}" title="${esc(titulo)}">${icono(ico)}<span>${esc(est.texto)}</span></p>`;
@@ -271,7 +271,7 @@ document.addEventListener('click', (ev) => {
       b.setAttribute('aria-pressed', String(ahora));
       b.setAttribute('aria-label', `${ahora ? 'Quitar de' : 'Agregar a'} favoritas: ${nombreCorto(id)}`);
     });
-    aviso(ahora ? 'Agregada a favoritas' : 'Quitada de favoritas');
+    avisoGuardado(ahora ? 'Agregada a favoritas' : 'Quitada de favoritas');
     return;
   }
   if (ev.target.closest('[data-tema]')) {
@@ -301,7 +301,10 @@ function aplicarTema() {
 
 almacen.alCambiarGuardado((est) => {
   renderNavegacion(ruta());
-  if (est.estado === 'error') aviso(mensajeFallo(est.motivo));
+  if (est.estado === 'error') {
+    const e = almacen.estadoGuardado();
+    aviso(e.pendientes.length ? `${e.texto}. ${e.mensaje}` : e.mensaje);
+  }
 });
 
 aplicarTema();

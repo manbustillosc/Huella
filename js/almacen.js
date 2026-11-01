@@ -22,6 +22,9 @@ export const ESTADOS_GUARDADO = {
 };
 let estado = { estado: 'guardado', motivo: null, ts: 0 };
 let ultimoOk = 0;
+// Resultado de la última escritura en el almacenamiento permanente, para que la interfaz solo anuncie «guardado» cuando
+// la escritura se comprobó (ver avisoGuardado en ui.js).
+let ultima = { ok: true, motivo: null, clave: null, sesion: false };
 const oyentes = new Set();
 function fijarEstado(nuevo, motivo = null) {
   const cambio = nuevo !== estado.estado || motivo !== estado.motivo;
@@ -64,6 +67,20 @@ export function mensajeFallo(motivo) {
   }[motivo] || 'No se pudo guardar el cambio.';
 }
 
+// Mensaje cuando un cambio de la valoración no pudo escribirse pero se conserva en memoria (solo en esta pestaña).
+export function mensajeNoGuardado(motivo) {
+  const causa = {
+    lleno: 'El almacenamiento del navegador está lleno',
+    bloqueado: 'El navegador bloqueó el almacenamiento',
+    verificacion: 'No se pudo comprobar la escritura en el navegador',
+  }[motivo] || 'El navegador no permitió guardar';
+  const que = {
+    lleno: 'Exporta el episodio desde Seguimiento y libera espacio borrando episodios archivados que ya exportaste.',
+    bloqueado: 'Revisa la configuración de privacidad del navegador y exporta el episodio desde Seguimiento.',
+  }[motivo] || 'Exporta el episodio desde Seguimiento por seguridad.';
+  return `${causa}: el cambio se conserva solo en esta pestaña hasta que la cierres o la recargues. ${que}`;
+}
+
 function motivoError(err) {
   const n = err?.name || '';
   if (n === 'QuotaExceededError' || n === 'NS_ERROR_DOM_QUOTA_REACHED' || err?.code === 22 || err?.code === 1014) return 'lleno';
@@ -92,6 +109,7 @@ function escribir(area, clave, valor, { respaldar = true } = {}) {
     if (area.getItem(PREFIJO + clave) !== json) throw Object.assign(new Error('verificación fallida'), { name: 'VerificacionError' });
     if (area === local) {
       ultimoOk = Date.now();
+      ultima = { ok: true, motivo: null, clave, sesion: local === enMemoria };
       respaldo.delete(clave);
       if (!respaldo.size) fijarEstado(local === enMemoria ? 'sesion' : 'guardado', local === enMemoria ? 'no_disponible' : null);
     }
@@ -100,6 +118,7 @@ function escribir(area, clave, valor, { respaldar = true } = {}) {
     const motivo = err?.name === 'VerificacionError' ? 'verificacion' : motivoError(err);
     if (area === local) {
       if (respaldar) respaldo.set(clave, json);
+      ultima = { ok: false, motivo, clave, sesion: local === enMemoria, enMemoria: respaldar };
       fijarEstado('error', motivo);
     }
     return { ok: false, motivo };
@@ -172,7 +191,12 @@ export const almacen = {
   },
 
   /* Estado del guardado */
-  estadoGuardado: () => ({ ...estado, texto: ESTADOS_GUARDADO[estado.estado], pendientes: [...respaldo.keys()], ultimoOk }),
+  estadoGuardado: () => ({
+    ...estado, texto: ESTADOS_GUARDADO[estado.estado], pendientes: [...respaldo.keys()], ultimoOk,
+    // Explicación del estado: con cambios pendientes en memoria, se dice que siguen en esta pestaña.
+    mensaje: estado.estado === 'guardado' ? '' : respaldo.size ? mensajeNoGuardado(estado.motivo) : mensajeFallo(estado.motivo),
+  }),
+  ultimaEscritura: () => ({ ...ultima }),
   alCambiarGuardado(fn) { oyentes.add(fn); return () => oyentes.delete(fn); },
 
   /* Episodios archivados (solo en este navegador). Nunca se descartan solos: al llegar al límite, archivar o importar
@@ -287,7 +311,7 @@ export const almacen = {
   quitarResultado(id) {
     const v = this.valoracion();
     v.resultados = v.resultados.filter((r) => r.id !== id);
-    this.guardarValoracion(v);
+    return this.guardarValoracion(v);
   },
   omitidas(rutaId) {
     return this.valoracion().rutas[rutaId]?.omitidas || [];
@@ -352,6 +376,7 @@ export const almacen = {
     }
     Object.keys(memoria).forEach((k) => delete memoria[k]);
     respaldo.clear();
+    ultima = { ok: true, motivo: null, clave: null, sesion: local === enMemoria };
     fijarEstado(local === enMemoria ? 'sesion' : 'guardado', local === enMemoria ? 'no_disponible' : null);
   },
 
@@ -360,6 +385,7 @@ export const almacen = {
     local = l || seguro('localStorage');
     sesion = s || seguro('sessionStorage');
     respaldo.clear();
+    ultima = { ok: true, motivo: null, clave: null, sesion: local === enMemoria };
     fijarEstado(local === enMemoria ? 'sesion' : 'guardado', local === enMemoria ? 'no_disponible' : null);
   },
 };

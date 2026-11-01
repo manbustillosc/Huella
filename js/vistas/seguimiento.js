@@ -11,7 +11,7 @@ import {
 import { validarImportacion, MAX_BYTES_IMPORTACION } from '../importacion.js';
 import { respuestasSinAnadir } from '../pendientes.js';
 import { textoCambio, textoRespectoA, fechaCorta } from '../comparacion.js';
-import { $, $$, esc, icono, plural, hoyISO, aviso, confirmarEnDosToques } from '../ui.js';
+import { $, $$, esc, icono, plural, hoyISO, aviso, avisoGuardado, confirmarEnDosToques } from '../ui.js';
 import { filaObjetivo, filaIntervencion, formularioCambio, conectarPlan, conectarQuitar, avisoDatos } from './plan-ui.js';
 
 const AVISO_EXPORTAR = 'El archivo contiene información de salud del episodio, sin nombre ni identificadores. Revisa que el contexto clínico y las notas no incluyan datos identificables, guárdalo en un lugar seguro, no lo envíes por canales no seguros y bórralo cuando ya no lo necesites. Huella no lo sube a ningún servidor.';
@@ -252,14 +252,14 @@ export function montarSeguimiento(rerender, alCambiar) {
       const v = almacen.valoracion();
       reabrirEpisodio(v);
       almacen.guardarValoracion(v);
+      avisoGuardado('Episodio reabierto');
       redibujar('#cerrar-episodio');
-      aviso('Episodio reabierto');
     });
     $('#ep-etiqueta', panel)?.addEventListener('change', (ev) => {
       const v = almacen.valoracion();
       fijarEtiquetaEpisodio(v, ev.target.value);
       almacen.guardarValoracion(v);
-      aviso('Etiqueta guardada');
+      avisoGuardado('Etiqueta guardada');
     });
     const exp = $('#exportar', panel);
     if (exp && !exp.disabled) confirmarEnDosToques(exp, { texto: `${icono('alerta')} Toca otra vez para descargar el archivo`, accion: () => exportar(almacen.valoracion()) });

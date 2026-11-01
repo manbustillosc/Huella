@@ -4,7 +4,7 @@ import { porId, DOMINIOS, RUTAS } from '../datos.js';
 import { FUENTES } from '../motor.js';
 import { notaValoracion, valorGuardado, hallazgosYSugerencias } from '../nota.js';
 import { ordenarCronologico, compararResultados, etiquetaAplicacion, fechaCorta, isoDe, textoCambio, textoRespectoA } from '../comparacion.js';
-import { $, $$, esc, icono, plural, aviso, copiar, selectorFormato, alCambiarFormato, ETIQUETA_COPIAR, confirmarEnDosToques } from '../ui.js';
+import { $, $$, esc, icono, plural, aviso, avisoGuardado, copiar, selectorFormato, alCambiarFormato, ETIQUETA_COPIAR, confirmarEnDosToques } from '../ui.js';
 import { progresoRuta } from './rutas-estado.js';
 import { medicacionDe, resumenMedicacion } from '../medicacion.js';
 import { planDe, planConContenido } from '../plan.js';
@@ -142,8 +142,8 @@ export function renderValoracion() {
 function lineaGuardado() {
   const est = almacen.estadoGuardado();
   const hora = est.ultimoOk ? new Date(est.ultimoOk).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : '';
-  const detalle = est.estado === 'guardado' ? (hora ? ` · comprobado a las ${hora}` : '') : `. ${mensajeFallo(est.motivo)}`;
-  return `<p class="senal-guardado est-g-${est.estado} en-pagina" role="status">${icono(est.estado === 'guardado' ? 'check' : 'alerta')}<span>${esc(est.texto)}${esc(detalle)}</span></p>`;
+  const detalle = est.estado === 'guardado' ? (hora ? ` · comprobado a las ${hora}` : '') : `. ${est.mensaje}`;
+  return `<p class="senal-guardado est-g-${est.estado} en-pagina" id="linea-guardado" role="status">${icono(est.estado === 'guardado' ? 'check' : 'alerta')}<span>${esc(est.texto)}${esc(detalle)}</span></p>`;
 }
 
 function descripcionFormato(f) {
@@ -155,6 +155,13 @@ function descripcionFormato(f) {
 }
 
 export function montarValoracion(rerender, alCambiar) {
+  // La línea de estado del guardado se actualiza en cuanto cambia el estado, para que nunca diga «Guardado» mientras la
+  // barra dice «No guardado». Al salir de la pantalla, el oyente se retira solo.
+  const dejarDeOir = almacen.alCambiarGuardado(() => {
+    const linea = document.getElementById('linea-guardado');
+    if (!linea) { dejarDeOir(); return; }
+    linea.outerHTML = lineaGuardado();
+  });
   const actualizarNota = () => {
     const nota = $('#nota');
     if (!nota) return;
@@ -174,6 +181,7 @@ export function montarValoracion(rerender, alCambiar) {
       contexto: $('#p-contexto').value,
     };
     almacen.guardarValoracion(v);
+    avisoGuardado();
     actualizarNota();
   };
   ['#p-edad', '#p-sexo', '#p-escolaridad', '#p-contexto'].forEach((s) => $(s).addEventListener('input', guardarPaciente));
@@ -200,9 +208,9 @@ export function montarValoracion(rerender, alCambiar) {
     texto: icono('alerta'),
     accion: () => {
       almacen.quitarResultado(b.dataset.quitar);
+      avisoGuardado('Quitado de la valoración');
       alCambiar();
       rerender();
-      aviso('Quitado de la valoración');
     },
   }));
   $$('[data-quitar]').forEach((b) => b.addEventListener('click', () => {

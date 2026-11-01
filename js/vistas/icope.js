@@ -15,7 +15,7 @@ import {
 } from '../plan.js';
 import { valorGuardado } from '../nota.js';
 import { fechaCorta, diasEntre } from '../comparacion.js';
-import { $, $$, esc, icono, plural, aviso, copiar, hoyISO, confirmarEnDosToques } from '../ui.js';
+import { $, $$, esc, icono, plural, aviso, avisoGuardado, copiar, hoyISO, confirmarEnDosToques } from '../ui.js';
 
 export const PESTANAS_ICOPE = [
   ['panel', 'Panel'],
@@ -534,11 +534,11 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
     $('#copiar-icope')?.addEventListener('click', () => copiar($('#texto-icope').textContent, 'Resumen ICOPE copiado'));
     $$('[data-quitar-objetivo]', panel).forEach((b) => confirmarEnDosToques(b, {
       texto: icono('alerta'),
-      accion: () => { guardar(({ plan }) => quitarObjetivo(plan, b.dataset.quitarObjetivo, hoy)); redibujar(); aviso('Objetivo quitado del plan'); },
+      accion: () => { guardar(({ plan }) => quitarObjetivo(plan, b.dataset.quitarObjetivo, hoy)); redibujar(); avisoGuardado('Objetivo quitado del plan'); },
     }));
     $$('[data-quitar-int]', panel).forEach((b) => confirmarEnDosToques(b, {
       texto: icono('alerta'),
-      accion: () => { guardar(({ plan }) => quitarIntervencion(plan, b.dataset.quitarInt, hoy)); redibujar(); aviso('Intervención quitada del plan'); },
+      accion: () => { guardar(({ plan }) => quitarIntervencion(plan, b.dataset.quitarInt, hoy)); redibujar(); avisoGuardado('Intervención quitada del plan'); },
     }));
     $$('[data-quitar-externa]', panel).forEach((b) => confirmarEnDosToques(b, {
       texto: icono('alerta'),
@@ -546,7 +546,7 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
         const [dom, id] = b.dataset.quitarExterna.split(':');
         guardar(({ icope }) => { icope.detalle = { ...icope.detalle, [dom]: (icope.detalle[dom] || []).filter((x) => x.id !== id) }; });
         redibujar();
-        aviso('Registro quitado');
+        avisoGuardado('Registro quitado');
       },
     }));
   }
@@ -560,7 +560,7 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
         registrarCambio(plan, `${dominioIcope(dom).nombre}: el médico confirmó como vigente una evaluación detallada previa (${c.dataset.texto}).`, hoy);
       });
       redibujar();
-      aviso('Evaluación previa confirmada como vigente');
+      avisoGuardado('Evaluación previa confirmada como vigente');
       return;
     }
     const rr = ev.target.closest('[data-retirar-reuso]');
@@ -571,7 +571,7 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
         registrarCambio(plan, `${dominioIcope(dom).nombre}: se retiró la confirmación de la evaluación detallada previa.`, hoy);
       });
       redibujar();
-      aviso('Confirmación retirada');
+      avisoGuardado('Confirmación retirada');
       return;
     }
     const b = ev.target.closest('[data-agregar-int]');
@@ -579,7 +579,7 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
     const ambito = b.dataset.agregarInt;
     guardar(({ plan }) => agregarIntervencion(plan, ambito, { categoria: b.dataset.categoria, texto: b.dataset.texto, origen: 'sugerida' }, hoy, nombreAmbitoIcope(ambito)));
     redibujar();
-    aviso('Intervención agregada al plan');
+    avisoGuardado('Intervención agregada al plan');
   });
 
   panel.addEventListener('change', (ev) => {
@@ -589,7 +589,7 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
       const nota = panel.querySelector(`[data-nota-problema="${dom}"]`)?.value || '';
       guardar(({ plan }) => fijarProblema(plan, ambitoIcope(dom), { estado: t.value, nota }, hoy, dominioIcope(dom).nombre));
       redibujar(`[data-problema="${dom}"]`);
-      aviso(t.value ? 'Valoración del médico registrada' : 'Valoración del médico retirada');
+      avisoGuardado(t.value ? 'Valoración del médico registrada' : 'Valoración del médico retirada');
     } else if (t.matches('[data-nota-problema]')) {
       const dom = t.dataset.notaProblema;
       const estado = panel.querySelector(`[data-problema="${dom}"]`)?.value;
@@ -597,21 +597,21 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
     } else if (t.matches('[data-prioridad]')) {
       const ambito = t.dataset.prioridad;
       guardar(({ plan }) => fijarPrioridad(plan, ambito, t.value, hoy, nombreAmbitoIcope(ambito)));
-      aviso(t.value ? `Prioridad ${nombreDe(PRIORIDADES, t.value).toLowerCase()}` : 'Prioridad sin definir');
+      avisoGuardado(t.value ? `Prioridad ${nombreDe(PRIORIDADES, t.value).toLowerCase()}` : 'Prioridad sin definir');
       alCambiar();
     } else if (t.matches('[data-revaloracion]')) {
       const ambito = t.dataset.revaloracion;
       guardar(({ plan }) => fijarRevaloracion(plan, ambito, t.value, hoy, nombreAmbitoIcope(ambito)));
-      aviso(t.value ? 'Fecha de revaloración guardada' : 'Fecha de revaloración quitada');
+      avisoGuardado(t.value ? 'Fecha de revaloración guardada' : 'Fecha de revaloración quitada');
       alCambiar();
     } else if (t.matches('[data-estado-objetivo]')) {
       guardar(({ plan }) => actualizarObjetivo(plan, t.dataset.estadoObjetivo, { estado: t.value }, hoy));
       redibujar(`[data-estado-objetivo="${t.dataset.estadoObjetivo}"]`);
-      aviso('Estado del objetivo actualizado');
+      avisoGuardado('Estado del objetivo actualizado');
     } else if (t.matches('[data-estado-int]')) {
       guardar(({ plan }) => actualizarIntervencion(plan, t.dataset.estadoInt, { estado: t.value }, hoy));
       redibujar(`[data-estado-int="${t.dataset.estadoInt}"]`);
-      aviso('Estado de la intervención actualizado');
+      avisoGuardado('Estado de la intervención actualizado');
     }
   });
 
@@ -622,7 +622,7 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
     if (form.id === 'form-pref') {
       guardar(({ plan }) => fijarPreferencias(plan, datos));
       redibujar();
-      aviso('Preferencias guardadas');
+      avisoGuardado('Preferencias guardadas');
     } else if (form.dataset.formObjetivo) {
       const ambito = form.dataset.formObjetivo;
       let ok = null;
@@ -635,13 +635,13 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
         return;
       }
       redibujar();
-      aviso('Objetivo agregado al plan');
+      avisoGuardado('Objetivo agregado al plan');
     } else if (form.dataset.formInt) {
       const ambito = form.dataset.formInt;
       if (!String(datos.texto || '').trim()) { form.querySelector('[name="texto"]').focus(); aviso('Escribe la intervención'); return; }
       guardar(({ plan }) => agregarIntervencion(plan, ambito, { categoria: datos.categoria, texto: datos.texto }, hoy, nombreAmbitoIcope(ambito)));
       redibujar();
-      aviso('Intervención agregada al plan');
+      avisoGuardado('Intervención agregada al plan');
     } else if (form.dataset.formExterna) {
       const dom = form.dataset.formExterna;
       const prueba = String(datos.prueba || '').replace(/\s+/g, ' ').trim().slice(0, 80);
@@ -653,13 +653,13 @@ export function montarIcope({ pestana }, rerender, alCambiar) {
         registrarCambio(plan, `${dominioIcope(dom).nombre}: evaluación detallada registrada (${prueba}).`, hoy);
       });
       redibujar();
-      aviso('Evaluación detallada registrada');
+      avisoGuardado('Evaluación detallada registrada');
     } else if (form.id === 'form-cambio') {
       let ok = false;
       guardar(({ plan }) => { ok = registrarCambio(plan, datos.texto, datos.fecha || hoy); });
       if (!ok) { form.querySelector('[name="texto"]').focus(); aviso('Describe el cambio'); return; }
       redibujar();
-      aviso('Cambio registrado');
+      avisoGuardado('Cambio registrado');
     }
   });
 

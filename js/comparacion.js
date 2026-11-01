@@ -35,6 +35,21 @@ export function ordenarCronologico(rs) {
   });
 }
 
+// Contenido clínico de una aplicación, para saber si ya está guardada tal cual: respuestas una por una, puntaje, valor,
+// interpretación, datos vinculados, fechas y fuente. Se excluyen solo los campos técnicos (identificador, marca de
+// guardado y enlace a la aplicación que se corrige) y las claves vacías, que versiones anteriores no siempre guardaban.
+// Dos aplicaciones con el mismo total pero respuestas distintas NO son iguales.
+const CAMPOS_TECNICOS = new Set(['id', 'guardado', '_origen']);
+function normalizarContenido(x) {
+  if (Array.isArray(x)) return x.map(normalizarContenido);
+  if (x && typeof x === 'object') {
+    return Object.fromEntries(Object.keys(x).filter((k) => !CAMPOS_TECNICOS.has(k) && x[k] != null).sort().map((k) => [k, normalizarContenido(x[k])]));
+  }
+  return x;
+}
+export const contenidoClinico = (r) => JSON.stringify(normalizarContenido(r));
+export const mismoContenido = (a, b) => contenidoClinico(a) === contenidoClinico(b);
+
 export const referenciaDe = (lista) => lista.find((r) => r.momento === 'basal') || lista[0] || null;
 
 // Resultado vigente: la aplicación más reciente según su fecha, no según el nombre del momento.

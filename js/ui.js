@@ -1,6 +1,6 @@
 // Piezas de interfaz compartidas por las vistas.
 import { icono } from './iconos.js';
-import { almacen } from './almacen.js';
+import { almacen, mensajeNoGuardado, mensajeFallo } from './almacen.js';
 import { porId, dominioDe, escalasDe } from './datos.js';
 import { TIPOS, CLASES, claseDe, TEXTO_REGISTRO } from './motor.js';
 import { valorGuardado } from './nota.js';
@@ -142,7 +142,21 @@ export function aviso(mensaje) {
   el.textContent = mensaje;
   el.classList.add('visible');
   clearTimeout(temporizadorAviso);
-  temporizadorAviso = setTimeout(() => el.classList.remove('visible'), 2400);
+  // Los mensajes largos (p. ej., un fallo de guardado) quedan más tiempo para poder leerlos.
+  temporizadorAviso = setTimeout(() => el.classList.remove('visible'), Math.min(10000, Math.max(2400, String(mensaje).length * 55)));
+}
+
+// Anuncia un cambio solo si la última escritura en el navegador se completó y se comprobó. Si falló, no muestra el
+// mensaje de éxito: explica que el cambio se conserva solo en esta pestaña (o que no se hizo, en las operaciones de
+// episodios). Sin «exito», solo avisa si falló (guardados silenciosos). Devuelve true si quedó guardado.
+export function avisoGuardado(exito = null) {
+  const r = almacen.ultimaEscritura();
+  if (r.ok) {
+    if (exito) aviso(r.sesion ? `${exito}. Solo durante esta sesión: este navegador no guarda datos de forma permanente.` : exito);
+    return true;
+  }
+  aviso(r.enMemoria === false ? mensajeFallo(r.motivo) : `No guardado. ${mensajeNoGuardado(r.motivo)}`);
+  return false;
 }
 
 // Copia al portapapeles y solo anuncia éxito si se pudo confirmar. Si el navegador lo impide, abre un cuadro con el

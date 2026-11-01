@@ -122,6 +122,7 @@ export default {
     { texto: 'Hlatky MA, Boineau RE, Higginbotham MB, et al. A brief self-administered questionnaire to determine functional capacity (the Duke Activity Status Index). Am J Cardiol. 1989;64(10):651-4.', doi: '10.1016/0002-9149(89)90496-7' },
     { texto: 'Wijeysundera DN, Beattie WS, Hillis GS, et al. Integration of the Duke Activity Status Index into preoperative risk evaluation: a multicentre prospective cohort study. Br J Anaesth. 2020;124(3):261-70.', doi: '10.1016/j.bja.2019.11.025' },
     { texto: 'Thompson A, Fleischmann KE, Smilowitz NR, et al. 2024 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery. Circulation. 2024;150(19):e351-e442. Secciones 3.2 y 4.5.', doi: '10.1161/CIR.0000000000001285' },
+    { texto: 'Thompson A, Fleischmann KE, Smilowitz NR, et al. 2026 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery. Circulation. 2026;154(13):e413-e504. Reafirmación de la guía de 2024: recomendaciones idénticas.', doi: '10.1161/CIR.0000000000001472' },
     { texto: 'Instituto Mexicano del Seguro Social, Dirección de Prestaciones Médicas. Lineamiento para Valoración Preoperatoria para Cirugía Electiva no Cardiaca. México: IMSS; agosto 2026. Cuadro 3, p. 12.' },
   ],
 };

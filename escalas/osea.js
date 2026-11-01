@@ -111,6 +111,10 @@ export const INDICACIONES_RADIO = [
   { texto: 'Ninguna: registrar el radio solo como dato adicional', valor: 'ninguna' },
 ];
 const escrito = (x) => x != null && String(x).trim() !== '' && Number.isFinite(Number(String(x).trim().replace(',', '.')));
+// Sitios centrales que el informe puede declarar no interpretables (cambios degenerativos o fracturas vertebrales,
+// prótesis o material en la cadera, artefactos). No participan en la categoría densitométrica (ISCD).
+const CENTRALES = SITIOS.filter(([id]) => id !== 't_radio');
+const noInterpretablesDe = (v) => new Set(Array.isArray(v.no_interpretables) ? v.no_interpretables : []);
 
 const B_DXA = {
   normal: { id: 'normal', rango: 'T-score ≥ −1.0', etiqueta: 'Densidad mineral ósea normal', nivel: 'bien', texto: 'T-score más bajo de −1.0 o mayor (categorías de la OMS).' },
@@ -155,6 +159,13 @@ export const dxa = {
     tSitio('t_columna', 'T-score, columna lumbar (L1–L4)'),
     tSitio('t_cuello', 'T-score, cuello femoral'),
     tSitio('t_cadera', 'T-score, cadera total'),
+    {
+      id: 'no_interpretables', tipo: 'checklist', opcional: true, textoCorto: 'sitios centrales no interpretables',
+      texto: 'Sitios centrales no interpretables (opcional)',
+      visibleSi: (r) => CENTRALES.some(([id]) => escrito(r[id])),
+      ayuda: 'Marca solo los que el informe declara no interpretables: p. ej., artrosis o cambios degenerativos, fracturas vertebrales, prótesis o material de osteosíntesis en la cadera. No entran en la categoría densitométrica; se muestran como dato adicional.',
+      opciones: CENTRALES.map(([id, n]) => ({ id, texto: n.charAt(0).toUpperCase() + n.slice(1) })),
+    },
     tSitio('t_radio', 'T-score, radio 33%'),
     {
       id: 'radio_motivo', texto: 'Indicación de la ISCD para usar el radio 33% en el diagnóstico', textoCorto: 'indicación del radio 33%', puntua: false,
@@ -182,11 +193,15 @@ export const dxa = {
   validar({ v }) {
     const usaT = (v.sexo?.valor === 1 && v.menopausia?.valor === 1) || (v.sexo?.valor === 0 && Number.isFinite(v.edad) && v.edad >= 50);
     const hayT = SITIOS.some(([id]) => Number.isFinite(v[id]));
-    const hayCentral = SITIOS.some(([id]) => id !== 't_radio' && Number.isFinite(v[id]));
+    const excluidos = noInterpretablesDe(v);
+    const hayCentral = CENTRALES.some(([id]) => Number.isFinite(v[id]) && !excluidos.has(id));
     if (v.sexo && Number.isFinite(v.edad) && (v.sexo.valor === 0 || v.menopausia)) {
       if (usaT && !hayT) return { t_columna: 'Registra al menos un T-score.' };
+      if (usaT && !hayCentral && !Number.isFinite(v.t_radio)) {
+        return { no_interpretables: 'Ningún sitio registrado es interpretable: sin columna ni cadera interpretables, la categoría solo puede usar el radio 33% con una indicación de la ISCD. Registra el radio o revisa los sitios marcados.' };
+      }
       if (usaT && !hayCentral && v.radio_motivo?.valor === 'ninguna') {
-        return { radio_motivo: 'Sin T-score de columna ni de cadera, el radio 33% solo clasifica si existe una indicación de la ISCD; elige la que corresponda o registra un sitio central.' };
+        return { radio_motivo: 'Sin T-score interpretable de columna ni de cadera, el radio 33% solo clasifica si existe una indicación de la ISCD; elige la que corresponda o registra un sitio central interpretable.' };
       }
       if (!usaT && !Number.isFinite(v.z_min)) return { z_min: 'En esta población se interpreta el Z-score: regístralo.' };
     }
@@ -201,17 +216,28 @@ export const dxa = {
     let valor = null;
     let sitiosMin = [];
     let radio = null;
+    let noInterp = [];
     if (usaT) {
       // El radio 33% entra en la categoría solo con una indicación de la ISCD; si no, se muestra como dato adicional.
       const conRadio = Number.isFinite(v.t_radio);
       const radioDx = conRadio && Boolean(v.radio_motivo) && v.radio_motivo.valor !== 'ninguna';
       radio = conRadio ? { t: v.t_radio, diagnostico: radioDx, indicacion: v.radio_motivo?.valor || null } : null;
-      const medidos = SITIOS.filter(([id]) => Number.isFinite(v[id]) && (id !== 't_radio' || radioDx)).map(([id, n]) => ({ n, t: v[id] }));
+      // Los sitios centrales no interpretables tampoco entran; se informan aparte.
+      const excluidos = noInterpretablesDe(v);
+      const fuera = CENTRALES.filter(([id]) => Number.isFinite(v[id]) && excluidos.has(id)).map(([id, n]) => ({ id, n, t: v[id] }));
+      noInterp = fuera.map(({ id, t }) => ({ sitio: id, t }));
+      const medidos = SITIOS.filter(([id]) => Number.isFinite(v[id]) && !excluidos.has(id) && (id !== 't_radio' || radioDx)).map(([id, n]) => ({ n, t: v[id] }));
       const min = Math.min(...medidos.map((x) => x.t));
       valor = min;
       banda = min >= T_NORMAL ? B_DXA.normal : min > T_OP ? B_DXA.baja : B_DXA.osteoporosis;
       sitiosMin = medidos.filter((x) => x.t === min).map((x) => x.n);
       lineas.push(`T-scores para la categoría: ${medidos.map((x) => `${x.n} ${x.t}`).join('; ')}. Más bajo: ${min} (${sitiosMin.join(' y ')}).`);
+      if (fuera.length) lineas.push(`No interpretable según el informe, fuera de la categoría: ${fuera.map((x) => `${x.n} ${x.t}`).join('; ')}.`);
+      const columnaUtil = Number.isFinite(v.t_columna) && !excluidos.has('t_columna');
+      const caderaUtil = ['t_cuello', 't_cadera'].some((id) => Number.isFinite(v[id]) && !excluidos.has(id));
+      if (radioDx && v.radio_motivo.valor === 'central' && columnaUtil && caderaUtil) {
+        lineas.push('Se indicó que la cadera o la columna no pueden medirse o interpretarse, pero ambas tienen T-scores interpretables registrados: verifica la indicación o marca los sitios no interpretables.');
+      }
       if (radioDx) lineas.push(`Radio 33% incluido en la categoría por indicación de la ISCD: ${v.radio_motivo.texto.toLowerCase()}.`);
       else if (conRadio) lineas.push(`Radio 33%: T-score ${v.t_radio}, registrado como dato adicional; no entra en la categoría densitométrica porque no se documentó una indicación de la ISCD (cadera o columna no medibles o no interpretables, hiperparatiroidismo u obesidad que supera el límite de la mesa).`);
     } else {
@@ -234,7 +260,7 @@ export const dxa = {
       valor, unidad: usaT ? 'T' : 'Z', mostrar: String(valor), sufijo: usaT ? 'T-score más bajo' : 'Z-score más bajo',
       lineas, lineasNota: lineas,
       extras: {
-        usaT, valor, fractura: v.fractura.valor, sitiosMin, radio,
+        usaT, valor, fractura: v.fractura.valor, sitiosMin, radio, noInterpretables: noInterp,
         dmo: v.dmo_sitio?.valor && Number.isFinite(v.dmo_valor) ? { sitio: v.dmo_sitio.valor, valor: v.dmo_valor, equipo: v.equipo?.valor || 'no_consta', lsc: Number.isFinite(v.lsc) ? v.lsc : null } : null,
       },
     };
@@ -271,6 +297,7 @@ export const dxa = {
   notas: [
     'Categorías densitométricas de la OMS con el T-score más bajo de columna lumbar, cuello femoral y cadera total: normal ≥ −1.0; baja masa ósea entre −1.0 y −2.5; osteoporosis ≤ −2.5.',
     'El radio 33% (antebrazo no dominante) entra en la categoría solo con una indicación de la ISCD: cadera o columna que no pueden medirse o interpretarse, hiperparatiroidismo u obesidad que supera el límite de peso de la mesa. Sin ella, Huella lo muestra como dato adicional y no lo usa para clasificar.',
+    'Los sitios centrales que el informe declara no interpretables (cambios degenerativos o fracturas vertebrales, prótesis o material en la cadera, artefactos) no entran en la categoría; se muestran como dato adicional.',
     'La osteoporosis densitométrica no es lo mismo que la clínica: una fractura por fragilidad de cadera o vertebral establece el diagnóstico clínico aunque el T-score no llegue a −2.5.',
     'En mujeres premenopáusicas y hombres menores de 50 años se interpreta el Z-score (≤ −2.0: por debajo de lo esperado para la edad).',
     'Seguimiento: la ISCD recomienda comparar la DMO en g/cm² del mismo sitio, en el mismo equipo, con el cambio mínimo significativo (LSC) del centro. Huella no califica como mejoría o deterioro las diferencias del T-score ni compara T-score con Z-score.',

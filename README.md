@@ -227,6 +227,14 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **Diagramas de la VPO:** se distinguen cirugía electiva, urgente y de emergencia (modificador «E»); ASA V ya no se presenta como «urgencia quirúrgica»; la elevación nueva del ST o los cambios isquémicos con síntomas van a Urgencias; el manejo de marcapasos y DAI se individualiza (sitio respecto al ombligo, dependencia de la estimulación, imán frente a reprogramación y reactivación al terminar); y el ECG preoperatorio muestra qué indica el lineamiento del IMSS y con qué fuerza lo recomienda la guía AHA/ACC 2024. Lo que dice el lineamiento sigue visible y atribuido.
 - **Sin conexión**, solo la navegación recibe `index.html` como respaldo; un archivo JavaScript o CSS recibe su copia guardada o un error 503. Un enlace con codificación inválida abre el inicio en lugar de detener la app.
 
+## Segunda auditoría (versión 2.13.1)
+
+- **Correcciones de resultados con el mismo total:** Huella compara el contenido clínico completo (cada respuesta, puntaje, valor, interpretación, datos vinculados, fechas y fuente) para decidir si una aplicación ya está guardada; solo excluye el identificador, la marca de guardado y el enlace a la aplicación corregida. Corregir dos respuestas que se compensan (p. ej., Barthel 85) ya se puede guardar, con la confirmación de siempre.
+- **Creatinina en Gupta:** una creatinina vacía, ausente, no numérica, fuera del rango de su unidad o con una unidad desconocida ya no se toma como 0 mg/dL; el botón «Usar este dato» aparece deshabilitado con el motivo. 132.6 µmol/L se convierte a 1.5 mg/dL sin error de redondeo. La ecuación y sus coeficientes no cambian.
+- **Mensajes de guardado:** cada acción anuncia «guardado» solo si la escritura se comprobó. Si el navegador no guarda, el aviso dice que el cambio se conserva solo en esta pestaña y qué hacer; la línea de estado de Valoración se actualiza al momento, sin mensajes contradictorios.
+- **VPO:** se cita la reafirmación de septiembre de 2026 de la guía AHA/ACC (mismas recomendaciones que la de 2024) y se listan las guías internacionales citadas.
+- **DXA:** los sitios centrales que el informe declara no interpretables no entran en la categoría densitométrica y se muestran como dato adicional.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

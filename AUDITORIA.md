@@ -171,3 +171,15 @@ Sección 5 del informe (validación clínica complementaria): en esta versión s
 
 Pendientes: la revisión individual de los demás instrumentos de los 119 con los 12 puntos de la sección 5, y las pruebas manuales en iPhone con Safari, Android con Chrome y Edge (las automatizadas usan Chromium).
 
+## Versión 2.13.1: segunda auditoría, 31/10/2026
+
+Cada punto se reprodujo en la 2.13.0 antes de corregirlo (`tests/fase17-segunda-auditoria.test.mjs`).
+
+| Punto | Estado en la 2.13.0 | Corrección y prueba |
+|---|---|---|
+| 1. Resultados idénticos | Confirmado: `mismoContenido()` comparaba resumen, fecha, fuente y fecha de referencia; un Barthel 85 corregido con dos respuestas que se compensan tenía el mismo resumen y quedaba como «En la valoración» sin poder guardarse. | `contenidoClinico()` y `mismoContenido()` en `js/comparacion.js` comparan todo menos `id`, `guardado` y `_origen`, ignorando claves vacías de versiones anteriores. La corrección reemplaza la aplicación de origen con confirmación y aparece en el desglose. |
+| 2. Creatinina de Gupta | Confirmado: un campo vacío se convertía en 0 mg/dL («1.5 o menos») y un resultado sin `respuestas` lanzaba un error. | `leerCreatinina()` devuelve valor o motivo: vacío, ausente, sin respuestas, no numérico, negativo, cero, fuera de rango o con unidad desconocida → sin valor; el vínculo queda deshabilitado con el motivo y se vuelve a comprobar al aplicar. Coeficientes sin cambios. |
+| 3. Mensajes de guardado | Confirmado: reabrir, etiqueta, medicamentos, función renal, plan, ICOPE, quitar resultados, retomar y momento de rutas anunciaban éxito sin comprobar; la línea de Valoración podía decir «Guardado» con la barra en «No guardado». | `almacen.ultimaEscritura()` y `avisoGuardado()` (ui.js): éxito solo con escritura comprobada; si falla, mensaje que distingue «solo en esta pestaña» (en memoria) de «no se hizo» (operaciones de episodios) y de «solo durante esta sesión» (sin almacenamiento permanente). STOPP/START, Beers y datos clínicos avisan si fallan. |
+| 4. Referencias de la VPO | La guía AHA/ACC se reafirmó el 28/09/2026 con recomendaciones, texto, figuras, tablas y referencias idénticos (comunicado del ACC). | Se agrega la cita 2026 (Circulation 2026;154(13):e413-e504; JACC 2026;88(13):1543-1643) junto a la de 2024, que es la que cita el lineamiento. Los algoritmos no cambian. |
+| 5. DXA | Mejora: no había forma de excluir un sitio central no interpretable. | Lista opcional «Sitios centrales no interpretables»: esos sitios no entran en la categoría y se muestran aparte; sin sitio interpretable ni radio con indicación, se pide revisar. |
+

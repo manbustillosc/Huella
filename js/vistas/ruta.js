@@ -4,7 +4,7 @@ import { rutaDe } from '../datos.js';
 import { momentoDe } from '../motor.js';
 import { valorGuardado } from '../nota.js';
 import { etiquetaAplicacion } from '../comparacion.js';
-import { $, $$, esc, icono, plural, aviso, estadoHerramienta, copiar } from '../ui.js';
+import { $, $$, esc, icono, plural, aviso, avisoGuardado, estadoHerramienta, copiar } from '../ui.js';
 import { herramientaDe } from '../herramientas.js';
 import { progresoRuta, siguientePendiente, urlPaso, tiempoRuta, momentoDeRuta, frasesRuta } from './rutas-estado.js';
 
@@ -161,12 +161,12 @@ export function montarRuta({ id }, rerender) {
   $('#copiar-frases')?.addEventListener('click', () => copiar(frasesRuta(rutaDe(id)).map((f) => f.texto).join('\n'), 'Resultados copiados'));
   $$('[data-retomar]').forEach((b) => b.addEventListener('click', () => {
     almacen.alternarOmitida(id, b.dataset.retomar, false);
-    aviso('Instrumento retomado');
+    avisoGuardado('Instrumento retomado');
     rerender();
   }));
   $$('input[name="momento-ruta"]').forEach((input) => input.addEventListener('change', () => {
     almacen.guardarMomentoRuta(id, input.value);
-    aviso(`Momento: ${momentoDe(input.value).nombre}`);
+    avisoGuardado(`Momento: ${momentoDe(input.value).nombre}`);
     rerender();
   }));
 }

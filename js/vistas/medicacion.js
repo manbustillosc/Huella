@@ -6,7 +6,7 @@ import {
   medicacionDe, normalizarMedicamento, lineaMedicamento, textoRenal, resumenMedicacion, textoRevision,
 } from '../medicacion.js';
 import { vigenteDe, diasEntre } from '../comparacion.js';
-import { $, $$, esc, icono, plural, aviso, copiar, confirmarEnDosToques, hoyISO } from '../ui.js';
+import { $, $$, esc, icono, plural, aviso, avisoGuardado, copiar, confirmarEnDosToques, hoyISO } from '../ui.js';
 
 const leer = () => medicacionDe(almacen.valoracion());
 function guardar(m) {
@@ -269,7 +269,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       const m = leer();
       m.paliativo = ev.target.checked;
       guardar(m);
-      aviso(m.paliativo ? 'Contexto paliativo registrado' : 'Contexto paliativo quitado');
+      avisoGuardado(m.paliativo ? 'Contexto paliativo registrado' : 'Contexto paliativo quitado');
     });
     $$('[data-renal]').forEach((b) => b.addEventListener('click', () => {
       const id = b.dataset.renal;
@@ -279,7 +279,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       m.renal = { ...(m.renal || {}), [id === 'cockcroft' ? 'depuracion' : 'tfg']: { valor: Math.round(res.valor), fecha: res.fecha || null, fuente: id } };
       guardar(m);
       rerender();
-      aviso('Función renal tomada de esta valoración');
+      avisoGuardado('Función renal tomada de esta valoración');
     }));
     $('#r-guardar').addEventListener('click', () => {
       const tfg = Number($('#r-tfg').value);
@@ -293,14 +293,14 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       if (ok(dep, 250)) m.renal.depuracion = { valor: Math.round(dep), fecha, fuente: 'manual' };
       guardar(m);
       rerender();
-      aviso('Función renal registrada');
+      avisoGuardado('Función renal registrada');
     });
     $('#r-quitar')?.addEventListener('click', () => {
       const m = leer();
       m.renal = null;
       guardar(m);
       rerender();
-      aviso('Función renal quitada');
+      avisoGuardado('Función renal quitada');
     });
     const form = $('#form-med');
     form.addEventListener('submit', (ev) => {
@@ -322,7 +322,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       fijarEdicion(null);
       actualizar();
       rerender();
-      aviso(editar ? 'Medicamento actualizado' : `${med.generico} agregado`);
+      avisoGuardado(editar ? 'Medicamento actualizado' : `${med.generico} agregado`);
     });
     $('#cancelar-med')?.addEventListener('click', () => { fijarEdicion(null); rerender(); });
     $$('[data-editar-med]').forEach((b) => b.addEventListener('click', () => {
@@ -339,7 +339,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
         guardar(m);
         actualizar();
         rerender();
-        aviso('Medicamento quitado');
+        avisoGuardado('Medicamento quitado');
       },
     }));
   }
@@ -361,6 +361,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
         else m.stopp[id] = { ...(m.stopp[id] || {}), estado: radio.value };
         if (radio.value !== 'cumple' && m.stopp[id]) delete m.stopp[id].med;
         guardar(m);
+        avisoGuardado();
         const li = radio.closest('.criterio');
         li.className = `criterio est-${radio.value}`;
         const medSel = li.querySelector('.crit-med');
@@ -375,6 +376,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
           if (sel.value) m.stopp[id].med = sel.value;
           else delete m.stopp[id].med;
           guardar(m);
+          avisoGuardado();
         }
       }
     });
@@ -394,7 +396,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       guardar(m);
       refrescarCuenta(seccion);
       actualizar();
-      aviso(n ? `${plural(n, 'criterio marcado', 'criterios marcados')} como «No se cumple»` : 'No había criterios sin revisar en esta sección');
+      avisoGuardado(n ? `${plural(n, 'criterio marcado', 'criterios marcados')} como «No se cumple»` : 'No había criterios sin revisar en esta sección');
     }));
   }
 
@@ -407,6 +409,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       if (radio.value === 'sin') delete m.beers[id];
       else m.beers[id] = { ...(m.beers[id] || {}), estado: radio.value };
       guardar(m);
+      avisoGuardado();
       const card = radio.closest('[data-beers]');
       card.className = `tarjeta beers-cat est-${radio.value}`;
       const nota = card.querySelector('.beers-nota');
@@ -421,6 +424,7 @@ export function montarMedicacion({ pestana }, rerender, alCambiar) {
       const id = t.dataset.notaBeers;
       m.beers[id] = { ...(m.beers[id] || { estado: 'hallazgo' }), nota: t.value.slice(0, 300) };
       guardar(m);
+      avisoGuardado();
     });
   }
 

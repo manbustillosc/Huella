@@ -46,15 +46,29 @@ export function riesgoGupta({ edad, asa, funcional, creatinina, cirugia }) {
 export const fmtRiesgo = (p) => (p < 0.01 ? 'menos de 0.01' : p < 1 ? Number(p.toFixed(2)).toString() : Number(p.toFixed(1)).toString());
 const CORTE_ELEVADO = 1;
 
-const creatininaMgDl = (res) => {
-  const n = Number(String(res.respuestas?.creatinina ?? '').replace(',', '.'));
-  if (!Number.isFinite(n)) return null;
-  const u = UNIDADES_CREATININA.find((x) => x.id === res.respuestas.creatinina_u) || UNIDADES_CREATININA[0];
-  return u.aBase ? u.aBase(n) : n;
-};
+// Creatinina de un resultado guardado (CKD-EPI, Cockcroft-Gault o BIS), convertida a mg/dL. Devuelve el valor y, si no
+// se puede usar, el motivo. Una creatinina vacía, ausente, no numérica, fuera del rango posible de su unidad o con una
+// unidad desconocida nunca se toma como 0 mg/dL: el vínculo queda deshabilitado y se explica por qué.
+export function leerCreatinina(res) {
+  const resp = res?.respuestas;
+  if (!resp || typeof resp !== 'object') return { valor: null, motivo: 'El resultado guardado no conserva sus respuestas (versión anterior): registra la creatinina en esta escala.' };
+  const crudo = resp.creatinina;
+  if (crudo == null || typeof crudo === 'boolean' || typeof crudo === 'object' || String(crudo).trim() === '') {
+    return { valor: null, motivo: 'El resultado guardado no tiene la creatinina registrada.' };
+  }
+  const n = Number(String(crudo).trim().replace(',', '.'));
+  const u = resp.creatinina_u == null || resp.creatinina_u === '' ? UNIDADES_CREATININA[0] : UNIDADES_CREATININA.find((x) => x.id === resp.creatinina_u);
+  if (!u) return { valor: null, motivo: 'La unidad de la creatinina guardada no es reconocible: regístrala en esta escala.' };
+  if (!Number.isFinite(n) || n < u.min || n > u.max) {
+    return { valor: null, motivo: `La creatinina guardada no es un valor válido (debe estar entre ${u.min} y ${u.max} ${u.etiqueta}): regístrala en esta escala.` };
+  }
+  // Redondeo a 6 decimales para que la conversión de µmol/L no cambie el lado del umbral (132.6 µmol/L = 1.5 mg/dL).
+  return { valor: Math.round((u.aBase ? u.aBase(n) : n) * 1e6) / 1e6, motivo: null };
+}
+export const creatininaMgDl = (res) => leerCreatinina(res).valor;
 const vinculoCreatinina = (escala, titulo) => ({
   id: escala, escala, titulo,
-  disponible: (res) => (creatininaMgDl(res) != null ? true : 'El resultado guardado no tiene la creatinina registrada.'),
+  disponible: (res) => leerCreatinina(res).motivo || true,
   describir: (res) => `Creatinina ${Number(creatininaMgDl(res).toFixed(2))} mg/dL (${creatininaMgDl(res) > 1.5 ? 'mayor de 1.5' : '1.5 o menos'})`,
   aplicar: (res) => ({ creatinina: creatininaMgDl(res) > 1.5 ? 1 : 0 }),
   campos: ['creatinina'],

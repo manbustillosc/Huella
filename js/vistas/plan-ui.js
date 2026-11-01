@@ -7,7 +7,7 @@ import {
   fijarProblema, fijarPrioridad, fijarRevaloracion, agregarObjetivo, actualizarObjetivo, quitarObjetivo, agregarIntervencion,
   actualizarIntervencion, quitarIntervencion, fijarPreferencias, registrarCambio, agregarProblemaLibre, quitarProblemaLibre,
 } from '../plan.js';
-import { $$, esc, icono, hoyISO, aviso, confirmarEnDosToques } from '../ui.js';
+import { $$, esc, icono, hoyISO, aviso, avisoGuardado, confirmarEnDosToques } from '../ui.js';
 
 export const slugAmbito = (a) => String(a).replace(/[^a-z0-9_-]/gi, '-');
 export const avisoDatos = `<p class="aviso-datos">${icono('escudo')} Escribe sin nombres, expedientes ni otros datos que identifiquen a la persona o a su familia.</p>`;
@@ -166,7 +166,7 @@ export function conectarPlan(raiz, { redibujar, alCambiar = () => {} }) {
     const ambito = b.dataset.agregarInt;
     guardarPlan((plan) => agregarIntervencion(plan, ambito, { categoria: b.dataset.categoria, texto: b.dataset.texto, origen: 'sugerida' }, hoy, nombreDeAmbito(ambito)));
     redibujar();
-    aviso('Intervención agregada al plan');
+    avisoGuardado('Intervención agregada al plan');
   });
   raiz.addEventListener('change', (ev) => {
     const t = ev.target;
@@ -175,29 +175,29 @@ export function conectarPlan(raiz, { redibujar, alCambiar = () => {} }) {
       const nota = raiz.querySelector(`[data-nota-problema="${CSS.escape(a)}"]`)?.value || '';
       guardarPlan((plan) => fijarProblema(plan, a, { estado: t.value, nota }, hoy, nombreDeAmbito(a)));
       redibujar(`[data-problema="${CSS.escape(a)}"]`);
-      aviso(t.value ? 'Valoración del médico registrada' : 'Valoración del médico retirada');
+      avisoGuardado(t.value ? 'Valoración del médico registrada' : 'Valoración del médico retirada');
     } else if (t.matches('[data-nota-problema]')) {
       const a = t.dataset.notaProblema;
       const estado = raiz.querySelector(`[data-problema="${CSS.escape(a)}"]`)?.value;
-      if (estado) { guardarPlan((plan) => fijarProblema(plan, a, { estado, nota: t.value }, hoy, nombreDeAmbito(a))); aviso('Nota guardada'); } else aviso('Elige primero la valoración del médico');
+      if (estado) { guardarPlan((plan) => fijarProblema(plan, a, { estado, nota: t.value }, hoy, nombreDeAmbito(a))); avisoGuardado('Nota guardada'); } else aviso('Elige primero la valoración del médico');
     } else if (t.matches('[data-prioridad]')) {
       const a = t.dataset.prioridad;
       guardarPlan((plan) => fijarPrioridad(plan, a, t.value, hoy, nombreDeAmbito(a)));
-      aviso(t.value ? `Prioridad ${nombreDe(PRIORIDADES, t.value).toLowerCase()}` : 'Prioridad sin definir');
+      avisoGuardado(t.value ? `Prioridad ${nombreDe(PRIORIDADES, t.value).toLowerCase()}` : 'Prioridad sin definir');
       redibujar(`[data-prioridad="${CSS.escape(a)}"][value="${t.value}"]`);
     } else if (t.matches('[data-revaloracion]')) {
       const a = t.dataset.revaloracion;
       guardarPlan((plan) => fijarRevaloracion(plan, a, t.value, hoy, nombreDeAmbito(a)));
-      aviso(t.value ? 'Fecha de revaloración guardada' : 'Fecha de revaloración quitada');
+      avisoGuardado(t.value ? 'Fecha de revaloración guardada' : 'Fecha de revaloración quitada');
       alCambiar();
     } else if (t.matches('[data-estado-objetivo]')) {
       guardarPlan((plan) => actualizarObjetivo(plan, t.dataset.estadoObjetivo, { estado: t.value }, hoy));
       redibujar(`[data-estado-objetivo="${CSS.escape(t.dataset.estadoObjetivo)}"]`);
-      aviso('Estado del objetivo actualizado');
+      avisoGuardado('Estado del objetivo actualizado');
     } else if (t.matches('[data-estado-int]')) {
       guardarPlan((plan) => actualizarIntervencion(plan, t.dataset.estadoInt, { estado: t.value }, hoy));
       redibujar(`[data-estado-int="${CSS.escape(t.dataset.estadoInt)}"]`);
-      aviso('Estado de la intervención actualizado');
+      avisoGuardado('Estado de la intervención actualizado');
     }
   });
   raiz.addEventListener('submit', (ev) => {
@@ -207,7 +207,7 @@ export function conectarPlan(raiz, { redibujar, alCambiar = () => {} }) {
     if (form.id === 'form-pref') {
       guardarPlan((plan) => fijarPreferencias(plan, datos));
       redibujar();
-      aviso('Preferencias guardadas');
+      avisoGuardado('Preferencias guardadas');
     } else if (form.id === 'form-problema') {
       const nuevo = guardarPlan((plan) => agregarProblemaLibre(plan, datos.nombre, hoy));
       if (!nuevo) { form.querySelector('[name="nombre"]').focus(); aviso(String(datos.nombre || '').trim() ? 'Ese problema ya está en la lista' : 'Escribe el problema'); return; }
@@ -218,7 +218,7 @@ export function conectarPlan(raiz, { redibujar, alCambiar = () => {} }) {
         tarjeta.scrollIntoView({ block: 'start' });
         tarjeta.querySelector('summary')?.focus({ preventScroll: true });
       }
-      aviso('Problema agregado');
+      avisoGuardado('Problema agregado');
     } else if (form.dataset.formObjetivo) {
       const a = form.dataset.formObjetivo;
       const ok = guardarPlan((plan) => agregarObjetivo(plan, a, datos, hoy, nombreDeAmbito(a)));
@@ -230,18 +230,18 @@ export function conectarPlan(raiz, { redibujar, alCambiar = () => {} }) {
         return;
       }
       redibujar();
-      aviso('Objetivo agregado al plan');
+      avisoGuardado('Objetivo agregado al plan');
     } else if (form.dataset.formInt) {
       const a = form.dataset.formInt;
       if (!String(datos.texto || '').trim()) { form.querySelector('[name="texto"]').focus(); aviso('Escribe la intervención'); return; }
       guardarPlan((plan) => agregarIntervencion(plan, a, { categoria: datos.categoria, texto: datos.texto }, hoy, nombreDeAmbito(a)));
       redibujar();
-      aviso('Intervención agregada al plan');
+      avisoGuardado('Intervención agregada al plan');
     } else if (form.id === 'form-cambio') {
       const ok = guardarPlan((plan) => registrarCambio(plan, datos.texto, datos.fecha || hoy));
       if (!ok) { form.querySelector('[name="texto"]').focus(); aviso('Describe el cambio'); return; }
       redibujar();
-      aviso('Cambio registrado');
+      avisoGuardado('Cambio registrado');
     }
   });
 }
@@ -251,15 +251,15 @@ export function conectarQuitar(raiz, { redibujar }) {
   const hoy = hoyISO();
   $$('[data-quitar-objetivo]', raiz).forEach((b) => confirmarEnDosToques(b, {
     texto: icono('alerta'),
-    accion: () => { guardarPlan((plan) => quitarObjetivo(plan, b.dataset.quitarObjetivo, hoy)); redibujar(); aviso('Objetivo quitado del plan'); },
+    accion: () => { guardarPlan((plan) => quitarObjetivo(plan, b.dataset.quitarObjetivo, hoy)); redibujar(); avisoGuardado('Objetivo quitado del plan'); },
   }));
   $$('[data-quitar-int]', raiz).forEach((b) => confirmarEnDosToques(b, {
     texto: icono('alerta'),
-    accion: () => { guardarPlan((plan) => quitarIntervencion(plan, b.dataset.quitarInt, hoy)); redibujar(); aviso('Intervención quitada del plan'); },
+    accion: () => { guardarPlan((plan) => quitarIntervencion(plan, b.dataset.quitarInt, hoy)); redibujar(); avisoGuardado('Intervención quitada del plan'); },
   }));
   $$('[data-quitar-libre]', raiz).forEach((b) => confirmarEnDosToques(b, {
     texto: `${icono('alerta')} Toca otra vez para quitar el problema y su plan`,
-    accion: () => { guardarPlan((plan) => quitarProblemaLibre(plan, b.dataset.quitarLibre, hoy)); redibujar(); aviso('Problema quitado'); },
+    accion: () => { guardarPlan((plan) => quitarProblemaLibre(plan, b.dataset.quitarLibre, hoy)); redibujar(); avisoGuardado('Problema quitado'); },
   }));
 }
 

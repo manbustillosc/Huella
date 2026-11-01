@@ -23,6 +23,10 @@ export const ORIGENES_VPO = {
 // Fuentes complementarias verificables (guías internacionales). Se citan donde Huella matiza o completa el lineamiento.
 export const GUIAS_VPO = {
   acc2024: 'Thompson A, Fleischmann KE, Smilowitz NR, et al. 2024 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery. Circulation. 2024;150(19):e351-e442. doi:10.1161/CIR.0000000000001285.',
+  // Reafirmación del 28 de septiembre de 2026: el comité conjunto ACC/AHA la declaró vigente; recomendaciones, texto,
+  // figuras, tablas y referencias son idénticos a los de 2024 (solo cambia el año del título). Por eso los textos de
+  // Huella siguen citando «AHA/ACC 2024», que es también la edición que cita el lineamiento del IMSS.
+  acc2026: 'Thompson A, Fleischmann KE, Smilowitz NR, et al. 2026 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery. Circulation. 2026;154(13):e413-e504. doi:10.1161/CIR.0000000000001472. También en J Am Coll Cardiol. 2026;88(13):1543-1643. doi:10.1016/j.jacc.2026.06.017. Reafirmación de la guía de 2024 sin cambios en sus recomendaciones.',
   acc2014: 'Fleisher LA, Fleischmann KE, Auerbach AD, et al. 2014 ACC/AHA Guideline on Perioperative Cardiovascular Evaluation and Management of Patients Undergoing Noncardiac Surgery. Circulation. 2014;130(24):e278-333. doi:10.1161/CIR.0000000000000106.',
   asa2020: 'American Society of Anesthesiologists. ASA Physical Status Classification System. Última modificación: 13 de diciembre de 2020.',
   hrs2011: 'Crossley GH, Poole JE, Rozner MA, et al. The Heart Rhythm Society (HRS)/American Society of Anesthesiologists (ASA) Expert Consensus Statement on the perioperative management of patients with implantable defibrillators, pacemakers and arrhythmia monitors. Heart Rhythm. 2011;8(7):1114-54. doi:10.1016/j.hrthm.2010.12.023.',
@@ -124,7 +128,7 @@ export const DIAGRAMAS = [
       { origen: 'lineamiento', texto: 'Actividades 7 a 10 y 15 a 18', paginas: '4 a 6' },
       { origen: 'lineamiento', texto: 'Algoritmo 2. Valoración preoperatoria por Cardiología', paginas: '9' },
       { origen: 'lineamiento', texto: 'Cuadro 3 (DASI) y cuadro 4 (RCRI)', paginas: '12 y 13' },
-      { origen: 'guia', texto: 'Guía AHA/ACC 2024 de cirugía no cardiaca, sección 3.2 (capacidad funcional; DASI ≤34)' },
+      { origen: 'guia', texto: 'Guía AHA/ACC 2024 de cirugía no cardiaca, reafirmada sin cambios en 2026; sección 3.2 (capacidad funcional; DASI ≤34)' },
     ],
     nodos: [
       inicio('Persona con indicación de cirugía electiva no cardiaca.'),
@@ -183,7 +187,7 @@ export const DIAGRAMAS = [
     fuentes: [
       { origen: 'lineamiento', texto: 'Cuadro 9 (criterios para solicitar ECG) y cuadro 10 (alteraciones que requieren valoración)', paginas: '18' },
       { origen: 'lineamiento', texto: 'Recomendaciones sobre estudios de rutina (rendimiento del ECG)', paginas: '7' },
-      { origen: 'guia', texto: 'Guía AHA/ACC 2024 de cirugía no cardiaca: fuerza de las recomendaciones de ECG preoperatorio' },
+      { origen: 'guia', texto: 'Guía AHA/ACC 2024 de cirugía no cardiaca, reafirmada sin cambios en 2026: fuerza de las recomendaciones de ECG preoperatorio' },
     ],
     nodos: [
       decision('¿Síntomas o signos cardiovasculares activos?', [

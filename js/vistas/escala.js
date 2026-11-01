@@ -7,11 +7,11 @@ import {
   ordenarPorCapacidad, fraseDe,
 } from '../motor.js';
 import {
-  compararResultados, esUnico, etiquetaAplicacion, fechaCorta, textoRespectoA, textoCambio, vigenteDe, diasEntre,
+  compararResultados, esUnico, etiquetaAplicacion, fechaCorta, textoRespectoA, textoCambio, vigenteDe, diasEntre, mismoContenido,
 } from '../comparacion.js';
 import { valorGuardado } from '../nota.js';
 import {
-  $, $$, esc, icono, plural, aviso, copiar, botonEstrella, selectorFormato, alCambiarFormato,
+  $, $$, esc, icono, plural, aviso, avisoGuardado, copiar, botonEstrella, selectorFormato, alCambiarFormato,
   ETIQUETA_COPIAR, movimientoReducido, hoyISO, chipTipo, confirmarEnDosToques,
 } from '../ui.js';
 import { pasosConEstado, siguientePendiente, urlPaso, unidadesNucleo } from './rutas-estado.js';
@@ -76,7 +76,9 @@ function panelVinculos(e, r) {
     if (!res) return `<li class="vinculo sin-dato">${icono('pendiente')}<div><strong>${esc(vin.titulo)}</strong><span>Sin registro de ${esc(fuente.corto)} en esta valoración.</span></div></li>`;
     const etq = etiquetaAplicacion(res) || fechaCorta(res.fecha);
     const disp = vin.disponible(res);
-    if (disp !== true) return `<li class="vinculo no-aplica">${icono('alerta')}<div><strong>${esc(vin.titulo)}</strong> <span class="vin-fecha">${esc(etq)}</span><span>${esc(disp)}</span></div></li>`;
+    if (disp !== true) {
+      return `<li class="vinculo no-aplica">${icono('alerta')}<div><strong>${esc(vin.titulo)}</strong> <span class="vin-fecha">${esc(etq)}</span><span id="vin-motivo-${esc(vin.id)}">${esc(disp)}</span></div><button class="btn btn-chico" type="button" disabled aria-describedby="vin-motivo-${esc(vin.id)}">No disponible</button></li>`;
+    }
     const adv = vin.advertencia?.(res);
     const dias = res.fecha ? diasEntre(res.fecha, hoyISO()) : 0;
     const usado = usados[vin.id]?.resultadoId === res.id;
@@ -346,7 +348,7 @@ function montarTiraRuta(ctx) {
     const pa = pasoActual(ctx);
     almacen.alternarOmitida(ctx.ruta.id, pa.actual.clave, true);
     const sig = siguientePendiente(ctx.ruta, pa.i);
-    aviso(`${ctx.e.corto} omitido`);
+    avisoGuardado(`${ctx.e.corto} omitido`);
     location.hash = sig ? urlPaso(ctx.ruta, sig) : `#/r/${ctx.ruta.id}`;
   });
 }
@@ -591,7 +593,8 @@ export function montarEscala(params, rerender) {
     $$('[data-vincular]').forEach((b) => b.addEventListener('click', () => {
       const vin = e.vinculos.find((x) => x.id === b.dataset.vincular);
       const res = vin && candidatoVinculo(vin);
-      if (!res) return;
+      // Se vuelve a comprobar al aplicar: un dato que dejó de ser válido nunca se copia.
+      if (!res || vin.disponible(res) !== true) return;
       const otros = Object.entries(r._vinculos || {}).filter(([, v]) => v.campos?.some((c) => vin.campos.includes(c)));
       r = { ...r, ...vin.aplicar(res), _vinculos: { ...(r._vinculos || {}) } };
       for (const [id] of otros) delete r._vinculos[id];
@@ -686,11 +689,10 @@ export function aGuardado(e, res, r, momento) {
   };
 }
 
-const mismoContenido = (a, b) => a.resumen === b.resumen && a.fecha === b.fecha && (a.fuente || null) === (b.fuente || null)
-  && (a.fechaReferencia || null) === (b.fechaReferencia || null);
-
 // Qué hará el botón de guardar: agregar, reemplazar (con confirmación) o elegir entre nueva aplicación y reemplazo.
-function planGuardado(ctx, guardable, r) {
+// «Ya está en la valoración» solo si una aplicación guardada tiene exactamente el mismo contenido clínico (todas las
+// respuestas, no solo el resumen): corregir respuestas que conservan el total sigue permitiendo actualizar.
+export function planGuardado(ctx, guardable, r) {
   const slot = almacen.resultadosSlot(ctx.e.id, ctx.momento);
   const igual = slot.find((x) => mismoContenido(x, guardable)) || null;
   const unico = esUnico(ctx.momento);
@@ -942,9 +944,10 @@ export function montarResultado(params, alGuardar) {
       : almacen.guardarResultado(guardable, { unico: esUnico(ctx.momento) });
     // Las respuestas en edición quedan ligadas a la aplicación guardada para futuras correcciones.
     almacen.guardarRespuestas(e.id, ctx.momento, { ...r, _origen: guardado.id });
+    // El mensaje depende del resultado real de esta escritura, no del estado general del guardado.
+    const escritura = almacen.ultimaEscritura();
     alGuardar();
-    const est = almacen.estadoGuardado();
-    const sufijo = est.estado === 'error' ? ' solo en esta pestaña: el navegador no permitió guardarlo. Exporta el episodio desde Seguimiento.' : est.estado === 'sesion' ? ' (solo durante esta sesión)' : '';
+    const sufijo = !escritura.ok ? ' solo en esta pestaña: el navegador no permitió guardarlo. Exporta el episodio desde Seguimiento.' : escritura.sesion ? ' (solo durante esta sesión)' : '';
     if (ctx.ruta) {
       aviso(`${e.corto} guardado${sufijo}`);
       continuarRuta();
