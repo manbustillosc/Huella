@@ -1,4 +1,4 @@
-// Fase 4: índice de riesgo de caídas de Downton y Short FES-I (registro del puntaje).
+// Fase 4: índice de riesgo de caídas de Downton y Short FES-I (registro del puntaje). Versión 2.14.0: FES-I completa (registro).
 import { SUG } from './_comun.js';
 
 /* ---------- Downton ---------- */
@@ -114,3 +114,46 @@ export const shortFesi = {
     { texto: 'Delbaere K, Close JCT, Mikolaizak AS, et al. The Falls Efficacy Scale International (FES-I). A comprehensive longitudinal validation study. Age Ageing. 2010;39(2):210-6.', doi: '10.1093/ageing/afp225' },
   ],
 };
+
+/* ---------- FES-I completa, 16 actividades (registro) ---------- */
+
+export const fesi = {
+  id: 'fesi',
+  nombre: 'Escala internacional de eficacia ante las caídas (FES-I), 16 actividades',
+  corto: 'FES-I',
+  dominio: 'caidas',
+  tipo: 'tamizaje',
+  registro: true,
+  aliases: ['FESI', 'FES-I 16', 'Falls Efficacy Scale International', 'miedo a caer', 'temor a caídas', 'preocupación por caer'],
+  problemas: ['miedo a caer', 'caídas', 'restricción de actividades'],
+  descripcion: 'Registro del puntaje oficial: preocupación por caer en 16 actividades, de 1 a 4 cada una (16 a 64).',
+  objetivo: 'Medir la preocupación por caer en actividades básicas y sociales; más completa que la versión breve.',
+  poblacion: 'Personas mayores en la comunidad (Yardley, 2005; Delbaere, 2010); hay versiones oficiales en español.',
+  aplicacion: [
+    'Aplica la versión oficial en español de 16 actividades (sitio de la FES-I, Universidad de Manchester). Huella solo registra el total.',
+    'Pregunta por la preocupación que sentiría al hacer cada actividad, aunque no la haga habitualmente. Puede ser autoaplicada o por entrevista.',
+  ],
+  tiempo: '5 min',
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'menos preocupación por caer',
+  textoEmpeoramiento: 'más preocupación por caer',
+  min: 16,
+  max: 64,
+  campos: [{ id: 'puntaje', tipo: 'numero', texto: 'Puntaje total (16 a 64)', unidad: 'puntos', min: 16, max: 64, entero: true }],
+  bandas: [
+    { min: 16, max: 19, etiqueta: 'Preocupación baja por caer', nivel: 'bien', texto: 'Puntaje de 16 a 19.', sugerencias: [] },
+    { min: 20, max: 27, etiqueta: 'Preocupación moderada por caer', nivel: 'leve', hallazgo: true, texto: 'Puntaje de 20 a 27.', sugerencias: ['Explorar si la preocupación limita actividades y considerar ejercicio de fuerza y equilibrio.'] },
+    { min: 28, max: 64, etiqueta: 'Preocupación alta por caer', nivel: 'moderado', hallazgo: true, texto: 'Puntaje de 28 a 64: preocupación alta, asociada a restricción de actividades y mayor riesgo de caídas.', sugerencias: [SUG.caidas, 'Ejercicio de fuerza y equilibrio (p. ej., Vivifrail o tai chi) y abordaje cognitivo-conductual del miedo a caer.'] },
+  ],
+  calcular: ({ v }) => ({ puntaje: v.puntaje }),
+  notas: [
+    'Puntos de corte de Delbaere et al. (2010): 16 a 19 baja, 20 a 27 moderada y 28 a 64 alta preocupación por caer.',
+    'Mide la preocupación por caer, no el riesgo de caídas por sí mismo. Si se necesita algo más rápido, usa la versión breve (Short FES-I, 7 actividades); sus puntajes no son intercambiables.',
+  ],
+  licencia: { texto: 'FES-I y Short FES-I: Prevention of Falls Network Europe y Universidad de Manchester; gratuitas para clínicos e investigadores citando la fuente, con versiones oficiales en su sitio. Huella solo registra el puntaje.', enlace: 'https://sites.manchester.ac.uk/fes-i/' },
+  referencias: [
+    { texto: 'Yardley L, Beyer N, Hauer K, Kempen G, Piot-Ziegler C, Todd C. Development and initial validation of the Falls Efficacy Scale-International (FES-I). Age Ageing. 2005;34(6):614-9.', doi: '10.1093/ageing/afi196' },
+    { texto: 'Delbaere K, Close JCT, Mikolaizak AS, et al. The Falls Efficacy Scale International (FES-I). A comprehensive longitudinal validation study. Age Ageing. 2010;39(2):210-6.', doi: '10.1093/ageing/afp225' },
+  ],
+};
+

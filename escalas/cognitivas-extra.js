@@ -1,5 +1,5 @@
 // Fase 4: cuestionario de actividades funcionales de Pfeffer, Escala de Deterioro Global de Reisberg y fluencia verbal
-// semántica. Redacción en español propia de Huella.
+// semántica. Versión 2.14.0: cuestionario de Pfeiffer (SPMSQ). Redacción en español propia de Huella.
 import { SUG } from './_comun.js';
 
 /* ---------- FAQ de Pfeffer ---------- */
@@ -242,3 +242,111 @@ export const fluencia = {
     { texto: 'Barrero-Hernández FJ, Vives-Montero F, Morales-Gordo B. Evaluación de la versión española del Memory Impairment Screen. Rev Neurol. 2006;43(1):15-9.' },
   ],
 };
+
+/* ---------- Cuestionario de Pfeiffer (SPMSQ) ---------- */
+
+const OPC_PFEIFFER = [
+  { texto: 'Correcta', valor: 0 },
+  { texto: 'Error', valor: 1 },
+];
+const PREGUNTAS_PFEIFFER = [
+  ['fecha', '¿Qué fecha es hoy? (día, mes y año)', 'fecha', 'Es correcta solo si dice el día, el mes y el año exactos.'],
+  ['dia', '¿Qué día de la semana es hoy?', 'día de la semana'],
+  ['lugar', '¿Cómo se llama este lugar?', 'lugar', 'Cualquier descripción correcta del lugar (su casa, el consultorio, el hospital, la residencia) es válida.'],
+  ['telefono', '¿Cuál es su número de teléfono? Si no tiene, ¿cuál es su domicilio?', 'teléfono o domicilio', 'Compruébalo con un familiar o con el expediente.'],
+  ['edad', '¿Cuántos años tiene?', 'edad'],
+  ['nacimiento', '¿Cuál es su fecha de nacimiento? (día, mes y año)', 'fecha de nacimiento', 'Compruébala con un documento o con un familiar.'],
+  ['presidente', '¿Quién es el presidente actual del país?', 'presidente actual', 'Basta el apellido.'],
+  ['anterior', '¿Quién fue el presidente anterior?', 'presidente anterior', 'Basta el apellido.'],
+  ['madre', '¿Cuál es el primer apellido de su madre?', 'apellido de la madre', 'No hace falta que diga los dos apellidos; compruébalo con un familiar.'],
+  ['resta', 'Reste de 3 en 3 desde 20 hasta llegar a 2 (20, 17, 14, 11, 8, 5, 2)', 'resta de 3 en 3', 'Cualquier error en la serie, o no poder terminarla, cuenta como un solo error.'],
+];
+const ESCOLARIDAD_PFEIFFER = [
+  { texto: 'No sabe leer ni escribir o no fue a la escuela', valor: 0, hasta: 0, detalle: 'Se permite un error más' },
+  { texto: 'Primaria a preparatoria', valor: 1, hasta: 12, detalle: 'Sin ajuste' },
+  { texto: 'Estudios universitarios', valor: 2, hasta: 99, detalle: 'Se permite un error menos' },
+];
+const AJUSTE_PFEIFFER = [-1, 0, 1];
+
+export const pfeiffer = {
+  id: 'pfeiffer',
+  nombre: 'Cuestionario de Pfeiffer (SPMSQ)',
+  corto: 'Pfeiffer (SPMSQ)',
+  dominio: 'cognitivo',
+  tipo: 'tamizaje',
+  aliases: ['Pfeiffer', 'Pfeifer', 'SPMSQ', 'Short Portable Mental Status Questionnaire', 'test de Pfeiffer', 'Pfeiffer cognitivo', 'cuestionario portátil', 'orientación'],
+  problemas: ['deterioro cognitivo', 'demencia', 'orientación', 'memoria'],
+  descripcion: '10 preguntas de orientación, memoria e información y una resta; cuenta los errores (0 a 10) y los ajusta por escolaridad.',
+  objetivo: 'Detectar de forma rápida un probable deterioro cognitivo y estimar su intensidad; útil cuando no se puede leer, escribir ni dibujar.',
+  poblacion: 'Personas de 65 años o más en la comunidad, en consulta y en residencias (Pfeiffer, 1975). Versión en español validada en mayores de 65 años con muchas personas que no sabían leer (Martínez de la Iglesia, 2001).',
+  aplicacion: [
+    'Registra primero la escolaridad: cambia el número de errores que se permite.',
+    'Haz las 10 preguntas en orden, sin dar pistas, y marca cada una como correcta o error. Comprueba con un familiar o con el expediente los datos que no puedas verificar (teléfono, nacimiento, apellido de la madre).',
+    'Con lentes y auxiliares auditivos puestos, en un lugar tranquilo. No requiere leer, escribir ni dibujar.',
+  ],
+  tiempo: '3 a 5 min',
+  direccionClinica: 'menor_mejor',
+  textoMejoria: 'menos errores',
+  textoEmpeoramiento: 'más errores',
+  unidadCambio: ['error', 'errores'],
+  min: 0,
+  max: 10,
+  campos: [
+    { id: 'escolaridad', texto: 'Escolaridad', textoCorto: 'escolaridad', puntua: false, prefill: 'escolaridadRango', opciones: ESCOLARIDAD_PFEIFFER, ayuda: 'Sin estudios se permite un error más; con estudios universitarios, un error menos (Pfeiffer, 1975; Martínez de la Iglesia, 2001).' },
+    ...PREGUNTAS_PFEIFFER.map(([id, texto, textoCorto, ayuda], i) => ({
+      id, texto, textoCorto, opciones: OPC_PFEIFFER, ...(ayuda ? { ayuda } : {}), ...(i === 0 ? { grupo: 'Preguntas · cuenta los errores' } : {}),
+    })),
+  ],
+  bandas: [
+    { min: 0, max: 2, etiqueta: 'Sin deterioro cognitivo probable', nivel: 'bien', texto: '0 a 2 errores (ajustados por escolaridad): funcionamiento intelectual intacto. No descarta un deterioro leve.', sugerencias: [] },
+    {
+      min: 3, max: 4, etiqueta: 'Probable deterioro cognitivo leve', nivel: 'leve', hallazgo: true,
+      texto: '3 a 4 errores (ajustados por escolaridad): sugiere deterioro cognitivo leve. Es un tamizaje; no establece el diagnóstico.',
+      sugerencias: [SUG.descartarDelirium, SUG.cognitivaCompleta, SUG.causasReversibles],
+    },
+    {
+      min: 5, max: 7, etiqueta: 'Probable deterioro cognitivo moderado', nivel: 'moderado', hallazgo: true,
+      texto: '5 a 7 errores (ajustados por escolaridad): sugiere deterioro cognitivo moderado. Es un tamizaje; no establece el diagnóstico.',
+      sugerencias: [SUG.descartarDelirium, SUG.cognitivaCompleta, SUG.causasReversibles, SUG.cuidador],
+    },
+    {
+      min: 8, max: 10, etiqueta: 'Probable deterioro cognitivo grave', nivel: 'grave', hallazgo: true,
+      texto: '8 a 10 errores (ajustados por escolaridad): sugiere deterioro cognitivo grave. Es un tamizaje; no establece el diagnóstico.',
+      sugerencias: [SUG.descartarDelirium, SUG.causasReversibles, SUG.cuidador, 'Valorar la funcionalidad (Barthel, Lawton-Brody) y las necesidades de apoyo y seguridad.'],
+    },
+  ],
+  calcular({ v, escala }) {
+    const errores = PREGUNTAS_PFEIFFER.reduce((s, [id]) => s + (v[id]?.valor ?? 0), 0);
+    const ajuste = AJUSTE_PFEIFFER[v.escolaridad?.valor ?? 1] ?? 0;
+    const ajustados = Math.min(10, Math.max(0, errores + ajuste));
+    const banda = escala.bandas.find((b) => ajustados >= b.min && ajustados <= b.max);
+    const lineas = [];
+    if (ajuste < 0) lineas.push(`Sin estudios se permite un error más: ${errores} ${errores === 1 ? 'error cuenta' : 'errores cuentan'} como ${ajustados}.`);
+    else if (ajuste > 0) lineas.push(`Con estudios universitarios se permite un error menos: ${errores} ${errores === 1 ? 'error cuenta' : 'errores cuentan'} como ${ajustados}.`);
+    else lineas.push('Escolaridad de primaria a preparatoria: sin ajuste.');
+    return {
+      puntaje: errores,
+      mostrar: String(errores),
+      sufijo: errores === 1 ? 'error de 10' : 'errores de 10',
+      banda,
+      lineas,
+      lineasNota: ajuste ? lineas : [],
+      extras: { ajustados, ajuste },
+    };
+  },
+  resumen: (res) => `Pfeiffer (SPMSQ): ${res.puntaje} ${res.puntaje === 1 ? 'error' : 'errores'} de 10${res.extras?.ajuste ? `, ${res.extras.ajustados} ajustados por escolaridad` : ''} (${res.banda.etiqueta.toLowerCase()}).`,
+  resumenBreve: (res) => `Pfeiffer ${res.puntaje} ${res.puntaje === 1 ? 'error' : 'errores'}${res.extras?.ajuste ? ` (${res.extras.ajustados} ajustados)` : ''} (${res.banda.etiqueta.toLowerCase()})`,
+  notas: [
+    'Categorías de Pfeiffer (1975), sobre los errores ajustados por escolaridad: 0 a 2 intacto, 3 a 4 leve, 5 a 7 moderado y 8 a 10 grave.',
+    'En la versión en español (Martínez de la Iglesia, 2001), 3 o más errores tuvo sensibilidad de 85.7 % y especificidad de 79.3 % para deterioro cognitivo; en personas que no saben leer se recomienda 4 o más. El ajuste por escolaridad de Huella da el mismo resultado.',
+    'El artículo original también ajustaba por raza; Huella no usa ese ajuste.',
+    'Explora sobre todo orientación y memoria: es poco sensible al deterioro leve y a las alteraciones ejecutivas o visuoespaciales. Un resultado normal no descarta deterioro si hay quejas o cambios funcionales.',
+    'La desorientación también aparece en el delirium, la depresión grave y los déficits sensoriales.',
+  ],
+  licencia: { texto: 'Cuestionario publicado por Pfeiffer (1975); sin titular de licencias identificado. Redacción en español propia de Huella, basada en la versión validada en castellano (Martínez de la Iglesia, 2001).' },
+  referencias: [
+    { texto: 'Pfeiffer E. A short portable mental status questionnaire for the assessment of organic brain deficit in elderly patients. J Am Geriatr Soc. 1975;23(10):433-41.', doi: '10.1111/j.1532-5415.1975.tb00927.x' },
+    { texto: 'Martínez de la Iglesia J, Dueñas Herrero R, Onís Vilches MC, Aguado Taberné C, Albert Colomer C, Luque Luque R. Adaptación y validación al castellano del cuestionario de Pfeiffer (SPMSQ) para detectar la existencia de deterioro cognitivo en personas mayores de 65 años. Med Clin (Barc). 2001;117(4):129-34.', doi: '10.1016/s0025-7753(01)72040-4' },
+  ],
+};
+

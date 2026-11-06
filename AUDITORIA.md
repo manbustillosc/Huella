@@ -171,6 +171,15 @@ Sección 5 del informe (validación clínica complementaria): en esta versión s
 
 Pendientes: la revisión individual de los demás instrumentos de los 119 con los 12 puntos de la sección 5, y las pruebas manuales en iPhone con Safari, Android con Chrome y Edge (las automatizadas usan Chromium).
 
+## Versión 2.14.0: Pfeiffer y FES-I, 06/11/2026
+
+A petición del médico se agregan el cuestionario de Pfeiffer (SPMSQ) y la FES-I de 16 actividades.
+
+| Instrumento | Fuente verificada | Decisiones |
+|---|---|---|
+| Pfeiffer (SPMSQ) | Pfeiffer, J Am Geriatr Soc 1975;23(10):433-41 (categorías 0–2, 3–4, 5–7, 8–10; un error más con solo primaria y uno menos con estudios superiores, en el original). Martínez de la Iglesia et al., Med Clin (Barc) 2001;117(4):129-34 (corte de 3 o más errores: sensibilidad 85.7 %, especificidad 79.3 %; 4 o más en personas que no saben leer). | Ajuste por escolaridad de la práctica en español: un error más sin estudios (equivale al corte de 4 de la validación) y uno menos con estudios universitarios. No se usa el ajuste por raza del original. Se guardan los errores reales; la interpretación usa los ajustados. Redacción propia; sin titular de licencias identificado. |
+| FES-I (16 actividades) | Yardley et al., Age Ageing 2005;34(6):614-9; Delbaere et al., Age Ageing 2010;39(2):210-6 (cortes 16–19, 20–27, 28–64); sitio oficial de la FES-I (Universidad de Manchester), consultado el 06/11/2026: gratuita para clínicos e investigadores citando la fuente; las traducciones deben ser las oficiales. | Solo registro del total, como la Short FES-I, porque Huella no puede reproducir la traducción oficial sin permiso. |
+
 ## Versión 2.13.1: segunda auditoría, 31/10/2026
 
 Cada punto se reprodujo en la 2.13.0 antes de corregirlo (`tests/fase17-segunda-auditoria.test.mjs`).

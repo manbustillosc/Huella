@@ -137,6 +137,8 @@ export const EJEMPLOS = {
   soledad3: () => resp('soledad3', { compania: 'A menudo', excluido: 'Algunas veces', aislado: 'Algunas veces' }),
   downton: () => resp('downton', { caidas: 'Sí', medicamentos: ['sedantes', 'diureticos', 'otros'], deficits: ['visual'], mental: 'Orientado', deambulacion: 'Segura, con ayuda' }),
   shortfesi: () => resp('shortfesi', { puntaje: 15 }),
+  fesi: () => resp('fesi', { puntaje: 30 }),
+  pfeiffer: () => resp('pfeiffer', { ...todos('pfeiffer', () => 0), escolaridad: 'Primaria a preparatoria', resta: 'Error', madre: 'Error', fecha: 'Error' }),
   must: () => resp('must', { puntaje: 1 }),
   norton: () => resp('norton', { fisico: 'Aceptable', mental: 'Apático', actividad: 'Camina con ayuda', movilidad: 'Ligeramente limitada', incontinencia: 'Ocasional' }),
   dolorint: () => resp('dolorint', { escala: 'Numérica (0 a 10)', en: 6, contexto: 'Con el movimiento' }),

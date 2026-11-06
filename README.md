@@ -235,6 +235,12 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **VPO:** se cita la reafirmación de septiembre de 2026 de la guía AHA/ACC (mismas recomendaciones que la de 2024) y se listan las guías internacionales citadas.
 - **DXA:** los sitios centrales que el informe declara no interpretables no entran en la categoría densitométrica y se muestran como dato adicional.
 
+## Versión 2.14.0: Pfeiffer y FES-I
+
+- **Cuestionario de Pfeiffer (SPMSQ)** en el dominio cognitivo y en la ruta de evaluación cognitiva: 10 preguntas con redacción propia basada en la versión en castellano validada (Martínez de la Iglesia, 2001). Cuenta los errores y los ajusta por escolaridad (sin estudios se permite un error más; con estudios universitarios, uno menos) y los interpreta con las categorías de Pfeiffer (1975): 0 a 2 intacto, 3 a 4 leve, 5 a 7 moderado, 8 a 10 grave. Guarda los errores reales y muestra los ajustados. Es distinto del cuestionario funcional de Pfeffer (FAQ), que ya estaba.
+- **FES-I completa (16 actividades)** junto a la Short FES-I: registro del total oficial (16 a 64) con los cortes de Delbaere (2010). Como la versión breve, no reproduce los reactivos: la FES-I es gratuita para clínicos citando la fuente, pero sus traducciones deben ser las oficiales de la Universidad de Manchester.
+- Total: 121 instrumentos. Pruebas en `tests/fase18-pfeiffer-fesi.test.mjs`.
+
 ## Pruebas y publicación
 
 - `node --test tests/*.test.mjs` ejecuta todas las pruebas, incluidas las de referencias entre módulos, archivos de la PWA y versión.

@@ -72,9 +72,9 @@ import { eat10, fois, degluObs, iddsi } from './deglucion.js';
 import { frax, dxa } from './osea.js';
 import { silla30, equilibrio4, dinamometria, ewgsop2 } from './movilidad.js';
 import { charlson, cirsg, news2 } from './comorbilidad.js';
-import { pfeffer, gdsReisberg, fluencia } from './cognitivas-extra.js';
+import { pfeffer, gdsReisberg, fluencia, pfeiffer } from './cognitivas-extra.js';
 import { gad7, cesd7, soledad3 } from './afectivas-extra.js';
-import { downton, shortFesi } from './caidas-extra.js';
+import { downton, shortFesi, fesi } from './caidas-extra.js';
 import { must, norton, dolorIntensidad, karnofsky, ppi, asa, lsns6, maltrato, ves13 } from './dominios-extra.js';
 import { isaacs, gpcog, gohai, mos, caprini, lace, g8, esasr, spict, necpal, mme } from './fase5.js';
 import { atenas, isarhp, harp, sppicees, susurro, lsa, oars, diazveiga, barreras, sprmbpc } from './inger.js';
@@ -83,12 +83,12 @@ import { gupta, nsqip } from './prequirurgicas.js';
 
 export const ESCALAS = [
   barthel, katz, lawton, pfeffer, rankin,
-  icopeCognicion, minicog, moca, mmse, reloj, gpcog, fluencia, isaacs, rudas, cdr, gdsReisberg, fast,
+  icopeCognicion, minicog, moca, mmse, pfeiffer, reloj, gpcog, fluencia, isaacs, rudas, cdr, gdsReisberg, fast,
   icopePsicologica, gds15, phq9, cesd7, gad7, cornell,
   cuatroAt, cam, rass, camicu, npiq,
   frail, cfs, fried, sarcf, ewgsop2, vivifrail, ves13, g8,
   sppb, velocidad, tug, silla5, silla30, equilibrio4, monopodal, alcance, tinetti, dinamometria, caminata6, caminata400,
-  icopeLocomotora, downton, shortFesi, lsa,
+  icopeLocomotora, downton, shortFesi, fesi, lsa,
   dxa, frax,
   icopeVitalidad, mnasf, must,
   icopeVision, agudezaVisual, icopeAudicion, audiometria, susurro, hhies, ohat, saludBucal, gohai,

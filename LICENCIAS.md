@@ -100,6 +100,8 @@ Estados:
 | Soledad 3 reactivos | Reactivos con traducción propia | Hughes et al. (2004), derivada de la escala UCLA (Russell) | Cumple, confirmar |
 | Downton | Factores y puntuación publicados | Downton, 1993; sin titular de licencias identificado | Cumple |
 | Short FES-I | Registro del total | Prevention of Falls Network Europe y Universidad de Manchester; versiones oficiales gratuitas en su sitio | Cumple (solo registro) |
+| FES-I | Registro del total (16 actividades) | Prevention of Falls Network Europe y Universidad de Manchester; gratuita para clínicos e investigadores citando la fuente; las traducciones deben ser las oficiales de su sitio, por eso no se reproducen los reactivos | Cumple (solo registro; agregada el 06/11/2026) |
+| Pfeiffer (SPMSQ) | Preguntas con redacción propia basada en la versión en castellano validada | Pfeiffer, 1975; Martínez de la Iglesia et al., 2001; sin titular de licencias identificado | Cumple (agregado el 06/11/2026) |
 | MUST | Registro del puntaje total; no reproduce la herramienta ni calcula el puntaje | © BAPEN. Integrar el MUST en una app usada fuera del Reino Unido requiere licencia (£20,000 + IVA por país, BAPEN 2025); el uso en expedientes para atención directa es gratuito donde el expediente no tiene costo | Cumple (solo registro; cambiado el 11/10/2026) |
 | Norton | Categorías y puntuación publicadas | Norton, McLaren y Exton-Smith, 1962; sin titular de licencias identificado | Cumple |
 | Intensidad del dolor | Escala numérica y visual analógica | Dominio público | Cumple |
