@@ -109,6 +109,7 @@ export const RUTAS = [
       { id: 'bis', nota: 'TFG estimada derivada en personas de 70 años o más; BIS2 si hay cistatina C.' },
       { id: 'cockcroft', nota: 'Depuración de creatinina para dosificar fármacos.' },
       { id: 'rass', nota: 'Nivel de agitación o sedación; en UCI es el paso previo del CAM-ICU.' },
+      { id: 'glasgow', nota: 'Nivel de conciencia por componentes (E, V, M); sobre todo tras una caída con golpe en la cabeza o un evento neurológico.' },
       { id: 'camicu', nota: 'Solo en UCI o con ventilación mecánica; no es intercambiable con el CAM.' },
       { id: 'deglucion', nota: 'Signos de disfagia observados: derivar a personal capacitado antes de cambiar la dieta.' },
       { id: 'intestinal', nota: 'Estreñimiento e impactación fecal, frecuentes durante la hospitalización.' },

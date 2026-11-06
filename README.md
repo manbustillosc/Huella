@@ -235,6 +235,12 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **VPO:** se cita la reafirmación de septiembre de 2026 de la guía AHA/ACC (mismas recomendaciones que la de 2024) y se listan las guías internacionales citadas.
 - **DXA:** los sitios centrales que el informe declara no interpretables no entran en la categoría densitométrica y se muestran como dato adicional.
 
+## Versión 2.15.0: Glasgow y calculadora oficial del CDR
+
+- **Escala de coma de Glasgow (GCS)** en «Delirium y conducta» y en la ruta de hospitalización: apertura ocular, respuesta verbal y motora con la terminología de Teasdale (2014), opción «No valorable» en cada componente (entonces no se calcula el total) y GCS-Pupilas opcional (Brennan, 2018). El resultado muestra los componentes (p. ej., 13/15 · E3 V4 M6) y advierte que en personas mayores el Glasgow puede subestimar una lesión intracraneal (Kehoe, 2016).
+- **CDR:** botón «Abrir la calculadora oficial del CDR» (NACC, enlazada por el Knight ADRC) que calcula el CDR global a partir de las 6 casillas. Solo abre el sitio; Huella no envía datos. La tabla de descripciones por casilla no se incluye porque Washington University exige licencia y prohíbe obras derivadas.
+- Total: 122 instrumentos. Pruebas en `tests/fase19-glasgow-cdr.test.mjs`.
+
 ## Versión 2.14.0: Pfeiffer y FES-I
 
 - **Cuestionario de Pfeiffer (SPMSQ)** en el dominio cognitivo y en la ruta de evaluación cognitiva: 10 preguntas con redacción propia basada en la versión en castellano validada (Martínez de la Iglesia, 2001). Cuenta los errores y los ajusta por escolaridad (sin estudios se permite un error más; con estudios universitarios, uno menos) y los interpreta con las categorías de Pfeiffer (1975): 0 a 2 intacto, 3 a 4 leve, 5 a 7 moderado, 8 a 10 grave. Guarda los errores reales y muestra los ajustados. Es distinto del cuestionario funcional de Pfeffer (FAQ), que ya estaba.

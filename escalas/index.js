@@ -53,6 +53,7 @@ import phq9 from './phq9.js';
 import cornell from './cornell.js';
 import npiq from './npiq.js';
 import rass from './rass.js';
+import glasgow from './glasgow.js';
 import camicu from './camicu.js';
 import fried from './fried.js';
 import tinetti from './tinetti.js';
@@ -85,7 +86,7 @@ export const ESCALAS = [
   barthel, katz, lawton, pfeffer, rankin,
   icopeCognicion, minicog, moca, mmse, pfeiffer, reloj, gpcog, fluencia, isaacs, rudas, cdr, gdsReisberg, fast,
   icopePsicologica, gds15, phq9, cesd7, gad7, cornell,
-  cuatroAt, cam, rass, camicu, npiq,
+  cuatroAt, cam, rass, camicu, glasgow, npiq,
   frail, cfs, fried, sarcf, ewgsop2, vivifrail, ves13, g8,
   sppb, velocidad, tug, silla5, silla30, equilibrio4, monopodal, alcance, tinetti, dinamometria, caminata6, caminata400,
   icopeLocomotora, downton, shortFesi, fesi, lsa,

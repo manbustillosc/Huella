@@ -50,7 +50,8 @@ Estados:
 | MMSE | Versión mexicana del INGER (Reyes de Beaman, 2004): registro del puntaje por dominio, forma abreviada con 8 puntos de entrada si la escolaridad es de 3 años o menos, corte ≤24; reglas con redacción propia, sin preguntas, palabras, frase, órdenes ni dibujo | Original: Folstein y colaboradores (MiniMental LLC; distribuye PAR). Versión mexicana publicada por el INGER (CC BY-NC-ND 4.0; formatos reproducibles completos con fines asistenciales sin ánimo de lucro) | Cumple (solo registro; versión INGER desde el 12/10/2026) |
 | Prueba del reloj | Criterios de aplicación y puntuación de Cacho et al. (1999) con redacción propia | Prueba sin titular de derechos; criterios publicados | Cumple |
 | RUDAS | Registro por dominio | Storey et al. | Cumple |
-| CDR | Registro | Washington University (Knight ADRC) | Cumple |
+| CDR | Registro; botón que abre la calculadora oficial de NACC (solo enlace, no envía datos) | Washington University (Knight ADRC); requiere licencia incluso sin fines de lucro y prohíbe obras derivadas, por eso no se reproducen la tabla de descripciones ni el algoritmo | Cumple |
+| Glasgow (GCS) | Componentes E, V y M con descripciones redactadas para Huella; GCS-Pupilas opcional | Universidad de Glasgow (GCS) y Sir Graham Teasdale (GCS-Pupilas): gratuitas para atención clínica e investigación, sin licencia, reconociendo la autoría | Cumple (agregada el 06/11/2026) |
 | FAST | Estadio con palabras clave | © B. Reisberg | Cumple |
 | ICOPE, 7 instrumentos | Adaptación | OPS, CC BY-NC-SA 3.0 IGO | Cumple |
 | GDS-15 | Reactivos | Dominio público (apoyo federal de EE. UU.) | Cumple |

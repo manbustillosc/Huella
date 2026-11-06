@@ -126,6 +126,15 @@ function fichaEscala(e) {
     </details>`;
 }
 
+// Enlace a una herramienta oficial externa (p. ej., la calculadora del CDR). Solo abre el sitio; no envía datos.
+function herramientaOficial(h) {
+  return `
+    <p class="herramienta-oficial">
+      <a class="btn" href="${esc(h.enlace)}" target="_blank" rel="noopener noreferrer">${esc(h.texto)} ${icono('adelante')}</a>
+      ${h.nota ? `<span>${esc(h.nota)}</span>` : ''}
+    </p>`;
+}
+
 function selectorMomento(ctx) {
   const guardados = almacen.resultadosDe(ctx.e.id).map((r) => r.momento);
   const m = momentoDe(ctx.momento);
@@ -382,6 +391,7 @@ export function renderEscala(params) {
         ${botonEstrella(e.id)}
       </header>
       ${fichaEscala(e)}
+      ${e.herramientaOficial ? herramientaOficial(e.herramientaOficial) : ''}
       ${e.hojaOficial || e.registro ? '<section class="hoja-oficial tarjeta" id="hoja-oficial" aria-live="polite"><p class="discreto">Buscando tu hoja oficial…</p></section>' : ''}
       ${e.momentos ? selectorMomento(ctx) : ''}
       ${datosAplicacion(e, r, ctx.momento)}

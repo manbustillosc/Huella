@@ -46,10 +46,16 @@ export default {
   poblacion: 'Personas con sospecha o diagnóstico de trastorno neurocognitivo, en especial enfermedad de Alzheimer (Morris, 1993). Requiere entrevista semiestructurada con un informante y con la persona.',
   aplicacion: [
     'Aplica la entrevista oficial del CDR con un informante y con la persona; requiere capacitación.',
-    'Asigna el CDR global con el algoritmo oficial (o la calculadora del Knight ADRC); Huella no lo calcula ni reproduce la entrevista.',
+    'Asigna el CDR global con el algoritmo oficial: el botón «Abrir la calculadora oficial del CDR» lo calcula a partir de las 6 casillas. Huella no lo calcula ni reproduce la entrevista.',
     'Si tienes las 6 casillas, regístralas: Huella suma el CDR-SB, más sensible al cambio que el global.',
   ],
   tiempo: '30 a 40 min',
+  // Botón directo a la calculadora oficial (NACC, enlazada por el Knight ADRC). Solo abre el sitio: no envía datos.
+  herramientaOficial: {
+    texto: 'Abrir la calculadora oficial del CDR',
+    enlace: 'https://www.naccdata.org/calculators/',
+    nota: 'Sitio de NACC, enlazado por el Knight ADRC: escribe las 6 casillas y obtienes el CDR global. Se abre en otra pestaña; Huella no envía ningún dato.',
+  },
   direccionClinica: 'menor_mejor',
   unidadCambio: ['punto', 'puntos'],
   decimalesCambio: 1,

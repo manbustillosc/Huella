@@ -20,8 +20,8 @@ export const DOMINIOS = [
   },
   {
     id: 'delirium', nombre: 'Delirium y conducta',
-    descripcion: 'Detección de delirium, nivel de sedación y síntomas neuropsiquiátricos.',
-    problemas: ['confusión', 'agitación', 'sedación', 'conducta'],
+    descripcion: 'Detección de delirium, nivel de conciencia (Glasgow), sedación y síntomas neuropsiquiátricos.',
+    problemas: ['confusión', 'agitación', 'sedación', 'conducta', 'nivel de conciencia'],
     planeadas: [],
   },
   {

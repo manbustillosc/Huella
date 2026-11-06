@@ -171,6 +171,13 @@ Sección 5 del informe (validación clínica complementaria): en esta versión s
 
 Pendientes: la revisión individual de los demás instrumentos de los 119 con los 12 puntos de la sección 5, y las pruebas manuales en iPhone con Safari, Android con Chrome y Edge (las automatizadas usan Chromium).
 
+## Versión 2.15.0: Glasgow y calculadora oficial del CDR, 06/11/2026
+
+| Cambio | Fuente verificada | Decisiones |
+|---|---|---|
+| Escala de coma de Glasgow | Teasdale y Jennett, Lancet 1974;2(7872):81-4; Teasdale et al., Lancet Neurol 2014;13(8):844-54 (terminología actual, «no valorable», comunicar componentes); Brennan et al., J Neurosurg 2018;128(6):1612-20 (GCS-P = total − pupilas sin reacción); Kehoe et al., Emerg Med J 2016;33(6):381-5. Permisos en glasgowcomascale.org (consultados el 06/11/2026): sin licencia para atención clínica e investigación, reconociendo la autoría. | Un componente «No valorable» impide calcular el total (no se asigna 1). La gravedad 13–15 / 9–12 / 3–8 se presenta como la clasificación del traumatismo craneoencefálico; 15 se muestra como conciencia normal. |
+| Botón a la calculadora oficial del CDR | Términos de uso del CDR® (WashU OTM) y página del algoritmo del Knight ADRC, que enlaza la calculadora de NACC (consultados el 06/11/2026). | Solo un enlace: no se reproduce la tabla ni el algoritmo y no se envían datos. |
+
 ## Versión 2.14.0: Pfeiffer y FES-I, 06/11/2026
 
 A petición del médico se agregan el cuestionario de Pfeiffer (SPMSQ) y la FES-I de 16 actividades.
