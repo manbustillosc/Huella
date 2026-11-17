@@ -93,6 +93,13 @@ export const DOMINIOS = [
     planeadas: [],
   },
   {
+    id: 'disnea', nombre: 'Disnea',
+    descripcion: 'Grado de disnea en las actividades diarias (mMRC) y clase funcional en la insuficiencia cardiaca (NYHA); la capacidad funcional (DASI), la caminata de 6 minutos y la intensidad de los síntomas (ESAS-r) están en otras secciones.',
+    problemas: ['disnea', 'falta de aire', 'insuficiencia cardiaca', 'EPOC'],
+    planeadas: [],
+    relacionadas: ['dasi', 'caminata6', 'esasr', 'news2'],
+  },
+  {
     id: 'comorbilidad', nombre: 'Comorbilidad y riesgo hospitalario',
     descripcion: 'Carga de comorbilidad (Charlson, CIRS-G), alerta temprana de deterioro (NEWS2), riesgo funcional en la hospitalización (ISAR-HP, HARP, SPPICEES) y de reingreso (LACE). Sin porcentajes de mortalidad.',
     problemas: ['comorbilidad', 'multimorbilidad', 'deterioro clínico', 'signos vitales', 'reingreso'],

@@ -171,6 +171,15 @@ Sección 5 del informe (validación clínica complementaria): en esta versión s
 
 Pendientes: la revisión individual de los demás instrumentos de los 119 con los 12 puntos de la sección 5, y las pruebas manuales en iPhone con Safari, Android con Chrome y Edge (las automatizadas usan Chromium).
 
+## Versión 2.16.0: disnea mMRC y clase funcional NYHA, 16/11/2026
+
+A petición del médico se agrega una sección de disnea con la mMRC y la NYHA.
+
+| Instrumento | Fuente verificada | Decisiones |
+|---|---|---|
+| Disnea mMRC | Fletcher et al., Br Med J 1959;2(5147):257-66; Mahler y Wells, Chest 1988;93(3):580-6; Bestall et al., Thorax 1999;54(7):581-6; Celli et al., N Engl J Med 2004;350(10):1005-12 (índice BODE); Mahler et al., COPD 2012;9(5):522-7 (poca sensibilidad al cambio); informe GOLD 2027, p. 43 (mMRC ≥ 2 separa «menos» de «más» disnea; equivalente CAAT™ 10). Permisos del MRC en ukri.org, consultados el 16/11/2026. | Grados con redacción propia, numeración mMRC (0–4) y su equivalencia MRC (1–5) en el resultado. Hallazgo desde el grado 2. Se incluye la atribución que pide el MRC y se indican los cambios; como el MRC no autoriza versiones modificadas ni traducciones, la redacción es propia y se anota como confirmación recomendada. |
+| Clase funcional NYHA | Criteria Committee of the NYHA, 9.ª ed., 1994, p. 253-6 (texto en professional.heart.org, © 1994 AHA, consultado el 16/11/2026); Heidenreich et al., Circulation 2022;145(18):e895-e1032; Raphael et al., Heart 2007;93(4):476-82 (concordancia de 54 % entre clases II y III). | Clases resumidas con redacción propia, como la ASA. No se registra la evaluación objetiva (A–D) de 1994. Hallazgo desde la clase II. |
+
 ## Versión 2.15.0: Glasgow y calculadora oficial del CDR, 06/11/2026
 
 | Cambio | Fuente verificada | Decisiones |

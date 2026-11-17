@@ -111,6 +111,8 @@ Estados:
 | Rankin modificada | Grados con redacción propia, secuencia de preguntas para decidir el grado y figuras originales de Huella | Rankin, 1957; van Swieten, 1988; se reproduce libremente, sin condiciones de uso publicadas | Cumple |
 | PPI | Criterios y puntuación publicados | Morita et al., 1999; sin titular de licencias identificado | Cumple |
 | ASA | Clases resumidas con redacción propia | © American Society of Anesthesiologists | Cumple, confirmar |
+| Disnea mMRC | Grados 0 a 4 con redacción propia y su equivalencia con la escala MRC original (1 a 5) | Medical Research Council (UKRI): permite usar su escala con cualquier fin, con la atribución «Used with the permission of the Medical Research Council» e indicando los cambios; no autoriza versiones modificadas ni traducciones | Cumple, confirmar (agregada el 16/11/2026) |
+| Clase funcional NYHA | Clases I a IV resumidas con redacción propia; no reproduce el texto original | Comité de Criterios de la New York Heart Association (9.ª ed., 1994), © 1994 American Heart Association | Cumple, confirmar (agregada el 16/11/2026) |
 | Lubben LSNS-6 | Reactivos con traducción propia | © J. Lubben | Cumple, confirmar |
 | Maltrato (EGM) | Registro de respuestas afirmativas por tipo; no reproduce reactivos | Giraldo-Rodríguez y Rosas-Carrasco (2013), INCMNSZ | Cumple (solo registro) |
 | VES-13 | Reactivos con traducción propia | © RAND: uso no comercial sin costo ni permiso, con reconocimiento a RAND y cita de Saliba et al. (2001) | Cumple |
@@ -162,6 +164,8 @@ Huella usa la *Guía de instrumentos de evaluación de la capacidad funcional* (
 | PPS | Victoria Hospice pide permiso para integrarla en software. Huella solo registra el nivel | Victoria Hospice Society |
 | CIRS-G | No hay condiciones publicadas | Departamento de Psiquiatría, University of Pittsburgh (autores del manual) |
 | ASA | La ASA es titular de la clasificación; Huella la resume con redacción propia | American Society of Anesthesiologists |
+| Disnea mMRC | El MRC autoriza su escala original, pero no puede autorizar versiones modificadas (como la mMRC) ni traducciones; Huella describe los grados con redacción propia | Medical Research Council (corporate@mrc.ukri.org) |
+| Clase funcional NYHA | La American Heart Association es titular del texto de 1994; Huella resume las clases con redacción propia | American Heart Association, Office of Scientific Affairs |
 | Lubben LSNS-6 | Traducción propia; sin condiciones publicadas | J. Lubben (Boston College) |
 | Soledad 3 reactivos | Traducción propia de una escala derivada de UCLA | Autores de la escala (Hughes et al.) |
 | SpRMBPC | El formato del INGER permite reproducirla, pero no hay condiciones publicadas del instrumento original (RMBPC) | Dra. Linda Teri, University of Washington (autora del original y coautora de la versión en español) |
@@ -256,3 +260,5 @@ Versiones completas (hoy solo registro): GPCOG (UNSW), G8 (autores y Nestlé), S
 - NECPAL: documento de SECPAL sobre la app NECPAL.
 - NEWS2: Royal College of Physicians.
 - INGER: aviso legal de la *Guía de instrumentos de evaluación geriátrica integral* (2020).
+- Escala de disnea del MRC: página de permisos de UKRI (ukri.org, «MRC Dyspnoea Scale»).
+- NYHA: «Classification of Functional Capacity and Objective Assessment» (professional.heart.org).

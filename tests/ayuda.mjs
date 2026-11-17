@@ -139,6 +139,8 @@ export const EJEMPLOS = {
   shortfesi: () => resp('shortfesi', { puntaje: 15 }),
   fesi: () => resp('fesi', { puntaje: 30 }),
   glasgow: () => resp('glasgow', { ocular: 'Al sonido', verbal: 'Confusa', motora: 'Obedece órdenes', pupilas: 'No evaluadas' }),
+  mmrc: () => resp('mmrc', { grado: '2 · Camina más lento o hace pausas en plano', otraCausa: 'No' }),
+  nyha: () => resp('nyha', { clase: 'III · Limitación marcada' }),
   pfeiffer: () => resp('pfeiffer', { ...todos('pfeiffer', () => 0), escolaridad: 'Primaria a preparatoria', resta: 'Error', madre: 'Error', fecha: 'Error' }),
   must: () => resp('must', { puntaje: 1 }),
   norton: () => resp('norton', { fisico: 'Aceptable', mental: 'Apático', actividad: 'Camina con ayuda', movilidad: 'Ligeramente limitada', incontinencia: 'Ocasional' }),

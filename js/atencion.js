@@ -99,6 +99,11 @@ export const SUGERENCIAS_DOMINIO = {
     { categoria: 'paliativos', texto: 'Valorar necesidades paliativas y control de síntomas.' },
     { categoria: 'paliativos', texto: 'Conversar sobre objetivos y preferencias de cuidado.' },
   ],
+  disnea: [
+    { categoria: 'otra', texto: 'Buscar la causa de la disnea (respiratoria, cardiaca, anemia, desacondicionamiento o ansiedad).' },
+    { categoria: 'farmacologica', texto: 'Revisar el tratamiento de la enfermedad de base y la técnica de inhalación.' },
+    { categoria: 'ejercicio', texto: 'Rehabilitación pulmonar o cardiaca, o ejercicio adaptado, cuando esté estable.' },
+  ],
   comorbilidad: [
     { categoria: 'otra', texto: 'Revisar el control de las enfermedades crónicas.' },
     { categoria: 'referencia', texto: 'Coordinar el seguimiento entre especialidades.' },

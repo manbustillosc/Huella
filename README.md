@@ -235,6 +235,14 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **VPO:** se cita la reafirmación de septiembre de 2026 de la guía AHA/ACC (mismas recomendaciones que la de 2024) y se listan las guías internacionales citadas.
 - **DXA:** los sitios centrales que el informe declara no interpretables no entran en la categoría densitométrica y se muestran como dato adicional.
 
+## Versión 2.16.0: sección Disnea (mMRC y NYHA)
+
+- **Nueva sección «Disnea»** con dos instrumentos y enlaces a la DASI, la caminata de 6 minutos, el ESAS-r y el NEWS2, que siguen en sus secciones.
+- **Escala de disnea mMRC:** grados 0 a 4 con redacción propia y su equivalencia con la escala MRC original (1 a 5). Marca como hallazgo un grado de 2 o más, el umbral que mantiene el informe GOLD 2027 para separar «menos» de «más» disnea. Campo opcional para anotar que otra causa (dolor, artrosis, fragilidad, deterioro cognitivo) limita la actividad.
+- **Clase funcional NYHA:** clases I a IV con redacción propia, el mismo campo opcional y notas sobre su subjetividad (Raphael, 2007) y su relación con los estadios ACC/AHA (guía 2022).
+- Rutas: ambas en la valoración completa y la paliativa; NYHA también en la prequirúrgica y, como basal, en la hospitalaria.
+- Total: 124 instrumentos. Pruebas en `tests/fase20-disnea.test.mjs`.
+
 ## Versión 2.15.0: Glasgow y calculadora oficial del CDR
 
 - **Escala de coma de Glasgow (GCS)** en «Delirium y conducta» y en la ruta de hospitalización: apertura ocular, respuesta verbal y motora con la terminología de Teasdale (2014), opción «No valorable» en cada componente (entonces no se calcula el total) y GCS-Pupilas opcional (Brennan, 2018). El resultado muestra los componentes (p. ej., 13/15 · E3 V4 M6) y advierte que en personas mayores el Glasgow puede subestimar una lesión intracraneal (Kehoe, 2016).
