@@ -113,6 +113,11 @@ Estados:
 | ASA | Clases resumidas con redacción propia | © American Society of Anesthesiologists | Cumple, confirmar |
 | Disnea mMRC | Grados 0 a 4 con redacción propia y su equivalencia con la escala MRC original (1 a 5) | Medical Research Council (UKRI): permite usar su escala con cualquier fin, con la atribución «Used with the permission of the Medical Research Council» e indicando los cambios; no autoriza versiones modificadas ni traducciones | Cumple, confirmar (agregada el 16/11/2026) |
 | Clase funcional NYHA | Clases I a IV resumidas con redacción propia; no reproduce el texto original | Comité de Criterios de la New York Heart Association (9.ª ed., 1994), © 1994 American Heart Association | Cumple, confirmar (agregada el 16/11/2026) |
+| Grado GOLD (espirometría) | Grados 1 a 4 por FEV₁ con FEV₁/FVC < 0.70, con redacción propia | Criterios del informe GOLD 2027 (© GOLD), citados como hechos; no se reproducen figuras ni texto | Cumple (agregado el 16/11/2026) |
+| Grupo GOLD (A, B, E) | Criterios de 2026-2027 con redacción propia y sugerencias de tratamiento inicial del informe, sin dosis | Criterios del informe GOLD 2027 (© GOLD), citados como hechos | Cumple (agregado el 16/11/2026) |
+| CAAT/CAT | Registro del total (0 a 40); no reproduce las preguntas | © 2009 GlaxoSmithKline; CAT™ y CAAT™, marcas del grupo GSK. Gratuitos en la práctica clínica, sin cambios y solo con traducciones aprobadas; la integración electrónica requiere permiso del Consejo de Gobierno (CAAT@GAAPP.org) | Cumple (solo registro; agregado el 16/11/2026) |
+| Índice BODE | Puntos y cuartiles publicados | Celli et al., 2004; sin titular de licencias identificado | Cumple (agregado el 16/11/2026) |
+| Exacerbación de EPOC (Roma) | Criterios de la propuesta de Roma con redacción propia | Celli et al., 2021, recogidos en el informe GOLD 2027; citados como hechos | Cumple (agregado el 16/11/2026) |
 | Lubben LSNS-6 | Reactivos con traducción propia | © J. Lubben | Cumple, confirmar |
 | Maltrato (EGM) | Registro de respuestas afirmativas por tipo; no reproduce reactivos | Giraldo-Rodríguez y Rosas-Carrasco (2013), INCMNSZ | Cumple (solo registro) |
 | VES-13 | Reactivos con traducción propia | © RAND: uso no comercial sin costo ni permiso, con reconocimiento a RAND y cita de Saliba et al. (2001) | Cumple |
@@ -262,3 +267,5 @@ Versiones completas (hoy solo registro): GPCOG (UNSW), G8 (autores y Nestlé), S
 - INGER: aviso legal de la *Guía de instrumentos de evaluación geriátrica integral* (2020).
 - Escala de disnea del MRC: página de permisos de UKRI (ukri.org, «MRC Dyspnoea Scale»).
 - NYHA: «Classification of Functional Capacity and Objective Assessment» (professional.heart.org).
+- GOLD: informe 2027 y resumen de cambios de 2026 (goldcopd.org).
+- CAAT/CAT: guía de uso del 7 de noviembre de 2024 (GAAPP).

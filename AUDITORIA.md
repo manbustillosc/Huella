@@ -171,6 +171,18 @@ Sección 5 del informe (validación clínica complementaria): en esta versión s
 
 Pendientes: la revisión individual de los demás instrumentos de los 119 con los 12 puntos de la sección 5, y las pruebas manuales en iPhone con Safari, Android con Chrome y Edge (las automatizadas usan Chromium).
 
+## Versión 2.17.0: clasificaciones de la EPOC, 16/11/2026
+
+A petición del médico se agregan más clasificaciones de la EPOC.
+
+| Instrumento | Fuente verificada | Decisiones |
+|---|---|---|
+| Grado GOLD | Informe GOLD 2027, pp. 23 y 32-34 (FEV₁/FVC < 0.7 obligatorio; gravedad por FEV₁ % del predicho; repetir entre 0.6 y 0.8; el cociente fijo clasifica más obstrucción en personas mayores). | Cortes 80, 50 y 30 %, sin cambios en el informe. Con cociente ≥ 0.70 no se asigna grado. |
+| Grupo GOLD (A, B, E) | Resumen de cambios GOLD 2026 («the threshold of one moderate exacerbation»); informe 2027, pp. 43, 45 y 68; Zhang et al., J Glob Health 2026;16:04205 (E con ≥ 1 exacerbación moderada o grave); Choi et al., Chest 2026. | La figura del informe es imagen y no se pudo leer como texto: el criterio de E se confirmó con el resumen de cambios y dos artículos. Si se registran CAAT/CAT y mMRC, se elige uno, como pide GOLD. Las sugerencias de tratamiento citan el informe (p. 68) sin dosis. |
+| CAAT/CAT | Jones et al., Eur Respir J 2009;34(3):648-54; Tomaszewski et al., Respir Res 2023;24:106; Tal-Singer et al., 2025; guía de uso del 7/11/2024 (GAAPP): gratuito en clínica, sin cambios, traducciones aprobadas y permiso para integración electrónica. | Solo registro del total. Niveles de impacto de la tabla clínica de la guía (< 10, 10-20, 21-30, > 30); la guía tiene otra versión con 11-20 en sus preguntas frecuentes. |
+| Índice BODE | Celli et al., N Engl J Med 2004;350(10):1005-12; tabla de puntos reproducida en Funk et al., Respir Res 2009;10:1; Marin et al., Eur Respir J 2013;42(2):323-32. | Cuartiles 0-2, 3-4, 5-6 y 7-10, sin porcentajes de supervivencia. No se incluyó el BODEx porque no se pudo verificar su tabla de puntos. |
+| Exacerbación (Roma) | Celli et al., Am J Respir Crit Care Med 2021;204(11):1251-8; informe GOLD 2027, pp. 104-105 (mismos criterios en el informe 2026, p. 95). | Sin PCR se cuentan 4 criterios. La nota al pie de la categoría moderada sobre la PaO₂ no se usa para clasificar. Si la gasometría es grave con menos de 3 criterios, Huella no la llama «leve»: pide decidir con juicio clínico. |
+
 ## Versión 2.16.0: disnea mMRC y clase funcional NYHA, 16/11/2026
 
 A petición del médico se agrega una sección de disnea con la mMRC y la NYHA.

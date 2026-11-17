@@ -235,6 +235,17 @@ Cada instrumento pertenece a una de seis clases que se distinguen por color y fo
 - **VPO:** se cita la reafirmación de septiembre de 2026 de la guía AHA/ACC (mismas recomendaciones que la de 2024) y se listan las guías internacionales citadas.
 - **DXA:** los sitios centrales que el informe declara no interpretables no entran en la categoría densitométrica y se muestran como dato adicional.
 
+## Versión 2.17.0: clasificaciones de la EPOC
+
+- La sección pasa a llamarse **«Disnea y EPOC»** y suma cinco instrumentos:
+  - **Grado GOLD (espirometría):** GOLD 1 a 4 por el FEV₁ posbroncodilatador cuando FEV₁/FVC es menor de 0.70; acepta el cociente o el porcentaje y avisa que conviene repetir la prueba entre 0.60 y 0.70.
+  - **Grupo GOLD (A, B, E):** criterios de GOLD 2026-2027, en los que una sola exacerbación moderada ya define el grupo E. Puede tomar el CAAT/CAT o la mMRC registrados, con confirmación, y muestra las sugerencias de tratamiento inicial del informe, sin dosis.
+  - **CAAT/CAT:** registro del total (0 a 40) con los niveles de impacto de su guía de uso; no reproduce las preguntas.
+  - **Índice BODE:** IMC, FEV₁, mMRC y caminata de 6 minutos (puede tomar la distancia, la talla y el peso de la caminata); muestra el cuartil, sin porcentajes de supervivencia.
+  - **Gravedad de la exacerbación (propuesta de Roma):** leve, moderada (3 de 5 criterios) o grave (con gasometría), con aviso inmediato si hay acidosis hipercápnica.
+- Rutas: grado y grupo GOLD en la valoración completa, la exacerbación en la hospitalaria y el BODE en la paliativa.
+- Total: 129 instrumentos. Pruebas en `tests/fase21-epoc.test.mjs`.
+
 ## Versión 2.16.0: sección Disnea (mMRC y NYHA)
 
 - **Nueva sección «Disnea»** con dos instrumentos y enlaces a la DASI, la caminata de 6 minutos, el ESAS-r y el NEWS2, que siguen en sus secciones.

@@ -103,6 +103,7 @@ export const SUGERENCIAS_DOMINIO = {
     { categoria: 'otra', texto: 'Buscar la causa de la disnea (respiratoria, cardiaca, anemia, desacondicionamiento o ansiedad).' },
     { categoria: 'farmacologica', texto: 'Revisar el tratamiento de la enfermedad de base y la técnica de inhalación.' },
     { categoria: 'ejercicio', texto: 'Rehabilitación pulmonar o cardiaca, o ejercicio adaptado, cuando esté estable.' },
+    { categoria: 'otra', texto: 'EPOC: vacunas indicadas, plan de acción ante exacerbaciones y revisión de la oxigenoterapia.' },
   ],
   comorbilidad: [
     { categoria: 'otra', texto: 'Revisar el control de las enfermedades crónicas.' },

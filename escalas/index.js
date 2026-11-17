@@ -82,6 +82,7 @@ import { atenas, isarhp, harp, sppicees, susurro, lsa, oars, diazveiga, barreras
 import { silla5, caminata6, caminata400, monopodal, alcance } from './desempeno.js';
 import { gupta, nsqip } from './prequirurgicas.js';
 import { mmrc, nyha } from './disnea.js';
+import { goldgrado, goldabe, cat, bode, exaroma } from './epoc.js';
 
 export const ESCALAS = [
   barthel, katz, lawton, pfeffer, rankin,
@@ -99,7 +100,7 @@ export const ESCALAS = [
   suenoClinico, atenas, isi, epworth, stopbang,
   braden, norton,
   painad, dolorIntensidad,
-  mmrc, nyha,
+  mmrc, nyha, goldgrado, goldabe, cat, bode, exaroma,
   charlson, cirsg, news2, lace, isarhp, harp, sppicees,
   rcri, gupta, nsqip, ariscat, dasi, asa, riesgoqx, caprini,
   pps, karnofsky, ppi, esasr, spict, necpal,

@@ -93,9 +93,9 @@ export const DOMINIOS = [
     planeadas: [],
   },
   {
-    id: 'disnea', nombre: 'Disnea',
-    descripcion: 'Grado de disnea en las actividades diarias (mMRC) y clase funcional en la insuficiencia cardiaca (NYHA); la capacidad funcional (DASI), la caminata de 6 minutos y la intensidad de los síntomas (ESAS-r) están en otras secciones.',
-    problemas: ['disnea', 'falta de aire', 'insuficiencia cardiaca', 'EPOC'],
+    id: 'disnea', nombre: 'Disnea y EPOC',
+    descripcion: 'Disnea (mMRC), clase funcional en la insuficiencia cardiaca (NYHA) y clasificaciones de la EPOC: grado GOLD por espirometría, grupo GOLD A, B o E, CAAT/CAT, índice BODE y gravedad de la exacerbación. La DASI, la caminata de 6 minutos y el ESAS-r están en otras secciones.',
+    problemas: ['disnea', 'falta de aire', 'insuficiencia cardiaca', 'EPOC', 'exacerbación', 'espirometría'],
     planeadas: [],
     relacionadas: ['dasi', 'caminata6', 'esasr', 'news2'],
   },
